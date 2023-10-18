@@ -20,7 +20,7 @@ Django (추가 예정)
 ## 👨‍👨‍👧‍👧 Web-Mage (웹법사) 팀원 소개
 
 ### FrontEnd
-<div align="center">
+<div>
   <table>
     <tr>
       <td align="center" width="150px">
@@ -60,7 +60,7 @@ Django (추가 예정)
 </div>
 
 ### BackEnd
-<div align="center">
+<div>
   <table>
     <tr>
       <td align="center" width="150px">
