@@ -1,6 +1,6 @@
 // src/store/themeSlice.js
 
-import { configureStore, createSlice } from "@reduxjs/toolkit";
+import { createSlice } from "@reduxjs/toolkit";
 
 const themes = {
   light: {
