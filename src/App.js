@@ -1,6 +1,6 @@
 import "./App.css";
 import { Routes, Route } from "react-router-dom";
-import LoginPage from "./pages/Auth/LoginPage";
+import AuthPage from "./pages/AuthPage";
 import { ThemeProvider } from "styled-components";
 import { useSelector } from "react-redux";
 
@@ -10,7 +10,7 @@ function App() {
   return (
     <ThemeProvider theme={currentTheme}>
       <Routes>
-        <Route path="/" element={<LoginPage />} />
+        <Route path="/" element={<AuthPage />} />
       </Routes>
     </ThemeProvider>
   );
