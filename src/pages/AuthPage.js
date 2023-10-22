@@ -24,7 +24,7 @@ let Layout = styled.div`
   align-items: center;
   height: 100vh;
   gap: 160px;
-  background-color: ${(props) => props.theme.backgroundColor};
+  background-color: ${(props) => props.theme.bg};
 `;
 
 let MandaIcon = styled.div`
