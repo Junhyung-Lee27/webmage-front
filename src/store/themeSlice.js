@@ -4,18 +4,24 @@ import { createSlice } from "@reduxjs/toolkit";
 
 const themes = {
   light: {
-    backgroundColor: "#FFFFFF",
-    backgroundColor2: "#EBE9FA",
-    primaryColor: "#7269FF",
-    secondaryColor: "#251F4B",
-    borderColor: "#D8D6E2",
+    bg: "#FFFFFF", // 가장 밝은 배경
+    bg2: "#FAF9FF", // 덜 밝은 배경
+    bg3: "#EBE9FA", // 더 덜 밝은 배경
+    primary: "#7269FF", // 브랜드 컬러
+    secondary: "#251F4B", // 브랜드 서브 컬러
+    font1: "#1A1A1A", // 중요한 텍스트
+    font2: "#5B5B5B", // 덜 중요한 텍스트
+    border: "#D8D6E2", // 경계선 컬러
   },
   dark: {
-    backgroundColor: "#0F0B21",
-    backgroundColor2: "#221C44",
-    primaryColor: "#FFFFFF",
-    secondaryColor: "#7269FF",
-    borderColor: "#3B336C",
+    bg: "#0F0B21", // 가장 어두운 컬러
+    bg2: "#211634", // 덜 어두운 컬러
+    bg3: "#32254A", // 더 덜 어두운 컬러
+    primary: "#7269FF", // 브랜드 컬러
+    secondary: "#B2A8EE", // 브랜드 서브 컬러
+    font1: "#EAEAEA", // 중요한 텍스트
+    font2: "#B2B2B2", // 덜 중요한 텍스트
+    border: "#3C3572", // 경계선 컬러
   },
 };
 
