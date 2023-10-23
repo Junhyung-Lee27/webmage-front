@@ -37,7 +37,6 @@ function ForgotPassword() {
         align="center"
         color={currentTheme.font2}
         cursor="pointer"
-        margin="24px"
         onClick={() => {
           dispatch(showLogin());
         }}

@@ -69,6 +69,7 @@ function SignupForm() {
           align="center"
           color={currentTheme.primary}
           margin="4px 0px 0px 0px"
+          cursor="pointer"
           onClick={() => dispatch(showLogin())}
         >
           로그인
@@ -120,6 +121,7 @@ let StyledText = styled.span`
   color: ${({ color }) => color};
   text-align: ${({ align }) => align};
   margin: ${({ margin }) => margin};
+  cursor: ${({ cursor = "default" }) => cursor};
 `;
 
 export default SignupForm;
