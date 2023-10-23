@@ -7,7 +7,7 @@ import SignupForm from "../components/SignupForm";
 import ForgotPassword from "../components/ForgotPassword";
 
 
-function LoginPage() {
+function AuthPage() {
   const currentTheme = useSelector((state) => state.theme.themes[state.theme.currentTheme]);
   const showingForm = useSelector((state) => state.authpage.showingForm);
   
@@ -60,4 +60,4 @@ let StyledText = styled.span`
   cursor: ${({ cursor = "default" }) => cursor};
 `;
 
-export default LoginPage;
+export default AuthPage;
