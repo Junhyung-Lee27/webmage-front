@@ -1,7 +1,7 @@
 import styled from "styled-components";
 import { useSelector } from "react-redux";
 import MandaIconUrl from "./../assets/images/Manda_icon.svg";
-import ThemeToggle from "../components/ThemeToggle";
+import ThemeSwitch from "../components/ThemeSwitch";
 import LoginForm from "../components/LoginForm";
 import SignupForm from "../components/SignupForm";
 import ForgotPassword from "../components/ForgotPassword";
@@ -25,15 +25,10 @@ function AuthPage() {
         {showingForm === "Signup" && <SignupForm />}
         {showingForm === "ForgotPassword" && <ForgotPassword />}
       </Column>
-      <ThemeToggle />
+      <ThemeSwitch />
     </Layout>
   );
 }
-
-let Column = styled.div`
-  display: flex;
-  flex-direction: column;
-`;
 
 let Layout = styled.div`
   display: flex;
@@ -49,6 +44,12 @@ let MandaIcon = styled.div`
   height: 500px;
   width: 500px;
   background-size: cover;
+`;
+
+let Column = styled.div`
+  display: flex;
+  flex-direction: column;
+  height: 500px;
 `;
 
 let StyledText = styled.span`
