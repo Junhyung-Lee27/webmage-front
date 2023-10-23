@@ -12,13 +12,12 @@ function LoginForm() {
       <StyledText color={currentTheme.primary} size="32" weight="700" align="right">
         만다라트
       </StyledText>
-      <FormGroup></FormGroup>
+      <FormGroup currentTheme={currentTheme}></FormGroup>
     </Column>
   );
 }
 
-function FormGroup(props) {
-  const currentTheme = useSelector((state) => state.theme.themes[state.theme.currentTheme]);
+function FormGroup({currentTheme}) {
 
   return (
     <div>
