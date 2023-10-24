@@ -49,31 +49,31 @@ function FormGroup(props) {
           borderColor={currentTheme.font1}
           margin="4px 0px 24px 0px"
         ></StyledForm>
-        <StyledButton 
-          color= "white"
+        <StyledButton
+          color="white"
           backgroundColor={currentTheme.primary}
           borderColor={currentTheme.primary}
           margin="0px 2px">
           로그인
         </StyledButton>
-        <StyledButton 
-          color= "black"
-          backgroundColor= "#FFFFFF"
-          borderColor= "#000000"
+        <StyledButton
+          color="black"
+          backgroundColor="#FFFFFF"
+          borderColor="#000000"
           margin="8px 2px 0px 2px">
           구글로 시작하기
         </StyledButton>
-        <StyledButton 
-          color= "#191919"
-          backgroundColor= "#FEE500"
-          borderColor= "#FEE500"
+        <StyledButton
+          color="#191919"
+          backgroundColor="#FEE500"
+          borderColor="#FEE500"
           margin="8px 2px 0px 2px">
           카카오로 시작하기
         </StyledButton>
         <StyledButton
-          color= "white"
-          backgroundColor= "#03C75A"
-          borderColor= "#03C75A"
+          color="white"
+          backgroundColor="#03C75A"
+          borderColor="#03C75A"
           margin="8px 2px 0px 2px">
           네이버로 시작하기
         </StyledButton>
@@ -92,7 +92,7 @@ let StyledText = styled.span`
   font-weight: ${({ weight }) => weight};
   color: ${({ color }) => color};
   text-align: ${({ align }) => align};
-  margin: ${({margin}) => margin};
+  margin: ${({ margin }) => margin};
 `;
 
 let StyledForm = styled.input`
@@ -103,13 +103,13 @@ let StyledForm = styled.input`
   border: none;
   border-radius: 8px;
   background-color: ${({ backgroundColor }) => backgroundColor};
-  margin: ${({margin}) => margin};
+  margin: ${({ margin }) => margin};
   &::placeholder {
     color: ${({ placeholderColor }) => placeholderColor};
     opacity: 0.5;
   }
   &:focus {
-    outline: 2px solid ${({borderColor}) => borderColor};
+    outline: 2px solid ${({ borderColor }) => borderColor};
   }
 `;
 
@@ -118,7 +118,7 @@ let StyledButton = styled.button`
   font-size: 16px;
   font-weight: 700;
   line-height: 20px;
-  margin: ${({margin}) => margin};
+  margin: ${({ margin }) => margin};
   color: ${({ color }) => color};
   background-color: ${({ backgroundColor }) => backgroundColor};
   border: 1px solid ${({ borderColor }) => borderColor};
