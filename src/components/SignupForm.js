@@ -10,7 +10,7 @@ function SignupForm() {
     <ThemeProvider theme={theme}>
       <Column>
         <Column>
-          <StyledText weight="600">
+          <StyledText color={theme.font1}>
             <label htmlFor="user-id">아이디</label>
           </StyledText>
           <StyledForm
@@ -19,7 +19,7 @@ function SignupForm() {
             id="user-id"
           ></StyledForm>
 
-          <StyledText weight="600">
+          <StyledText color={theme.font1}>
             <label htmlFor="user-id">비밀번호</label>
           </StyledText>
           <StyledForm
@@ -28,7 +28,7 @@ function SignupForm() {
             id="user-id"
           ></StyledForm>
 
-          <StyledText weight="600">
+          <StyledText color={theme.font1}>
             <label htmlFor="password">비밀번호 확인</label>
           </StyledText>
           <StyledForm
@@ -39,13 +39,13 @@ function SignupForm() {
 
           <StyledButton>회원가입</StyledButton>
 
-          <StyledText align="center" theme={theme.font2}>
+          <StyledText weight="500" align="center" theme={theme.font2}>
             이미 계정이 있으신가요?
           </StyledText>
           <StyledText
             weight="700"
             align="center"
-            theme={theme.primary}
+            color={theme.primary}
             margin="4px"
             cursor="pointer"
             onClick={() => dispatch(showLogin())}
@@ -61,7 +61,7 @@ function SignupForm() {
 let StyledText = styled.span`
   font-size: 14px;
   font-weight: ${({ weight = "600" }) => weight};
-  color: ${({ theme = theme.font1 }) => theme};
+  color: ${({ color }) => color};
   text-align: ${({ align }) => align};
   margin-top: ${({ margin = "16px" }) => margin};
   cursor: ${({ cursor = "default" }) => cursor};
