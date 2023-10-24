@@ -13,7 +13,7 @@ function App() {
     <ThemeProvider theme={currentTheme}>
       <Routes>
         <Route path="/" element={<AuthPage />} />
-        <Route path="/settings" element={<SettingPage />} />
+        <Route path="/setting" element={<SettingPage />} />
         <Route path="/search" element={<SearchPage />} />
       </Routes>
     </ThemeProvider>
