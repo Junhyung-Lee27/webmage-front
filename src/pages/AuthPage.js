@@ -1,4 +1,4 @@
-import styled from "styled-components";
+import styled, { ThemeProvider } from "styled-components";
 import { useSelector } from "react-redux";
 import MandaIconUrl from "./../assets/images/Manda_icon.svg";
 import ThemeSwitch from "../components/ThemeSwitch";
@@ -8,35 +8,37 @@ import ForgotPassword from "../components/ForgotPassword";
 
 
 function AuthPage() {
-  const currentTheme = useSelector((state) => state.theme.themes[state.theme.currentTheme]);
+  const theme = useSelector((state) => state.theme.themes[state.theme.currentTheme]);
   const showingForm = useSelector((state) => state.authpage.showingForm);
   
   return (
-    <Layout theme={currentTheme}>
-      <MandaIcon />
-      <Column>
-        <StyledText color={currentTheme.font1} size="32" weight="700">
-          웹법사와 함께 만드는
-        </StyledText>
-        <StyledText color={currentTheme.primary} size="32" weight="700" align="right">
-          만다라트
-        </StyledText>
-        {showingForm === "Login" && <LoginForm />}
-        {showingForm === "Signup" && <SignupForm />}
-        {showingForm === "ForgotPassword" && <ForgotPassword />}
-      </Column>
-      <ThemeSwitch />
-    </Layout>
+    <ThemeProvider theme={theme}>
+      <PageLayout>
+        <MandaIcon />
+        <Column>
+          <StyledText color={theme.font1} size="32" weight="700">
+            웹법사와 함께 만드는
+          </StyledText>
+          <StyledText color={theme.primary} size="32" weight="700" align="right">
+            만다라트
+          </StyledText>
+          {showingForm === "Login" && <LoginForm />}
+          {showingForm === "Signup" && <SignupForm />}
+          {showingForm === "ForgotPassword" && <ForgotPassword />}
+        </Column>
+        <ThemeSwitch />
+      </PageLayout>
+    </ThemeProvider>
   );
 }
 
-let Layout = styled.div`
+let PageLayout = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
   height: 100vh;
   gap: 160px;
-  background-color: ${(props) => props.theme.bg};
+  background-color: ${({ theme }) => theme.bg};
 `;
 
 let MandaIcon = styled.div`

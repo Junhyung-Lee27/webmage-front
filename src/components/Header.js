@@ -1,4 +1,4 @@
-import styled from "styled-components";
+import styled, { ThemeProvider } from "styled-components";
 import { useSelector } from "react-redux";
 import { NavLink } from "react-router-dom";
 import ThemeSwitch from "../components/ThemeSwitch";
@@ -7,64 +7,66 @@ import {ReactComponent as AccountCircleIcon} from "./../assets/images/AccountCir
 import {ReactComponent as NotificationsIcon} from "./../assets/images/Notifications.svg";
 
 function Header() {
-  const currentTheme = useSelector((state) => state.theme.themes[state.theme.currentTheme]);
+  const theme = useSelector((state) => state.theme.themes[state.theme.currentTheme]);
 
   return (
-    <Row
-      backgroundColor={currentTheme.bg}
-      justifyContent="space-between"
-      padding="0px 196px"
-      boxShadow="0px 4px 4px 0px #00000025"
-    >
-      <Row gap="48px">
-        <MandaIcon />
-        <Row gap="16px">
-          <StyledLink theme={currentTheme} to="/manda" activeClassName="active">
-            만다라트
-          </StyledLink>
-          <StyledLink theme={currentTheme} to="/feed" activeClassName="active">
-            피드
-          </StyledLink>
-          <StyledLink theme={currentTheme} to="/explore" activeClassName="active">
-            탐색
-          </StyledLink>
-          <StyledLink theme={currentTheme} to="/chat" activeClassName="active">
-            채팅
-          </StyledLink>
+    <ThemeProvider theme={theme}>
+      <HeaderLayout position="relative" justifyContent="space-between" padding="0px 196px">
+        <Row gap="48px">
+          <MandaIcon />
+          <Row gap="16px">
+            <StyledLink to="/manda" activeClassName="active">
+              만다라트
+            </StyledLink>
+            <StyledLink to="/feed" activeClassName="active">
+              피드
+            </StyledLink>
+            <StyledLink to="/explore" activeClassName="active">
+              탐색
+            </StyledLink>
+            <StyledLink to="/chat" activeClassName="active">
+              채팅
+            </StyledLink>
+          </Row>
         </Row>
-      </Row>
-      <Row gap="40px">
-        <SearchBox
-          type="text"
-          placeholder="검색"
-          id="search-box"
-          fontColor={currentTheme.font1}
-          placeholderColor={currentTheme.font2}
-          backgroundColor={currentTheme.bg2}
-          borderColor={currentTheme.border}
-          outlineColor={currentTheme.primary}
-        />
-        <Row gap="24px">
-          <StyledNotificationIcon fill={currentTheme.font2}></StyledNotificationIcon>
-          <StyledAccountCircleIcon fill={currentTheme.font2}></StyledAccountCircleIcon>
+        <Row gap="40px">
+          <SearchBox type="text" placeholder="검색" id="search-box" />
+          <Row gap="24px">
+            <StyledNotificationIcon></StyledNotificationIcon>
+            <StyledAccountCircleIcon></StyledAccountCircleIcon>
+          </Row>
+          <ThemeSwitch />
         </Row>
-        <ThemeSwitch />
-      </Row>
-    </Row>
+      </HeaderLayout>
+    </ThemeProvider>
   );
 }
 
-let Row = styled.div`
+let HeaderLayout = styled.div`
+  position: ${({ position }) => position};
+  z-index: 1;
   height: 56px;
   padding: ${({ padding }) => padding};
-  box-shadow: ${({ boxShadow = "none"}) => boxShadow};
   box-sizing: border-box;
   gap: ${({ gap = "16px" }) => gap};
   display: flex;
   flex-direction: row;
   align-items: center;
   justify-content: ${({ justifyContent = "center" }) => justifyContent};
-  background-color: ${({ backgroundColor }) => backgroundColor};
+  background-color: ${({ theme }) => theme.bg};
+  border-bottom: 1px solid ${({ theme }) => theme.border};
+`;
+
+let Row = styled.div`
+  position: ${({ position }) => position};
+  height: 56px;
+  padding: ${({ padding }) => padding};
+  box-sizing: border-box;
+  gap: ${({ gap = "16px" }) => gap};
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: ${({ justifyContent = "center" }) => justifyContent};
 `;
 
 let MandaIcon = styled.object`
@@ -97,29 +99,29 @@ let SearchBox = styled.input`
   padding: 9px 120px 9px 16px;
   box-sizing: border-box;
   font-size: 16px;
-  color: ${({ fontColor }) => fontColor};
-  background-color: ${({ backgroundColor }) => backgroundColor};
-  border: 1px solid ${({ borderColor }) => borderColor};
+  color: ${({ theme }) => theme.font1};
+  background-color: ${({ theme }) => theme.bg2};
+  border: 1px solid ${({ theme }) => theme.border};
   border-radius: 4px;
   &::placeholder {
-    color: ${({ placeholderColor }) => placeholderColor};
+    color: ${({ theme }) => theme.font2};
     opacity: 0.5;
   }
   &:focus {
-    outline: 1px solid ${({ outlineColor }) => outlineColor};
+    outline: 1px solid ${({ theme }) => theme.primary};
   }
 `;
 
 let StyledNotificationIcon = styled(NotificationsIcon)`
   width: 36px;
   height: 36px;
-  fill: ${({ fillColor }) => fillColor};
+  fill: ${({ theme }) => theme.font2};
 `;
 
 let StyledAccountCircleIcon = styled(AccountCircleIcon)`
   width: 36px;
   height: 36px;
-  fill: ${({ fillColor }) => fillColor};
+  fill: ${({ theme }) => theme.font2};
 `;
 
 export default Header;
