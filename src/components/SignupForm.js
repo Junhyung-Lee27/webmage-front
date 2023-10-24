@@ -1,99 +1,88 @@
-import styled from "styled-components";
+import styled, { ThemeProvider } from "styled-components";
 import { useSelector, useDispatch } from "react-redux";
 import { showLogin } from "../store/authpageSlice";
 
 function SignupForm() {
-  const currentTheme = useSelector((state) => state.theme.themes[state.theme.currentTheme]);
+  const theme = useSelector((state) => state.theme.themes[state.theme.currentTheme]);
   const dispatch = useDispatch();
 
   return (
-    <Column>
+    <ThemeProvider theme={theme}>
       <Column>
-        <StyledText color={currentTheme.font1} size="14" weight="600" margin="16px 0px 0px 0px">
-          <label htmlFor="user-id">아이디</label>
-        </StyledText>
-        <StyledForm
-          type="email"
-          placeholder="사용할 이메일을 입력해주세요"
-          id="user-id"
-          fontColor={currentTheme.font1}
-          placeholderColor={currentTheme.font2}
-          backgroundColor={currentTheme.bg2}
-          borderColor={currentTheme.font1}
-          margin="4px 0px 0px 0px"
-        ></StyledForm>
+        <Column>
+          <StyledText weight="600">
+            <label htmlFor="user-id">아이디</label>
+          </StyledText>
+          <StyledForm
+            type="email"
+            placeholder="사용할 이메일을 입력해주세요"
+            id="user-id"
+          ></StyledForm>
 
-        <StyledText color={currentTheme.font1} size="14" weight="600" margin="16px 0px 0px 0px">
-          <label htmlFor="user-id">비밀번호</label>
-        </StyledText>
-        <StyledForm
-          type="email"
-          placeholder="사용할 비밀번호를 입력해주세요"
-          id="user-id"
-          fontColor={currentTheme.font1}
-          placeholderColor={currentTheme.font2}
-          backgroundColor={currentTheme.bg2}
-          borderColor={currentTheme.font1}
-          margin="4px 0px 0px 0px"
-        ></StyledForm>
+          <StyledText weight="600">
+            <label htmlFor="user-id">비밀번호</label>
+          </StyledText>
+          <StyledForm
+            type="email"
+            placeholder="사용할 비밀번호를 입력해주세요"
+            id="user-id"
+          ></StyledForm>
 
-        <StyledText color={currentTheme.font1} size="14" weight="600" margin="16px 0px 0px 0px">
-          <label htmlFor="password">비밀번호 확인</label>
-        </StyledText>
-        <StyledForm
-          type="email"
-          placeholder="비밀번호를 다시 입력해주세요"
-          id="user-id"
-          fontColor={currentTheme.font1}
-          placeholderColor={currentTheme.font2}
-          backgroundColor={currentTheme.bg2}
-          borderColor={currentTheme.font1}
-          margin="4px 0px 0px 0px"
-        ></StyledForm>
+          <StyledText weight="600">
+            <label htmlFor="password">비밀번호 확인</label>
+          </StyledText>
+          <StyledForm
+            type="email"
+            placeholder="비밀번호를 다시 입력해주세요"
+            id="user-id"
+          ></StyledForm>
 
-        <StyledButton
-          color="white"
-          backgroundColor={currentTheme.primary}
-          borderColor={currentTheme.primary}
-          margin="16px 2px 24px 2px"
-        >
-          회원가입
-        </StyledButton>
+          <StyledButton>회원가입</StyledButton>
 
-        <StyledText size="14" align="center" color={currentTheme.font2}>
-          이미 계정이 있으신가요?
-        </StyledText>
-        <StyledText
-          size="14"
-          weight="700"
-          align="center"
-          color={currentTheme.primary}
-          margin="4px 0px 0px 0px"
-          cursor="pointer"
-          onClick={() => dispatch(showLogin())}
-        >
-          로그인
-        </StyledText>
+          <StyledText align="center" theme={theme.font2}>
+            이미 계정이 있으신가요?
+          </StyledText>
+          <StyledText
+            weight="700"
+            align="center"
+            theme={theme.primary}
+            margin="4px"
+            cursor="pointer"
+            onClick={() => dispatch(showLogin())}
+          >
+            로그인
+          </StyledText>
+        </Column>
       </Column>
-    </Column>
+    </ThemeProvider>
   );
 }
+
+let StyledText = styled.span`
+  font-size: 14px;
+  font-weight: ${({ weight = "600" }) => weight};
+  color: ${({ theme = theme.font1 }) => theme};
+  text-align: ${({ align }) => align};
+  margin-top: ${({ margin = "16px" }) => margin};
+  cursor: ${({ cursor = "default" }) => cursor};
+`;
 
 let StyledForm = styled.input`
   height: 24px;
   padding: 8px 16px;
   font-size: 14px;
-  color: ${({ fontColor }) => fontColor};
+  color: ${({ theme }) => theme.font1};
   border: none;
   border-radius: 8px;
-  background-color: ${({ backgroundColor }) => backgroundColor};
-  margin: ${({ margin }) => margin};
+  background-color: ${({ theme }) => theme.bg2};
+  margin-top: 4px;
+
   &::placeholder {
-    color: ${({ placeholderColor }) => placeholderColor};
+    color: ${({ theme }) => theme.font2};
     opacity: 0.5;
   }
   &:focus {
-    outline: 2px solid ${({ borderColor }) => borderColor};
+    outline: 2px solid ${({ theme }) => theme.font1};
   }
 `;
 
@@ -102,26 +91,18 @@ let StyledButton = styled.button`
   font-size: 16px;
   font-weight: 700;
   line-height: 20px;
-  margin: ${({ margin }) => margin};
-  color: ${({ color }) => color};
-  background-color: ${({ backgroundColor }) => backgroundColor};
-  border: 1px solid ${({ borderColor }) => borderColor};
+  margin: 16px 2px 0px 2px;
+  color: white;
+  background-color: ${({ theme }) => theme.primary};
+  border: 1px solid ${({ theme }) => theme.primary};
   border-radius: 8px;
   outline: none;
+  cursor: pointer;
 `;
 
 let Column = styled.div`
   display: flex;
   flex-direction: column;
-`;
-
-let StyledText = styled.span`
-  font-size: ${({ size }) => size + "px"};
-  font-weight: ${({ weight }) => weight};
-  color: ${({ color }) => color};
-  text-align: ${({ align }) => align};
-  margin: ${({ margin }) => margin};
-  cursor: ${({ cursor = "default" }) => cursor};
 `;
 
 export default SignupForm;

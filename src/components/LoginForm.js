@@ -1,87 +1,59 @@
-import styled from "styled-components";
+import styled, { ThemeProvider } from "styled-components";
 import { useDispatch, useSelector } from "react-redux";
 import { showSignup, showForgotPassword } from "../store/authpageSlice";
 
 function LoginForm() {
-  const currentTheme = useSelector((state) => state.theme.themes[state.theme.currentTheme]);
+  const theme = useSelector((state) => state.theme.themes[state.theme.currentTheme]);
   const dispatch = useDispatch();
 
   return (
-    <div>
-      <Column>
-        <StyledText color={currentTheme.font1} size="14" weight="600" margin="24px 0px 0px 0px">
-          <label htmlFor="user-id">아이디</label>
-        </StyledText>
-        <StyledForm
-          type="email"
-          placeholder="이메일을 입력해주세요"
-          id="user-id"
-          fontColor={currentTheme.font1}
-          placeholderColor={currentTheme.font2}
-          backgroundColor={currentTheme.bg2}
-          borderColor={currentTheme.font1}
-          margin="4px 0px 0px 0px"
-        ></StyledForm>
-        <StyledText color={currentTheme.font1} size="14" weight="600" margin="16px 0px 0px 0px">
-          <label htmlFor="password">비밀번호</label>
-        </StyledText>
-        <StyledForm
-          type="password"
-          placeholder="비밀번호를 입력해주세요"
-          id="password"
-          fontColor={currentTheme.font1}
-          placeholderColor={currentTheme.font2}
-          backgroundColor={currentTheme.bg2}
-          borderColor={currentTheme.font1}
-          margin="4px 0px 0px 0px"
-        ></StyledForm>
-        <StyledButton
-          color="white"
-          backgroundColor={currentTheme.primary}
-          borderColor={currentTheme.primary}
-          margin="16px 2px 8px 2px"
-          cursor="pointer"
-        >
-          로그인
-        </StyledButton>
-        <Row>
-          <StyledText
-            size="12"
-            weight="700"
-            align="center"
-            color={currentTheme.font2}
-            cursor="pointer"
-            onClick={() => {
-              dispatch(showSignup());
-            }}
-          >
-            회원가입
+    <ThemeProvider theme={theme}>
+      <div>
+        <Column>
+          <StyledText color={theme.font1} size="14" weight="600" margin="24px 0px 0px 0px">
+            <label htmlFor="user-id">아이디</label>
           </StyledText>
-          <StyledText
-            size="12"
-            weight="700"
-            align="center"
-            color={currentTheme.font2}
-            cursor="pointer"
-            onClick={() => {
-              dispatch(showForgotPassword());
-            }}
-          >
-            비밀번호 찾기
+          <StyledForm type="email" placeholder="이메일을 입력해주세요" id="user-id"></StyledForm>
+          <StyledText color={theme.font1} size="14" weight="600" margin="16px 0px 0px 0px">
+            <label htmlFor="password">비밀번호</label>
           </StyledText>
-        </Row>
-        <LineText
-          size=""
-          color={currentTheme.font2}
-          borderColor={currentTheme.border}
-          margin="24px 0px 0px 0px"
-        >
-          {" "}
-          간편 로그인{" "}
-        </LineText>
-        <SocialLogin currentTheme={currentTheme}></SocialLogin>
-      </Column>
-    </div>
+          <StyledForm
+            type="password"
+            placeholder="비밀번호를 입력해주세요"
+            id="password"
+          ></StyledForm>
+          <StyledButton color="white">로그인</StyledButton>
+          <Row>
+            <StyledText
+              size="12"
+              weight="700"
+              align="center"
+              color={theme.font2}
+              cursor="pointer"
+              onClick={() => {
+                dispatch(showSignup());
+              }}
+            >
+              회원가입
+            </StyledText>
+            <StyledText
+              size="12"
+              weight="700"
+              align="center"
+              color={theme.font2}
+              cursor="pointer"
+              onClick={() => {
+                dispatch(showForgotPassword());
+              }}
+            >
+              비밀번호 찾기
+            </StyledText>
+          </Row>
+          <LineText>간편 로그인</LineText>
+          <SocialLogin theme={theme}></SocialLogin>
+        </Column>
+      </div>
+    </ThemeProvider>
   );
 }
 
@@ -97,20 +69,10 @@ function SocialLogin() {
         >
           G
         </CircleButton>
-        <CircleButton
-          color="#191919"
-          backgroundColor="#FEE500"
-          border="none"
-          borderColor="#FEE500"
-        >
+        <CircleButton color="#191919" backgroundColor="#FEE500" border="none" borderColor="#FEE500">
           K
         </CircleButton>
-        <CircleButton
-          color="white"
-          backgroundColor="#03C75A"
-          border="none"
-          borderColor="#03C75A"
-        >
+        <CircleButton color="white" backgroundColor="#03C75A" border="none" borderColor="#03C75A">
           N
         </CircleButton>
       </Row>
@@ -145,17 +107,17 @@ let StyledForm = styled.input`
   height: 24px;
   padding: 8px 16px;
   font-size: 14px;
-  color: ${({ fontColor }) => fontColor};
+  color: ${({ theme }) => theme.font1};
   border: none;
   border-radius: 8px;
-  background-color: ${({ backgroundColor }) => backgroundColor};
-  margin: ${({ margin }) => margin};
+  background-color: ${({ theme }) => theme.bg2};
+  margin-top: 4px;
   &::placeholder {
-    color: ${({ placeholderColor }) => placeholderColor};
+    color: ${({ theme }) => theme.font2};
     opacity: 0.5;
   }
   &:focus {
-    outline: 2px solid ${({ borderColor }) => borderColor};
+    outline: 2px solid ${({ theme }) => theme.primary};
   }
 `;
 
@@ -164,13 +126,13 @@ let StyledButton = styled.button`
   font-size: 16px;
   font-weight: 700;
   line-height: 20px;
-  margin: ${({ margin }) => margin};
+  margin: 24px 2px 8px 2px;
   color: ${({ color }) => color};
-  background-color: ${({ backgroundColor }) => backgroundColor};
-  border: 1px solid ${({ borderColor }) => borderColor};
+  background-color: ${({ theme }) => theme.primary};
+  border: 1px solid ${({ theme }) => theme.primary};
   border-radius: 8px;
   outline: none;
-  cursor: ${({ cursor = "default" }) => cursor};
+  cursor: pointer;
 `;
 
 let CircleButton = styled.button`
@@ -189,18 +151,18 @@ let CircleButton = styled.button`
 
 const LineText = styled.div`
   font-size: 13px;
-  color: ${({ color }) => color};
+  color: ${({ theme }) => theme.font2};
   display: flex;
   align-items: center;
   text-align: center;
-  margin: ${({ margin }) => margin};
+  margin: 24px 0px 0px 0px;
   cursor: default;
 
   &:before,
   &:after {
     content: "";
     flex: 1;
-    border-bottom: 1px solid ${({ borderColor }) => borderColor};
+    border-bottom: 1px solid ${({ theme }) => theme.border};
   }
 
   &:before {
