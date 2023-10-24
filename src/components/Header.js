@@ -1,36 +1,53 @@
 import styled from "styled-components";
 import { useSelector } from "react-redux";
-import { NavLink } from 'react-router-dom';
+import { NavLink } from "react-router-dom";
 import ThemeSwitch from "../components/ThemeSwitch";
 import MandaIconUrl from "./../assets/images/Manda_icon.svg";
+import {ReactComponent as AccountCircleIcon} from "./../assets/images/AccountCircle.svg";
+import {ReactComponent as NotificationsIcon} from "./../assets/images/Notifications.svg";
 
 function Header() {
   const currentTheme = useSelector((state) => state.theme.themes[state.theme.currentTheme]);
 
   return (
-    <Row backgroundColor={currentTheme.bg} justifyContent="space-between" padding="0px 196px">
+    <Row
+      backgroundColor={currentTheme.bg}
+      justifyContent="space-between"
+      padding="0px 196px"
+      boxShadow="0px 4px 4px 0px #00000025"
+    >
       <Row gap="48px">
         <MandaIcon />
         <Row gap="16px">
-          <StyledLink theme={currentTheme} to="/manda" activeClassName="active">만다라트</StyledLink>
-          <StyledLink theme={currentTheme} to="/feed" activeClassName="active">피드</StyledLink>
-          <StyledLink theme={currentTheme} to="/explore" activeClassName="active">탐색</StyledLink>
-          <StyledLink theme={currentTheme} to="/chat" activeClassName="active">채팅</StyledLink>
+          <StyledLink theme={currentTheme} to="/manda" activeClassName="active">
+            만다라트
+          </StyledLink>
+          <StyledLink theme={currentTheme} to="/feed" activeClassName="active">
+            피드
+          </StyledLink>
+          <StyledLink theme={currentTheme} to="/explore" activeClassName="active">
+            탐색
+          </StyledLink>
+          <StyledLink theme={currentTheme} to="/chat" activeClassName="active">
+            채팅
+          </StyledLink>
         </Row>
       </Row>
-      <Row>
+      <Row gap="40px">
         <SearchBox
           type="text"
           placeholder="검색"
           id="search-box"
           fontColor={currentTheme.font1}
           placeholderColor={currentTheme.font2}
-          backgroundColor={currentTheme.bg3}
-          borderColor={currentTheme.font1}
-          margin="4px 0px 0px 0px"
-          />
-        <div>알림 아이콘</div>
-        <div>옵션 아이콘</div>
+          backgroundColor={currentTheme.bg2}
+          borderColor={currentTheme.border}
+          outlineColor={currentTheme.primary}
+        />
+        <Row gap="24px">
+          <StyledNotificationIcon fill={currentTheme.font2}></StyledNotificationIcon>
+          <StyledAccountCircleIcon fill={currentTheme.font2}></StyledAccountCircleIcon>
+        </Row>
         <ThemeSwitch />
       </Row>
     </Row>
@@ -40,6 +57,8 @@ function Header() {
 let Row = styled.div`
   height: 56px;
   padding: ${({ padding }) => padding};
+  box-shadow: ${({ boxShadow = "none"}) => boxShadow};
+  box-sizing: border-box;
   gap: ${({ gap = "16px" }) => gap};
   display: flex;
   flex-direction: row;
@@ -48,7 +67,7 @@ let Row = styled.div`
   background-color: ${({ backgroundColor }) => backgroundColor};
 `;
 
-let MandaIcon = styled.div`
+let MandaIcon = styled.object`
   background-image: url(${MandaIconUrl});
   height: 48px;
   width: 48px;
@@ -71,24 +90,36 @@ let StyledLink = styled(NavLink)`
   &:hover {
     color: ${({ theme }) => theme.secondary};
   }
-`
+`;
 
 let SearchBox = styled.input`
   height: 34px;
-  padding: 7px 120px 7px 16px;
-  margin: 11px 0px;
+  padding: 9px 120px 9px 16px;
+  box-sizing: border-box;
   font-size: 16px;
   color: ${({ fontColor }) => fontColor};
-  border: none;
-  border-radius: 4px;
   background-color: ${({ backgroundColor }) => backgroundColor};
+  border: 1px solid ${({ borderColor }) => borderColor};
+  border-radius: 4px;
   &::placeholder {
     color: ${({ placeholderColor }) => placeholderColor};
     opacity: 0.5;
   }
   &:focus {
-    outline: 2px solid ${({ borderColor }) => borderColor};
+    outline: 1px solid ${({ outlineColor }) => outlineColor};
   }
+`;
+
+let StyledNotificationIcon = styled(NotificationsIcon)`
+  width: 36px;
+  height: 36px;
+  fill: ${({ fillColor }) => fillColor};
+`;
+
+let StyledAccountCircleIcon = styled(AccountCircleIcon)`
+  width: 36px;
+  height: 36px;
+  fill: ${({ fillColor }) => fillColor};
 `;
 
 export default Header;
