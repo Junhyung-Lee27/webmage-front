@@ -1,53 +1,33 @@
 import styled, { ThemeProvider } from "styled-components";
-import { useSelector, useDispatch } from "react-redux";
-import { showProfileEdit, showBlockedUsers, showDeleteAccount } from "./../store/settingpageSlice";
+import { useSelector } from "react-redux";
 import Header from "../components/Header";
-import ProfileEdit from "../components/ProfileEdit";
-import BlockedUsers from "../components/BlockedUsers";
-import DeleteAccount from "../components/DeleteAccount";
 import { ReactComponent as UserEditIcon } from "./../assets/images/UserEdit.svg";
 import { ReactComponent as UserXIcon } from "./../assets/images/UserX.svg";
-import { ReactComponent as LogoutIcon } from "./../assets/images/Logout.svg";
+import { ReactComponent as UserDeleteIcon } from "./../assets/images/UserDelete.svg";
 
 function SettingPage() {
-  const dispatch = useDispatch();
   const theme = useSelector((state) => state.theme.themes[state.theme.currentTheme]);
-  const activeItem = useSelector((state) => state.settingpage.activeItem);
 
   return (
     <ThemeProvider theme={theme}>
-      <PageLayout>
+      <PageLayout >
         <Header></Header>
-        <Body>
-          <MenuLayout>
-            <MenuContainer
-              bordercolor={theme.border}
-              onClick={() => dispatch(showProfileEdit())}
-              $isActive={activeItem === "ProfileEdit"}
-            >
-              <StyledUserEditIcon />
-              <MenuText marginleft="-2px">프로필 수정</MenuText>
+        <Body >
+          <MenuLayout >
+            <MenuContainer >
+              <StyledUserEditIcon  />
+              <MenuText  marginleft="-2px">프로필 수정</MenuText>
             </MenuContainer>
-            <MenuContainer
-              bordercolor={theme.border}
-              onClick={() => dispatch(showBlockedUsers())}
-              $isActive={activeItem === "BlockedUsers"}
-            >
-              <StyledUserXIcon />
-              <MenuText>차단/신고 리스트</MenuText>
+            <MenuContainer bordercolor={theme.border}>
+              <StyledUserXIcon  />
+              <MenuText >차단/신고 리스트</MenuText>
             </MenuContainer>
-            <MenuContainer
-              bordercolor={theme.border}
-              onClick={() => dispatch(showDeleteAccount())}
-              $isActive={activeItem === "DeleteAccount"}
-            >
-              <StyledLogoutIcon />
-              <MenuText>로그아웃</MenuText>
+            <MenuContainer bordercolor={theme.border}>
+              <StyledUserDeleteIcon  />
+              <MenuText >회원탈퇴</MenuText>
             </MenuContainer>
           </MenuLayout>
-          {activeItem === "ProfileEdit" && <ProfileEdit />}
-          {activeItem === "BlockedUsers" && <BlockedUsers />}
-          {activeItem === "DeleteAccount" && <DeleteAccount />}
+          <div>본문</div>
         </Body>
       </PageLayout>
     </ThemeProvider>
@@ -77,11 +57,27 @@ let MenuLayout = styled.div`
   background-color: ${({ theme }) => theme.bg};
 `;
 
+let MenuContainer = styled.div`
+  height: 56px;
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 16px;
+  padding: 0px 24px;
+  border-bottom: 1px solid ${({ theme }) => theme.border};
+
+  &:hover {
+    color: ${({ theme }) => theme.secondary};
+    fill: ${({ theme }) => theme.secondary};
+  }
+`;
+
 let MenuText = styled.span`
   font-size: 14px;
   margin: ${({ marginleft }) => marginleft};
   color: ${({ theme }) => theme.font1};
-`;
+`
 
 let StyledUserEditIcon = styled(UserEditIcon)`
   fill: ${({ theme }) => theme.font2};
@@ -92,31 +88,8 @@ let StyledUserXIcon = styled(UserXIcon)`
   fill: ${({ theme }) => theme.font2};
 `;
 
-let StyledLogoutIcon = styled(LogoutIcon)`
+let StyledUserDeleteIcon = styled(UserDeleteIcon)`
   fill: ${({ theme }) => theme.font2};
-`;
-
-let MenuContainer = styled.div`
-  height: 56px;
-  display: flex;
-  flex-direction: row;
-  justify-content: flex-start;
-  align-items: center;
-  gap: 16px;
-  padding: 0px 24px;
-  border-bottom: 1px solid ${({ theme }) => theme.border};
-  background-color: none;
-  cursor: default;
-
-  ${MenuText}, ${StyledLogoutIcon}, ${StyledUserEditIcon}, ${StyledUserXIcon} {
-    color: ${({ $isActive, theme }) => ($isActive ? theme.primary : theme.font1)};
-    fill: ${({ $isActive, theme }) => ($isActive ? theme.primary : theme.font1)};
-    font-weight: ${({ $isActive }) => ($isActive ? 700 : 500)};
-  }
-
-  &:hover {
-    background-color: ${({ theme }) => theme.bg2};
-  }
 `;
 
 export default SettingPage;
