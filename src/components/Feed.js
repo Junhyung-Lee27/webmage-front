@@ -1,11 +1,13 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import styled, { ThemeProvider } from "styled-components";
 import theme from "./theme";
 
 function Feed({ userInfo, contentInfo }) {
     const currentTheme = useSelector((state) => state.theme.themes[state.theme.currentTheme]);
-    const userName = "testName1";
+    const currentFilter = useSelector((state) => state.theme.filters[state.theme.currentTheme]);
+    const userName = "오르미";
+    const [emojiInfo, setEmojiInfo] = useState({});
 
     const formatDateAgo = (date) => {
         const now = new Date();
@@ -34,6 +36,31 @@ function Feed({ userInfo, contentInfo }) {
         }
     }
 
+    const getEmojiInfo = (emoji_count) => {
+        let maxKey = null;
+        let nextMaxKey = null;
+        let maxVal = -Infinity;
+        let nextMaxVal = -Infinity;
+        let total_count = 0;
+
+        for (let key in emoji_count) {
+            total_count += emoji_count[key];
+            if (emoji_count[key] > maxVal) {
+                nextMaxKey = maxKey;
+                nextMaxVal = maxVal;
+                maxKey = key;
+                maxVal = emoji_count[key];
+            } else if (emoji_count[key] > nextMaxVal) {
+                nextMaxKey = key;
+                nextMaxVal = emoji_count[key];
+            }
+        }
+
+        return { total_count, maxKey, nextMaxKey };
+    }
+    useEffect(() => {
+        setEmojiInfo(getEmojiInfo(contentInfo.emoji_count));
+    }, []);
     return (
         <ThemeProvider theme={theme}>
             <FeedBox bgcolor={currentTheme.bg3}>
@@ -68,7 +95,7 @@ function Feed({ userInfo, contentInfo }) {
                         </TextBox>
                     </UserInfo>
                     {userInfo.userName == userName ? (
-                        <MenuIcon src={process.env.PUBLIC_URL + "/menu-horizontal.svg"} />
+                        <MediumIcon src={process.env.PUBLIC_URL + "/icon/menu-horizontal.svg"} filter={currentFilter.font1} />
                     ) : (
                         userInfo.isFallowing ? (
                             <FallowingButton color={currentTheme.primary} colorhover={currentTheme.secondary}>
@@ -91,8 +118,112 @@ function Feed({ userInfo, contentInfo }) {
                         >
                             {contentInfo.content}
                         </StyledText>
+                        <AchieveCount color={currentTheme.font1}>
+                            <StyledText
+                                size="0.625rem"
+                                color={currentTheme.font1}
+                            >
+                                {contentInfo.content_count}회 실천
+                            </StyledText>
+                        </AchieveCount>
+                    </FlexBox>
+                    <FlexBox>
+                        <TitleBox>
+                            <StyledText
+                                size="0.75rem"
+                                weight="500"
+                                color={currentTheme.font2}
+                                margin="0 0 0.25rem 0"
+                            >
+                                핵심 목표
+                            </StyledText>
+                            <StyledText
+                                size="0.875rem"
+                                weight="500"
+                                color={currentTheme.font1}
+                            >
+                                {contentInfo.main_title}
+                            </StyledText>
+                        </TitleBox>
+                        <TitleBox>
+                            <StyledText
+                                size="0.75rem"
+                                weight="500"
+                                color={currentTheme.font2}
+                                margin="0 0 0.25rem 0"
+                            >
+                                세부 목표
+                            </StyledText>
+                            <StyledText
+                                size="0.875rem"
+                                weight="500"
+                                color={currentTheme.font1}
+                            >
+                                {contentInfo.sub_title}
+                            </StyledText>
+                        </TitleBox>
                     </FlexBox>
                 </FeedTitle>
+                <FeedArticle>
+                    <PictureWrap>
+                        <Picture src={contentInfo.content_img} />
+                    </PictureWrap>
+                    <StyledText
+                        size="1rem"
+                        weight="500"
+                        color={currentTheme.font1}
+                    >
+                        {contentInfo.post}
+                    </StyledText>
+                    <div>
+                        {contentInfo.tags.map((tag) => {
+                            return (
+                                <StyledText
+                                    size="1rem"
+                                    weight="500"
+                                    color={currentTheme.primary}
+                                    key={tag}
+                                >
+                                    {"#" + tag + " "}
+                                </StyledText>
+                            )
+                        })}
+                    </div>
+                </FeedArticle>
+                <FeedFooter>
+                    <CommunicationBox>
+                        {emojiInfo.total_count != 0 ? (
+                            <IconBox>
+                                <SmallIcon src={process.env.PUBLIC_URL + `/icon/${emojiInfo.maxKey}.svg`} />
+                                <SmallIcon src={process.env.PUBLIC_URL + `/icon/${emojiInfo.nextMaxKey}.svg`} />
+                                <StyledText
+                                    size="1rem"
+                                    weight="500"
+                                    color={currentTheme.font1}
+                                >
+                                    {emojiInfo.total_count}
+                                </StyledText>
+                            </IconBox>
+                        ) : null}
+                        {contentInfo.comment_info == [] ? null : (
+                            <IconBox>
+                                <SmallIcon src={process.env.PUBLIC_URL + "/icon/comment-fill.svg"} />
+                                <StyledText
+                                    size="1rem"
+                                    weight="500"
+                                    color={currentTheme.font1}
+                                >
+                                    {contentInfo.comment_info.length}
+                                </StyledText>
+                            </IconBox>
+                        )}
+                        <IconBox>
+                            <SmallIcon src={process.env.PUBLIC_URL + "/icon/addEmoji.svg"} filter={currentFilter.font1} />
+                            <SmallIcon src={process.env.PUBLIC_URL + "/icon/addComment.svg"} filter={currentFilter.font1} />
+                        </IconBox>
+                    </CommunicationBox>
+                    <SmallIcon src={process.env.PUBLIC_URL + "/icon/report.svg"} filter={currentFilter.font1} />
+                </FeedFooter>
             </FeedBox>
         </ThemeProvider>
     )
@@ -100,6 +231,8 @@ function Feed({ userInfo, contentInfo }) {
 
 let FlexBox = styled.div`
     ${({ theme }) => theme.flexBox.rowLeftCenter};
+    gap: 1rem;
+    width:100%;
 `;
 let StyledText = styled.span`
     font-size: ${({ size }) => size};
@@ -143,8 +276,13 @@ let ProfileImgWrapper = styled.div`
 let ProfileImg = styled.img`
     ${({ theme }) => theme.common.circleImg};
 `;
-let MenuIcon = styled.img`
+let MediumIcon = styled.img`
     ${({ theme }) => theme.iconSize.medium};
+    filter: ${({ filter }) => filter};
+`;
+let SmallIcon = styled.img`
+    ${({ theme }) => theme.iconSize.small};
+    filter: ${({ filter }) => filter};
 `;
 let FallowButton = styled.button`
     border: 1px solid ${({ color }) => color};
@@ -185,7 +323,48 @@ let FeedTitle = styled.div`
     margin: 1.5rem 0 1rem 0;
 `;
 let AchieveCount = styled.span`
-
+    ${({ theme }) => theme.flexBox.rowCenter};
+    border: 1px solid ${({ color }) => color};
+    width: 3rem;
+    height: 1rem;
+    border-radius: 0.5rem;
 `;
+let TitleBox = styled.div`
+    ${({ theme }) => theme.flexBox.columnLeftCenter};
+    width: 50%;
+    margin: 1rem 0;
+`;
+let FeedArticle = styled.div`
+    ${({ theme }) => theme.flexBox.columnLeftCenter};
+    width:100%;
+    gap:1rem;
+`;
+let PictureWrap = styled.div`
+    padding-top: 65%;
+    position: relative;
+    width: 100%;
+`;
+let Picture = styled.img`
+    height: 100%;
+    position: absolute;
+    width: 100%;
+    object-fit: cover;
+    left: 0;
+    top: 0;
+    border-radius:0.25rem;
+`;
+let FeedFooter = styled.div`
+    ${({ theme }) => theme.flexBox.rowSpaceBetween};
+    width: 100%;
+`;
+let CommunicationBox = styled.div`
+    ${({ theme }) => theme.flexBox.rowLeftCenter};
+    gap: 1rem;
+    margin: 1rem 0;
+`;
+let IconBox = styled.div`
+    ${({ theme }) => theme.flexBox.rowLeftCenter};
+    gap: 0.5rem;
+`
 
 export default Feed;

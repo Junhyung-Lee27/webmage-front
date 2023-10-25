@@ -27,18 +27,20 @@ const feedInfo = [
                 "프로그래밍",
                 "지식갱신",
             ],
-            emoji_count: [10, 6, 4, 3, 3, 1],
+            emoji_count: {
+                like: 10,
+                dislike: 0,
+                heart: 6,
+                smile: 4,
+                sad: 1,
+                angry: 1,
+            },
             comment_info: [
                 {
-                    username: "test1comment1",
-                    comment: "test1comment1 content ~~~~~~~asdfasdfasdf\n12312312124124",
+                    username: "오르미",
+                    comment: "오늘 수업 잘들었습니다!",
                     upload_date: new Date(2023, 9, 21, 6, 18, 0),
                 },
-                {
-                    username: "test1comment2",
-                    comment: "test1comment2 content ~~~~~~~asdfasdfasdf\jjjjjjjjjjjj",
-                    upload_date: new Date(2023, 9, 24, 1, 20, 0),
-                }
             ]
         }
     },
@@ -64,12 +66,24 @@ const feedInfo = [
                 "알고리즘",
                 "보충수업",
             ],
-            emoji_count: [10, 6, 4, 3, 3, 0],
+            emoji_count: {
+                like: 13,
+                dislike: 2,
+                heart: 4,
+                smile: 1,
+                sad: 0,
+                angry: 0,
+            },
             comment_info: [
                 {
                     username: "이스트",
                     comment: "대단하세요!",
                     upload_date: new Date(2023, 9, 21, 6, 18, 0),
+                },
+                {
+                    username: "김도언",
+                    comment: "잘 하고 계십니다",
+                    upload_date: new Date(2023, 9, 24, 1, 20, 0),
                 }
             ]
         }
