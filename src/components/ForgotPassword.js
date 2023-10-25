@@ -64,7 +64,7 @@ let StyledForm = styled.input`
     opacity: 0.5;
   }
   &:focus {
-    outline: 2px solid ${({ theme }) => theme.border};
+    outline: 2px solid ${({ theme }) => theme.primary};
   }
 `;
 
