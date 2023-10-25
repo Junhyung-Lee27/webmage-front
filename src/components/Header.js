@@ -21,7 +21,7 @@ function Header() {
             <StyledLink to="/feed" activeclassname="active">
               피드
             </StyledLink>
-            <StyledLink to="/explore" activeclassname="active">
+            <StyledLink to="/search" activeclassname="active">
               탐색
             </StyledLink>
             <StyledLink to="/chat" activeclassname="active">
