@@ -113,15 +113,20 @@ let SearchBox = styled.input`
 `;
 
 let StyledNotificationIcon = styled(NotificationsIcon)`
-  width: 36px;
-  height: 36px;
   fill: ${({ theme }) => theme.font2};
+
+  &:hover {
+  fill: ${({ theme }) => theme.secondary};
+  }
+
 `;
 
 let StyledAccountCircleIcon = styled(AccountCircleIcon)`
-  width: 36px;
-  height: 36px;
   fill: ${({ theme }) => theme.font2};
+
+  &:hover {
+    fill: ${({ theme }) => theme.secondary};
+  }
 `;
 
 export default Header;
