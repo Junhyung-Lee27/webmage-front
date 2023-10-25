@@ -6,7 +6,6 @@ import theme from "./theme";
 function Feed({ userInfo, contentInfo }) {
     const currentTheme = useSelector((state) => state.theme.themes[state.theme.currentTheme]);
     const userName = "testName1";
-    console.log(currentTheme);
 
     const formatDateAgo = (date) => {
         const now = new Date();
@@ -37,7 +36,7 @@ function Feed({ userInfo, contentInfo }) {
 
     return (
         <ThemeProvider theme={theme}>
-            <FeedBox bgColor={currentTheme.bg3}>
+            <FeedBox bgcolor={currentTheme.bg3}>
                 <FeedHeader>
                     <UserInfo>
                         <ProfileImgWrapper>
@@ -72,11 +71,11 @@ function Feed({ userInfo, contentInfo }) {
                         <MenuIcon src={process.env.PUBLIC_URL + "/menu-horizontal.svg"} />
                     ) : (
                         userInfo.isFallowing ? (
-                            <FallowingButton bgColor={currentTheme.bg2} color={currentTheme.primary} colorhover={currentTheme.secondary}>
+                            <FallowingButton color={currentTheme.primary} colorhover={currentTheme.secondary}>
                                 팔로잉
                             </FallowingButton>
                         ) : (
-                            <FallowButton color={currentTheme.font2} colorhover={currentTheme.primary}>
+                            <FallowButton bgcolor={currentTheme.bg3} color={currentTheme.font2} colorhover={currentTheme.primary}>
                                 +팔로우
                             </FallowButton>
                         )
@@ -90,11 +89,9 @@ function Feed({ userInfo, contentInfo }) {
                             weight="700"
                             color={currentTheme.font1}
                         >
-                            {formatDateAgo(contentInfo.upload_date)}
+                            {contentInfo.content}
                         </StyledText>
-
                     </FlexBox>
-
                 </FeedTitle>
             </FeedBox>
         </ThemeProvider>
@@ -115,11 +112,13 @@ let FeedBox = styled.div`
     ${({ theme }) => theme.flexBox.rowCenter};
     ${({ theme }) => theme.font.importPretendard};
     font-family: Pretendard-Regular;
-    background-color: ${({ bgColor }) => bgColor};
+    background-color: ${({ bgcolor }) => bgcolor};
     flex-direction: column;
     // box-shadow: 0px 0.5rem 1.5rem 0px rgba(0, 0, 0, 0.15);
     width: 60%;
     padding: 1.75rem 2.5rem;
+    margin: 1rem;
+    border-radius: 0.5rem;
 `;
 let FeedHeader = styled.div`
     ${({ theme }) => theme.flexBox.rowSpaceBetween};
@@ -133,10 +132,13 @@ let TextBox = styled.div`
     ${({ theme }) => theme.flexBox.columnLeftCenter};
     width: calc(100% - 4rem);
     gap: 0.25rem;
+    flex-shrink: 1;
+    flex-glow: 1;
 `;
 let ProfileImgWrapper = styled.div`
     width: 4rem;
     height: 4rem;
+    flex-shrink: 0;
 `;
 let ProfileImg = styled.img`
     ${({ theme }) => theme.common.circleImg};
@@ -147,6 +149,7 @@ let MenuIcon = styled.img`
 let FallowButton = styled.button`
     border: 1px solid ${({ color }) => color};
     color: ${({ color }) => color};
+    background-color: ${({ bgcolor }) => bgcolor};
     border-radius: 1rem;
     width: 6rem;
     height: 2rem;
@@ -178,6 +181,8 @@ let FallowingButton = styled.button`
 `;
 let FeedTitle = styled.div`
     ${({ theme }) => theme.flexBox.columnLeftCenter};
+    width: 100%;
+    margin: 1.5rem 0 1rem 0;
 `;
 let AchieveCount = styled.span`
 
