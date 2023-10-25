@@ -37,7 +37,7 @@ function Feed({ userInfo, contentInfo }) {
 
     return (
         <ThemeProvider theme={theme}>
-            <FeedBox >
+            <FeedBox bgColor={currentTheme.bg3}>
                 <FeedHeader>
                     <UserInfo>
                         <ProfileImgWrapper>
@@ -69,10 +69,10 @@ function Feed({ userInfo, contentInfo }) {
                         </TextBox>
                     </UserInfo>
                     {userInfo.userName == userName ? (
-                        <MenuIcon src="/menu-horizontal.svg" />
+                        <MenuIcon src={process.env.PUBLIC_URL + "/menu-horizontal.svg"} />
                     ) : (
                         userInfo.isFallowing ? (
-                            <FallowingButton color={currentTheme.primary} colorhover={currentTheme.secondary}>
+                            <FallowingButton bgColor={currentTheme.bg2} color={currentTheme.primary} colorhover={currentTheme.secondary}>
                                 팔로잉
                             </FallowingButton>
                         ) : (
@@ -84,6 +84,16 @@ function Feed({ userInfo, contentInfo }) {
                     }
                 </FeedHeader>
                 <FeedTitle>
+                    <FlexBox>
+                        <StyledText
+                            size="1rem"
+                            weight="700"
+                            color={currentTheme.font1}
+                        >
+                            {formatDateAgo(contentInfo.upload_date)}
+                        </StyledText>
+
+                    </FlexBox>
 
                 </FeedTitle>
             </FeedBox>
@@ -91,8 +101,8 @@ function Feed({ userInfo, contentInfo }) {
     )
 }
 
-let Layout = styled.div`
-    ${({ theme }) => theme.common.layout};
+let FlexBox = styled.div`
+    ${({ theme }) => theme.flexBox.rowLeftCenter};
 `;
 let StyledText = styled.span`
     font-size: ${({ size }) => size};
@@ -104,11 +114,12 @@ let StyledText = styled.span`
 let FeedBox = styled.div`
     ${({ theme }) => theme.flexBox.rowCenter};
     ${({ theme }) => theme.font.importPretendard};
+    font-family: Pretendard-Regular;
+    background-color: ${({ bgColor }) => bgColor};
     flex-direction: column;
-    box-shadow: 0px 0.5rem 1.5rem 0px rgba(0, 0, 0, 0.15);
+    // box-shadow: 0px 0.5rem 1.5rem 0px rgba(0, 0, 0, 0.15);
     width: 60%;
     padding: 1.75rem 2.5rem;
-    font-family: Pretendard-Regular;
 `;
 let FeedHeader = styled.div`
     ${({ theme }) => theme.flexBox.rowSpaceBetween};
@@ -167,6 +178,9 @@ let FallowingButton = styled.button`
 `;
 let FeedTitle = styled.div`
     ${({ theme }) => theme.flexBox.columnLeftCenter};
+`;
+let AchieveCount = styled.span`
+
 `;
 
 export default Feed;

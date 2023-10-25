@@ -15,6 +15,12 @@ const font = {
 };
 
 const flexBox = {
+    rowLeftCenter: `
+        display: flex;
+        flex-direction: row;
+        justify-content: flex-start;
+        align-items: center;
+    `,
     rowCenter: `
         display: flex;
         flex-direction: row;
@@ -37,7 +43,7 @@ const flexBox = {
         display: flex;
         flex-direction: column;
         justify-content: center;
-        align-items: left;
+        align-items: flex-start;
     `
 };
 
