@@ -5,9 +5,10 @@ import Header from "../components/Header";
 import ProfileEdit from "../components/ProfileEdit";
 import BlockedUsers from "../components/BlockedUsers";
 import DeleteAccount from "../components/DeleteAccount";
-import { ReactComponent as UserEditIcon } from "./../assets/images/UserEdit.svg";
-import { ReactComponent as UserXIcon } from "./../assets/images/UserX.svg";
-import { ReactComponent as LogoutIcon } from "./../assets/images/Logout.svg";
+import { ReactComponent as editIcon } from "./../assets/images/edit.svg";
+import { ReactComponent as blockIcon } from "./../assets/images/block.svg";
+import { ReactComponent as logoutIcon } from "./../assets/images/logout.svg";
+import { ReactComponent as withdrawIcon } from "./../assets/images/withdraw.svg";
 
 function SettingPage() {
   const dispatch = useDispatch();
@@ -25,7 +26,7 @@ function SettingPage() {
               onClick={() => dispatch(showProfileEdit())}
               $isActive={activeItem === "ProfileEdit"}
             >
-              <StyledUserEditIcon />
+              <StyledEditIcon />
               <MenuText marginleft="-2px">프로필 수정</MenuText>
             </MenuContainer>
             <MenuContainer
@@ -33,16 +34,20 @@ function SettingPage() {
               onClick={() => dispatch(showBlockedUsers())}
               $isActive={activeItem === "BlockedUsers"}
             >
-              <StyledUserXIcon />
+              <StyledBlockIcon />
               <MenuText>차단/신고 리스트</MenuText>
+            </MenuContainer>
+            <MenuContainer bordercolor={theme.border} onClick={() => {}}>
+              <StyledLogoutIcon />
+              <MenuText>로그아웃</MenuText>
             </MenuContainer>
             <MenuContainer
               bordercolor={theme.border}
               onClick={() => dispatch(showDeleteAccount())}
               $isActive={activeItem === "DeleteAccount"}
             >
-              <StyledLogoutIcon />
-              <MenuText>로그아웃</MenuText>
+              <StyledWithdrawIcon />
+              <MenuText>회원탈퇴</MenuText>
             </MenuContainer>
           </MenuLayout>
           {activeItem === "ProfileEdit" && <ProfileEdit />}
@@ -83,16 +88,20 @@ let MenuText = styled.span`
   color: ${({ theme }) => theme.font1};
 `;
 
-let StyledUserEditIcon = styled(UserEditIcon)`
+let StyledEditIcon = styled(editIcon)`
   fill: ${({ theme }) => theme.font2};
   margin-left: 4px;
 `;
 
-let StyledUserXIcon = styled(UserXIcon)`
+let StyledBlockIcon = styled(blockIcon)`
   fill: ${({ theme }) => theme.font2};
 `;
 
-let StyledLogoutIcon = styled(LogoutIcon)`
+let StyledLogoutIcon = styled(logoutIcon)`
+  fill: ${({ theme }) => theme.font2};
+`;
+
+let StyledWithdrawIcon = styled(withdrawIcon)`
   fill: ${({ theme }) => theme.font2};
 `;
 
@@ -108,7 +117,7 @@ let MenuContainer = styled.div`
   background-color: none;
   cursor: default;
 
-  ${MenuText}, ${StyledLogoutIcon}, ${StyledUserEditIcon}, ${StyledUserXIcon} {
+  ${MenuText}, ${StyledEditIcon}, ${StyledBlockIcon}, ${StyledLogoutIcon}, ${StyledWithdrawIcon} {
     color: ${({ $isActive, theme }) => ($isActive ? theme.primary : theme.font1)};
     fill: ${({ $isActive, theme }) => ($isActive ? theme.primary : theme.font1)};
     font-weight: ${({ $isActive }) => ($isActive ? 700 : 500)};
