@@ -1,7 +1,10 @@
 import Feed from "../components/Feed";
 import styled from "styled-components";
 import { useSelector } from "react-redux";
-import ThemeSwitch from "../components/ThemeSwitch";
+import { ThemeProvider } from "styled-components";
+import Header from "../components/Header";
+import theme from "../components/theme";
+import UserRecommend from "../components/UserRecommend";
 
 const feedInfo = [
     {
@@ -91,38 +94,127 @@ const feedInfo = [
 ]
 
 function FeedPage() {
-    const currentTheme = useSelector((state) => state.theme.themes[state.currentTheme]);
+    const currentTheme = useSelector((state) => state.theme.themes[state.theme.currentTheme]);
     return (
-        <Layout theme={currentTheme}>
-            <ThemeSwitch />
-            <PageBox>
-                {feedInfo.map((feed) => (
-                    <Feed
-                        key={feed.contentInfo.id}
-                        userInfo={feed.userInfo}
-                        contentInfo={feed.contentInfo}
-                    />
-                ))}
-            </PageBox>
-        </Layout>
-    )
+        <ThemeProvider theme={theme}>
+            <Header />
+            <Layout theme={currentTheme}>
+                <PageBox className="pageBox">
+                    <FlexBox>
+                        <Nav>
+                            <StyledText
+                                size="1rem"
+                                weight="700"
+                                color={currentTheme.border}
+                            >마이</StyledText>
+                            <StyledText
+                                size="1rem"
+                                weight="700"
+                                color={currentTheme.font1}
+                            >전체</StyledText>
+                        </Nav>
+                        <Feeds>
+                            {feedInfo.map((feed) => (
+                                <Feed
+                                    key={feed.contentInfo.id}
+                                    userInfo={feed.userInfo}
+                                    contentInfo={feed.contentInfo}
+                                />
+                            ))}
+                        </Feeds>
+                    </FlexBox>
+                    <Aside>
+                        <WriteFeed bgcolor={currentTheme.primary}>
+                            <StyledText
+                                size="1rem"
+                                weight="700"
+                                color={currentTheme.bg}
+                            >피드 작성</StyledText>
+                        </WriteFeed>
+                        <Recommend>
+                            <StyledText
+                                size="1rem"
+                                weight="700"
+                                color={currentTheme.font1}
+                                margin="0 0 0 1.5rem"
+                            >추천</StyledText>
+                            <UserRecommend />
+                            <UserRecommend />
+                            <UserRecommend />
+                            <UserRecommend />
+                            <UserRecommend />
+                            <UserRecommend />
+                        </Recommend>
+                    </Aside>
+                </PageBox>
+            </Layout>
+        </ThemeProvider>
+    );
 }
 
 let Layout = styled.div`
   display: flex;
+  flex-direction: column;
   justify-content: center;
+  align-items:center;
   gap: 160px;
   background-color: ${(props) => props.theme.bg};
+  margin-top:2rem;
 `;
 
 let PageBox = styled.div`
-    dislay:flex;
+    display:flex;
+    flex-direction: row;
     justify-content: center;
     width: 1440px;
     @media screen and (max-width: 1440px) {
         width: 100vw;
-
     }
+    gap:0.5rem;
+    padding:0 1rem;
+    ${({ theme }) => theme.font.importPretendard};
+    font-family: Pretendard-Regular;
 `;
+let FlexBox = styled.div`
+    ${({ theme }) => theme.flexBox.columnLeftCenter};
+    width:100%;
+`;
+let Feeds = styled.div`
+    ${({ theme }) => theme.flexBox.columnCenterTop};
+    width:100%;
+`;
+let StyledText = styled.span`
+    font-size: ${({ size }) => size};
+    font-weight: ${({ weight }) => weight};
+    color: ${({ color }) => color};
+    text-align: ${({ align }) => align};
+    margin: ${({ margin }) => margin};
+`;
+let Aside = styled.div`
+    ${({ theme }) => theme.flexBox.columnCenterTop};
+    width: 250px;
+    gap: 1.5rem;
+    margin-top:2rem;
+`;
+let WriteFeed = styled.button`
+    width:250px;
+    height: 60px;
+    border:none;
+    border-radius:4px;
+    ${({ theme }) => theme.flexBox.rowCenter};
+    background-color: ${({ bgcolor }) => bgcolor};
+    margin-left:3rem;
+`;
+let Recommend = styled.div`
+    width:100%;
+    ${({ theme }) => theme.flexBox.columnLeftCenter};
+    gap:0.5rem;
+`;
+let Nav = styled.div`
+    width:100%;
+    ${({ theme }) => theme.flexBox.rowLeftCenter};
+    gap:1.5rem;
+    margin-left:0.5rem;
+`
 
 export default FeedPage;
