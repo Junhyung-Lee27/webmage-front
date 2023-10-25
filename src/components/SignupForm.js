@@ -23,18 +23,18 @@ function SignupForm() {
             <label htmlFor="user-id">비밀번호</label>
           </StyledText>
           <StyledForm
-            type="email"
+            type="password"
             placeholder="사용할 비밀번호를 입력해주세요"
-            id="user-id"
+            id="password"
           ></StyledForm>
 
           <StyledText color={theme.font1}>
             <label htmlFor="password">비밀번호 확인</label>
           </StyledText>
           <StyledForm
-            type="email"
+            type="password"
             placeholder="비밀번호를 다시 입력해주세요"
-            id="user-id"
+            id="password-check"
           ></StyledForm>
 
           <StyledButton>회원가입</StyledButton>

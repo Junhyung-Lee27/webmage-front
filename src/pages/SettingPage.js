@@ -16,13 +16,13 @@ function SettingPage() {
           <MenuLayout >
             <MenuContainer >
               <StyledUserEditIcon  />
-              <MenuText  marginLeft="-2px">프로필 수정</MenuText>
+              <MenuText  marginleft="-2px">프로필 수정</MenuText>
             </MenuContainer>
-            <MenuContainer borderColor={theme.border}>
+            <MenuContainer bordercolor={theme.border}>
               <StyledUserXIcon  />
               <MenuText >차단/신고 리스트</MenuText>
             </MenuContainer>
-            <MenuContainer borderColor={theme.border}>
+            <MenuContainer bordercolor={theme.border}>
               <StyledUserDeleteIcon  />
               <MenuText >회원탈퇴</MenuText>
             </MenuContainer>
@@ -75,7 +75,7 @@ let MenuContainer = styled.div`
 
 let MenuText = styled.span`
   font-size: 14px;
-  margin: ${({ marginLeft }) => marginLeft};
+  margin: ${({ marginleft }) => marginleft};
   color: ${({ theme }) => theme.font1};
 `
 

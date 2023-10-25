@@ -1,6 +1,9 @@
 import styled, { ThemeProvider } from "styled-components";
 import { useDispatch, useSelector } from "react-redux";
 import { showSignup, showForgotPassword } from "../store/authpageSlice";
+import KakaoLogoUrl from "./../assets/images/KaKao_Logo.svg";
+import NaverLogoUrl from "./../assets/images/Naver_Logo.svg";
+import GoogleLogoUrl from "./../assets/images/Google_Logo.svg";
 
 function LoginForm() {
   const theme = useSelector((state) => state.theme.themes[state.theme.currentTheme]);
@@ -63,18 +66,27 @@ function SocialLogin() {
       <Row margin="16px 0px 0px 0px">
         <CircleButton
           color="black"
-          backgroundColor="#FFFFFF"
-          border="1px solid #000000"
-          borderColor="#000000"
-        >
-          G
-        </CircleButton>
-        <CircleButton color="#191919" backgroundColor="#FEE500" border="none" borderColor="#FEE500">
-          K
-        </CircleButton>
-        <CircleButton color="white" backgroundColor="#03C75A" border="none" borderColor="#03C75A">
-          N
-        </CircleButton>
+          backgroundcolor="#FFFFFF"
+          border="1px solid #00000030"
+          backgroundimage={GoogleLogoUrl}
+          backgroundsize="50%"
+        ></CircleButton>
+        <CircleButton
+          color="#191919"
+          backgroundcolor="#FEE500"
+          border="none"
+          bordercolor="#FEE500"
+          backgroundimage={KakaoLogoUrl}
+          backgroundsize="50%"
+        ></CircleButton>
+        <CircleButton
+          color="white"
+          backgroundcolor="#03C75A"
+          border="none"
+          bordercolor="#03C75A"
+          backgroundimage={NaverLogoUrl}
+          backgroundsize="95%"
+        ></CircleButton>
       </Row>
     </Column>
   );
@@ -139,7 +151,11 @@ let CircleButton = styled.button`
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  background-color: ${({ backgroundColor }) => backgroundColor};
+  background-color: ${({ backgroundcolor }) => backgroundcolor};
+  background-image: ${({ backgroundimage }) => `url(${backgroundimage})`};
+  background-size: ${({ backgroundsize }) => backgroundsize};
+  background-repeat: no-repeat;
+  background-position: center center;
   color: ${({ color }) => color};
   border: ${({ border }) => border};
   outline: none;

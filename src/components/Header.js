@@ -11,20 +11,20 @@ function Header() {
 
   return (
     <ThemeProvider theme={theme}>
-      <HeaderLayout position="relative" justifyContent="space-between" padding="0px 196px">
+      <HeaderLayout position="relative" justifycontent="space-between" padding="0px 196px">
         <Row gap="48px">
           <MandaIcon />
           <Row gap="16px">
-            <StyledLink to="/manda" activeClassName="active">
+            <StyledLink to="/manda" activeclassname="active">
               만다라트
             </StyledLink>
-            <StyledLink to="/feed" activeClassName="active">
+            <StyledLink to="/feed" activeclassname="active">
               피드
             </StyledLink>
-            <StyledLink to="/explore" activeClassName="active">
+            <StyledLink to="/explore" activeclassname="active">
               탐색
             </StyledLink>
-            <StyledLink to="/chat" activeClassName="active">
+            <StyledLink to="/chat" activeclassname="active">
               채팅
             </StyledLink>
           </Row>
@@ -52,7 +52,7 @@ let HeaderLayout = styled.div`
   display: flex;
   flex-direction: row;
   align-items: center;
-  justify-content: ${({ justifyContent = "center" }) => justifyContent};
+  justify-content: ${({ justifycontent = "center" }) => justifycontent};
   background-color: ${({ theme }) => theme.bg};
   border-bottom: 1px solid ${({ theme }) => theme.border};
 `;
@@ -66,7 +66,7 @@ let Row = styled.div`
   display: flex;
   flex-direction: row;
   align-items: center;
-  justify-content: ${({ justifyContent = "center" }) => justifyContent};
+  justify-content: ${({ justifycontent = "center" }) => justifycontent};
 `;
 
 let MandaIcon = styled.object`
