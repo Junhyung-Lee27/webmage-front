@@ -3,6 +3,8 @@ import { Routes, Route } from "react-router-dom";
 import AuthPage from "./pages/AuthPage";
 import SettingPage from "./pages/SettingPage";
 import SearchPage from "./pages/SearchPage";
+import MainPage from "./pages/MainPage.js";
+import MandaWritePage from "./pages/MandaWritePage.js";
 import { ThemeProvider } from "styled-components";
 import { useSelector } from "react-redux";
 
@@ -13,6 +15,8 @@ function App() {
     <ThemeProvider theme={currentTheme}>
       <Routes>
         <Route path="/" element={<AuthPage />} />
+        <Route path="/manda" element={<MainPage />} />
+        <Route path="/mandawrite" element={<MandaWritePage />} />
         <Route path="/settings" element={<SettingPage />} />
         <Route path="/search" element={<SearchPage />} />
       </Routes>
