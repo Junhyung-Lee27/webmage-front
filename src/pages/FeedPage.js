@@ -1,7 +1,7 @@
 import Feed from "../components/Feed";
 import styled from "styled-components";
 import { useSelector } from "react-redux";
-import ThemeToggle from "../components/ThemeToggle";
+import ThemeSwitch from "../components/ThemeSwitch";
 
 const feedInfo = [
     {
@@ -80,7 +80,7 @@ function FeedPage() {
     const currentTheme = useSelector((state) => state.theme.themes[state.currentTheme]);
     return (
         <Layout theme={currentTheme}>
-            <ThemeToggle />
+            <ThemeSwitch />
             <PageBox>
                 {feedInfo.map((feed) => (
                     <Feed
