@@ -32,8 +32,10 @@ function Header() {
         <Row gap="40px">
           <SearchBox type="text" placeholder="검색" id="search-box" />
           <Row gap="24px">
-            <StyledNotificationIcon></StyledNotificationIcon>
-            <StyledAccountCircleIcon></StyledAccountCircleIcon>
+            <StyledNotificationIcon />
+            <NavLink to="/setting">
+              <StyledAccountCircleIcon />
+            </NavLink>
           </Row>
           <ThemeSwitch />
         </Row>
