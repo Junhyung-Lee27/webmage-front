@@ -1,6 +1,6 @@
 import styled, { ThemeProvider } from "styled-components";
 import { useSelector, useDispatch } from "react-redux";
-import { showProfileView, showAccountView, showBlockedUsers, showDeleteAccount } from "./../store/settingpageSlice";
+import { showProfileView, showAccountView, showBlockedUsers } from "./../store/settingpageSlice";
 import componentTheme from "./../components/theme";
 
 import Header from "../components/Header";

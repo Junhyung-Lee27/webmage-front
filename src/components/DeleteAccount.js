@@ -1,5 +1,4 @@
 import styled, { ThemeProvider } from "styled-components";
-import { useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import componentTheme from "./theme";
 import { showProfileView } from "./../store/settingpageSlice";

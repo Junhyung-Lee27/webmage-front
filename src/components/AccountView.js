@@ -41,7 +41,7 @@ function AccountInfo({ setIsEditing, theme }) {
   );
 }
 
-function AccountEdit({ theme }) {
+function AccountEdit() {
   return (
     <FormLayout>
       <LabelText>
