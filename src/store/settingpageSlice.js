@@ -3,11 +3,14 @@ import { createSlice } from "@reduxjs/toolkit";
 const settingpageSlice = createSlice({
   name: "settingpage",
   initialState: {
-    activeItem: "ProfileEdit",
+    activeItem: "ProfileView",
   },
   reducers: {
-    showProfileEdit: (state) => {
-      state.activeItem = "ProfileEdit";
+    showProfileView: (state) => {
+      state.activeItem = "ProfileView";
+    },
+    showAccountView: (state) => {
+      state.activeItem = "AccountView";
     },
     showBlockedUsers: (state) => {
       state.activeItem = "BlockedUsers";
@@ -18,5 +21,5 @@ const settingpageSlice = createSlice({
   },
 });
 
-export const { showProfileEdit, showBlockedUsers, showDeleteAccount } = settingpageSlice.actions;
+export const { showProfileView, showAccountView, showBlockedUsers, showDeleteAccount } = settingpageSlice.actions;
 export default settingpageSlice.reducer;

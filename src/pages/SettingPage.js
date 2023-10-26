@@ -1,11 +1,14 @@
 import styled, { ThemeProvider } from "styled-components";
 import { useSelector, useDispatch } from "react-redux";
-import { showProfileEdit, showBlockedUsers, showDeleteAccount } from "./../store/settingpageSlice";
+import { showProfileView, showAccountView, showBlockedUsers, showDeleteAccount } from "./../store/settingpageSlice";
+import componentTheme from "./../components/theme";
+
 import Header from "../components/Header";
-import ProfileEdit from "../components/ProfileEdit";
+import ProfileView from "../components/ProfileView";
+import AccountView from "../components/AccountView";
 import BlockedUsers from "../components/BlockedUsers";
 import DeleteAccount from "../components/DeleteAccount";
-import componentTheme from "./../components/theme"
+
 
 function SettingPage() {
   const dispatch = useDispatch();
@@ -28,14 +31,25 @@ function SettingPage() {
           <MenuLayout>
             <MenuContainer
               bordercolor={theme.color.border}
-              onClick={() => dispatch(showProfileEdit())}
-              $isActive={activeItem === "ProfileEdit"}
+              onClick={() => dispatch(showProfileView())}
+              $isActive={activeItem === "ProfileView"}
             >
               <SmallIcon
-                src={process.env.PUBLIC_URL + "/icon/edit.svg"}
+                src={process.env.PUBLIC_URL + "/icon/manage-profile.svg"}
                 filter={theme.filter.font1}
               />
-              <MenuText marginleft="-2px">프로필 수정</MenuText>
+              <MenuText marginleft="-2px">프로필 관리</MenuText>
+            </MenuContainer>
+            <MenuContainer
+              bordercolor={theme.color.border}
+              onClick={() => dispatch(showAccountView())}
+              $isActive={activeItem === "AccountView"}
+            >
+              <SmallIcon
+                src={process.env.PUBLIC_URL + "/icon/manage-account.svg"}
+                filter={theme.filter.font1}
+              />
+              <MenuText marginleft="-2px">계정 관리</MenuText>
             </MenuContainer>
             <MenuContainer
               bordercolor={theme.color.border}
@@ -43,31 +57,14 @@ function SettingPage() {
               $isActive={activeItem === "BlockedUsers"}
             >
               <SmallIcon
-                src={process.env.PUBLIC_URL + "/icon/block.svg"}
+                src={process.env.PUBLIC_URL + "/icon/blocked-users.svg"}
                 filter={theme.filter.font1}
               />
               <MenuText>차단/신고 리스트</MenuText>
             </MenuContainer>
-            <MenuContainer bordercolor={theme.color.border} onClick={() => {}}>
-              <SmallIcon
-                src={process.env.PUBLIC_URL + "/icon/logout.svg"}
-                filter={theme.filter.font1}
-              />
-              <MenuText>로그아웃</MenuText>
-            </MenuContainer>
-            <MenuContainer
-              bordercolor={theme.color.border}
-              onClick={() => dispatch(showDeleteAccount())}
-              $isActive={activeItem === "DeleteAccount"}
-            >
-              <SmallIcon
-                src={process.env.PUBLIC_URL + "/icon/withdraw.svg"}
-                filter={theme.filter.font1}
-              />
-              <MenuText>회원탈퇴</MenuText>
-            </MenuContainer>
           </MenuLayout>
-          {activeItem === "ProfileEdit" && <ProfileEdit />}
+          {activeItem === "ProfileView" && <ProfileView />}
+          {activeItem === "AccountView" && <AccountView />}
           {activeItem === "BlockedUsers" && <BlockedUsers />}
           {activeItem === "DeleteAccount" && <DeleteAccount />}
         </Body>
@@ -94,15 +91,18 @@ let Body = styled.div`
 let MenuLayout = styled.div`
   display: flex;
   flex-direction: column;
-  width: 240px;
-  border-right: 2px solid ${({ theme }) => theme.color.border};
+  width: 216px;
+  border-right: 1px solid ${({ theme }) => theme.color.border};
   background-color: ${({ theme }) => theme.color.bg};
 `;
 
 let MenuText = styled.span`
   font-size: 14px;
   margin: ${({ marginleft }) => marginleft};
-  color: ${({ theme }) => theme.color.font1};
+`;
+
+let SmallIcon = styled.img`
+  ${({ theme }) => theme.component.iconSize.small};
 `;
 
 let MenuContainer = styled.div`
@@ -120,11 +120,14 @@ let MenuContainer = styled.div`
   &:hover {
     background-color: ${({ theme }) => theme.color.bg2};
   }
-`;
 
-let SmallIcon = styled.img`
-    ${({ theme }) => theme.component.iconSize.small};
-    filter: ${({ theme }) => theme.filter.font2};
+  ${MenuText} {
+    color: ${({ $isActive, theme }) => ($isActive ? theme.color.primary : theme.color.font1)};
+  }
+
+  ${SmallIcon} {
+    filter: ${({ $isActive, theme }) => ($isActive ? theme.filter.primary : theme.filter.font2)};
+  }
 `;
 
 export default SettingPage;

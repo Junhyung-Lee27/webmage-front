@@ -1,35 +1,58 @@
 import styled, { ThemeProvider } from "styled-components";
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import componentTheme from "./theme";
-import { showProfileEdit } from "./../store/settingpageSlice";
+import { showProfileView } from "./../store/settingpageSlice";
 
 function DeleteAccount() {
   const colorTheme = useSelector((state) => state.theme.themes[state.theme.currentTheme]);
-  const combinedTheme = {
+  const theme = {
     color: colorTheme,
     component: componentTheme,
   };
-  const navigate = useNavigate();
   const dispatch = useDispatch();
 
-
-
   return (
-    <ThemeProvider theme={combinedTheme}>
+    <ThemeProvider theme={theme}>
       <ModalOverlay>
         <ModalContent>
-          <StyledText>정말 탈퇴하시나요? 😢</StyledText>
+          <StyledText
+            fontsize="20px"
+            fontweight="700"
+            color={theme.color.font1}
+            margin="0px 0px 56px 0px"
+            align="center"
+          >
+            정말 탈퇴하시나요? 😢
+          </StyledText>
+          <StyledText
+            fontsize="14px"
+            fontweight="500"
+            color={theme.color.font2}
+            margin="0px 0px 12px 0px"
+            align="left"
+          >
+            안전한 탈퇴를 위해 비밀번호를 입력해주세요.
+          </StyledText>
+          <StyledForm type="password" placeholder="비밀번호 입력"></StyledForm>
+          <StyledText
+            fontsize="16px"
+            fontweight="600"
+            color="{theme.color.font2}"
+            margin="0px 0px 16px 0px"
+          >
+            탈퇴시, 계정은 삭제되며 복구되지 않습니다.
+          </StyledText>
           <Buttons>
             <StyledButton
-              color={colorTheme.primary}
-              backgroundcolor={colorTheme.bg}
-              bordercolor={colorTheme.primary}
-              onClick={() => dispatch(showProfileEdit())}
+              color={theme.color.font1}
+              backgroundcolor={theme.color.bg3}
+              border="none"
+              onClick={() => dispatch(showProfileView())}
             >
               취소
             </StyledButton>
-            <StyledButton color="white" backgroundcolor={colorTheme.primary}>
+            <StyledButton color="white" backgroundcolor="#FF4C4C">
               탈퇴하기
             </StyledButton>
           </Buttons>
@@ -62,14 +85,15 @@ let ModalContent = styled.div`
   border-radius: 8px;
   max-width: 808px;
   max-height: 80%;
-  gap: 32px;
 `;
 
 let StyledText = styled.span`
-  font-size: 20px;
-  font-weight: 700;
-  text-align: center;
-  color: ${({ theme }) => theme.color.font1};
+  font-size: ${({ fontsize }) => fontsize};
+  font-weight: ${({ fontweight }) => fontweight};
+  color: ${({ color }) => color};
+  margin: ${({ margin }) => margin};
+  text-align: ${({ align }) => align};
+  width: 100%;
 `;
 
 let Buttons = styled.div`
@@ -86,14 +110,33 @@ let StyledButton = styled.button`
   font-weight: 700;
   line-height: 20px;
   width: 50%;
-  min-width: 60%;
+  min-width: 50%;
   padding: 12px 24px;
   color: ${({ color }) => color};
   background-color: ${({ backgroundcolor }) => backgroundcolor};
-  border: 1px solid ${({ bordercolor }) => bordercolor};
+  border: none;
   border-radius: 8px;
   outline: none;
   cursor: pointer;
+`;
+
+let StyledForm = styled.input`
+  width: 100%;
+  box-sizing: border-box;
+  padding: 16px;
+  font-size: 14px;
+  color: ${({ theme }) => theme.color.font1};
+  border: none;
+  border-radius: 8px;
+  background-color: ${({ theme }) => theme.color.bg2};
+  margin-bottom: 40px;
+  &::placeholder {
+    color: ${({ theme }) => theme.color.font2};
+    opacity: 0.5;
+  }
+  &:focus {
+    outline: 2px solid ${({ theme }) => theme.color.primary};
+  }
 `;
 
 export default DeleteAccount;
