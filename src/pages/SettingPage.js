@@ -118,15 +118,16 @@ let MenuContainer = styled.div`
   cursor: default;
 
   &:hover {
-    background-color: ${({ theme }) => theme.color.bg2};
+    background-color: ${({ theme }) => theme.color.bg3};
   }
 
   ${MenuText} {
-    color: ${({ $isActive, theme }) => ($isActive ? theme.color.primary : theme.color.font1)};
+    color: ${({ $isActive, theme }) => ($isActive ? theme.color.font1 : theme.color.font2)};
+    font-weight: ${({ $isActive }) => ($isActive ? "bold" : "normal")};
   }
 
   ${SmallIcon} {
-    filter: ${({ $isActive, theme }) => ($isActive ? theme.filter.primary : theme.filter.font2)};
+    filter: ${({ $isActive, theme }) => ($isActive ? theme.filter.font1 : theme.filter.font2)};
   }
 `;
 
