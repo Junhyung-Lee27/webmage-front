@@ -31,7 +31,7 @@ function SettingPage() {
               onClick={() => dispatch(showProfileEdit())}
               $isActive={activeItem === "ProfileEdit"}
             >
-              <MediumIcon
+              <SmallIcon
                 src={process.env.PUBLIC_URL + "/icon/edit.svg"}
                 filter={theme.filter.font1}
               />
@@ -42,14 +42,14 @@ function SettingPage() {
               onClick={() => dispatch(showBlockedUsers())}
               $isActive={activeItem === "BlockedUsers"}
             >
-              <MediumIcon
+              <SmallIcon
                 src={process.env.PUBLIC_URL + "/icon/block.svg"}
                 filter={theme.filter.font1}
               />
               <MenuText>차단/신고 리스트</MenuText>
             </MenuContainer>
             <MenuContainer bordercolor={theme.color.border} onClick={() => {}}>
-              <MediumIcon
+              <SmallIcon
                 src={process.env.PUBLIC_URL + "/icon/logout.svg"}
                 filter={theme.filter.font1}
               />
@@ -60,7 +60,7 @@ function SettingPage() {
               onClick={() => dispatch(showDeleteAccount())}
               $isActive={activeItem === "DeleteAccount"}
             >
-              <MediumIcon
+              <SmallIcon
                 src={process.env.PUBLIC_URL + "/icon/withdraw.svg"}
                 filter={theme.filter.font1}
               />
@@ -122,9 +122,9 @@ let MenuContainer = styled.div`
   }
 `;
 
-let MediumIcon = styled.img`
-    ${({ theme }) => theme.component.iconSize.medium};
-    filter: ${({ filter }) => filter};
+let SmallIcon = styled.img`
+    ${({ theme }) => theme.component.iconSize.small};
+    filter: ${({ theme }) => theme.filter.font2};
 `;
 
 export default SettingPage;
