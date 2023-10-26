@@ -22,17 +22,23 @@ function AuthPage() {
       <PageLayout>
         <MandaIcon src={process.env.PUBLIC_URL + "/logo/Manda_logo1.svg"} />
         <Column>
-          <StyledText color={theme.color.font1} size="32" weight="700">
+          <StyledText color={theme.color.font1} size="32" weight="700" margin="0px 0px 6px 0px">
             웹법사와 함께 만드는
           </StyledText>
-          <StyledText color={theme.color.primary} size="32" weight="700" align="right">
+          <StyledText
+            color={theme.color.primary}
+            size="32"
+            weight="700"
+            align="right"
+            margin="0px 0px 12px 0px"
+          >
             만다라트
           </StyledText>
+          <ThemeSwitch />
           {showingForm === "Login" && <LoginForm />}
           {showingForm === "Signup" && <SignupForm />}
           {showingForm === "ForgotPassword" && <ForgotPassword />}
         </Column>
-        <ThemeSwitch />
       </PageLayout>
     </ThemeProvider>
   );
