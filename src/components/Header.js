@@ -148,14 +148,14 @@ let LogoutBtn = styled.button`
   font-size: 14px;
   font-weight: 600;
   color: ${({ theme }) => theme.color.font2};
-  border: 2px solid ${({ theme }) => theme.color.font2};
+  border: 1px solid ${({ theme }) => theme.color.font2};
   border-radius: 4px;
   background-color: ${({ theme }) => theme.color.bg};
   cursor: pointer;
 
   &:hover {
     color: ${({ theme }) => theme.color.secondary};
-    border: 2px solid ${({ theme }) => theme.color.secondary};
+    border: 1px solid ${({ theme }) => theme.color.secondary};
   }
 `;
 
