@@ -28,7 +28,7 @@ function AccountView() {
   );
 }
 
-function AccountInfo({ setIsEditing, theme }) {
+function AccountInfo({ setIsEditing }) {
   const dispatch = useDispatch();
   
   return (
