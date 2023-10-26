@@ -35,7 +35,7 @@ function AccountInfo({ setIsEditing, theme }) {
     <FormLayout>
       <LabelText>이메일</LabelText>
       <StyledBox>test@manda.com</StyledBox>
-      <StyledButton>수정하기</StyledButton>
+      <StyledButton onClick={() => setIsEditing(true)}>수정하기</StyledButton>
       <WithdrawText onClick={() => dispatch(showDeleteAccount())}>Manda 탈퇴하기</WithdrawText>
     </FormLayout>
   );
