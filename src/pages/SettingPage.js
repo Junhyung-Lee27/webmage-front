@@ -7,7 +7,7 @@ import BlockedUsers from "../components/BlockedUsers";
 import DeleteAccount from "../components/DeleteAccount";
 import { ReactComponent as editIcon } from "./../assets/images/edit.svg";
 import { ReactComponent as blockIcon } from "./../assets/images/block.svg";
-import { ReactComponent as logoutIcon } from "./../assets/images/logout.svg";
+import { ReactComponent as logoutIcon } from "./../assets/images/Logout.svg";
 import { ReactComponent as withdrawIcon } from "./../assets/images/withdraw.svg";
 
 function SettingPage() {
