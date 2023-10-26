@@ -1,8 +1,10 @@
 import styled, { ThemeProvider } from "styled-components";
+import { useState } from "react";
 import { useSelector } from "react-redux";
 import { NavLink } from "react-router-dom";
 import componentTheme from "./theme";
 import ThemeSwitch from "../components/ThemeSwitch";
+import Notification from "./notification";
 
 function Header() {
   const colorTheme = useSelector((state) => state.theme.themes[state.theme.currentTheme]);
@@ -12,6 +14,8 @@ function Header() {
     filter: filterTheme,
     component: componentTheme,
   };
+
+  const [isNotiVisible, setIsNotiVisible] = useState(false);
 
   return (
     <ThemeProvider theme={combinedTheme}>
@@ -38,7 +42,16 @@ function Header() {
         <Row gap="20px">
           <SearchBox type="text" placeholder="검색" id="search-box" />
           <Row gap="16px">
-            <LargeIcon src={process.env.PUBLIC_URL + "/icon/header/Notifications.svg"} />
+            <NotiIconWrapper>
+              <LargeIcon
+                $active={isNotiVisible}
+                onClick={() => {
+                  setIsNotiVisible((prevState) => !prevState);
+                }}
+                src={process.env.PUBLIC_URL + "/icon/header/Notifications.svg"}
+              />
+              {isNotiVisible && <Notification>...</Notification>}
+            </NotiIconWrapper>
             <IconLink to="/setting" activeclassname="active">
               <LargeIcon src={process.env.PUBLIC_URL + "/icon/header/AccountCircle.svg"} />
             </IconLink>
@@ -121,24 +134,35 @@ let SearchBox = styled.input`
 
 let LargeIcon = styled.img`
   ${({ theme }) => theme.component.iconSize.large};
-  filter: ${({ theme }) => theme.filter.font2};
+  filter: ${({ theme, $active }) => ($active ? theme.filter.primary : theme.filter.font2)};
+  margin: 2px;
   cursor: pointer;
-
-  &:hover {
-    filter: ${({ theme }) => theme.filter.secondary};
-  }
-
-  &.active {
-    filter: ${({ theme }) => theme.filter.primary};
-  }
 `;
 
 let IconLink = styled(NavLink)`
-  width: fit-content;
-  height: fit-content;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: none;
 
   &.active ${LargeIcon} {
     filter: ${({ theme }) => theme.filter.primary};
+  }
+
+  &:hover {
+    background-color: ${({ theme }) => theme.color.bg3}
+  }
+`;
+
+let NotiIconWrapper = styled.div`
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 50%;
+
+  &:hover {
+    background-color: ${({ theme }) => theme.color.bg3}
   }
 `;
 
