@@ -32,7 +32,7 @@ function AccountInfo({ setIsEditing, theme }) {
   const dispatch = useDispatch();
   
   return (
-    <FormLayout></FormLayout>
+    <FormLayout>
       <LabelText>이메일</LabelText>
       <StyledBox>test@manda.com</StyledBox>
       <StyledButton>수정하기</StyledButton>
