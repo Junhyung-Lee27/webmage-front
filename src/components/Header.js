@@ -2,7 +2,7 @@ import styled, { ThemeProvider } from "styled-components";
 import { useSelector } from "react-redux";
 import { NavLink } from "react-router-dom";
 import ThemeSwitch from "../components/ThemeSwitch";
-import MandaIconUrl from "./../assets/images/Manda_icon.svg";
+import MandaLogo from "./../assets/images/Manda_logo.svg";
 import {ReactComponent as AccountCircleIcon} from "./../assets/images/AccountCircle.svg";
 import {ReactComponent as NotificationsIcon} from "./../assets/images/Notifications.svg";
 
@@ -13,7 +13,9 @@ function Header() {
     <ThemeProvider theme={theme}>
       <HeaderLayout position="relative" justifycontent="space-between" padding="0px 196px">
         <Row gap="48px">
-          <MandaIcon />
+          <NavLink to="/manda">
+            <MandaIcon />
+          </NavLink>
           <Row gap="16px">
             <StyledLink to="/manda" activeclassname="active">
               만다라트
@@ -72,10 +74,10 @@ let Row = styled.div`
 `;
 
 let MandaIcon = styled.object`
-  background-image: url(${MandaIconUrl});
+  background-image: url(${MandaLogo});
+  background-size: contain;
+  background-repeat: no-repeat;
   height: 48px;
-  width: 48px;
-  background-size: cover;
 `;
 
 let StyledLink = styled(NavLink)`
