@@ -1,25 +1,22 @@
 import styled, { ThemeProvider } from "styled-components";
 import { useSelector } from "react-redux";
 import componentTheme from "./theme"
-import { ReactComponent as ProfileEditIcon } from "./../assets/images/ProfileImgEdit.svg";
-
-// 나중에 서버에서 불러온 프로필 사진으로 변경
-import GoogleLogoUrl from "./../assets/images/Google_Logo.svg";
-
 
 function ProfileEdit() {
   const colorTheme = useSelector((state) => state.theme.themes[state.theme.currentTheme]);
-  const combinedTheme = {
+  const filterTheme = useSelector((state) => state.theme.filters[state.theme.currentTheme]);
+  const theme = {
     color: colorTheme,
-    component: componentTheme
-  }
+    filter: filterTheme,
+    component: componentTheme,
+  };
 
   return (
-    <ThemeProvider theme={combinedTheme}>
+    <ThemeProvider theme={theme}>
       <ProfileEditLayout>
         <ProfileImgLayout>
-          <ProfileImg />
-          <ImgEditBtn />
+          <ProfileImg src={process.env.PUBLIC_URL + "/testImg/profile1.svg"} />
+          <ImgEditBtn src={process.env.PUBLIC_URL + "/icon/edit.svg"} />
         </ProfileImgLayout>
         <FormLayout>
           <LabelText>
@@ -68,19 +65,18 @@ let ProfileImgLayout = styled.div`
   margin: 40px 0px;
 `;
 
-let ProfileImg = styled.div`
-  background-image: url(${GoogleLogoUrl});
+let ProfileImg = styled.img`
   width: 120px;
   height: 120px;
   border-radius: 50%;
 `;
 
-let ImgEditBtn = styled(ProfileEditIcon)`
+let ImgEditBtn = styled.img`
   ${({ theme }) => theme.component.iconSize.small};
+  filter: ${({ theme }) => theme.filter.font1};
   position: absolute;
   bottom: -10px;
   right: -10px;
-  fill: ${({ theme }) => theme.color.font1};
 `;
 
 let FormLayout = styled.div`

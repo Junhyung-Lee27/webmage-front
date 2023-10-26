@@ -1,6 +1,5 @@
 import styled from "styled-components";
 import { useSelector } from "react-redux";
-import { ReactComponent as AddBoxIcon } from "./../assets/images/AddBox.svg";
 
 function UserRecommend() {
   const currentTheme = useSelector((state) => state.theme.themes[state.theme.currentTheme]);
@@ -17,7 +16,10 @@ function UserRecommend() {
             프론트엔드 개발자
           </StyledText>
         </Column>
-        <StyledAddBox fillColor={currentTheme.primary}></StyledAddBox>
+        <StyledAddBox
+          src={process.env.PUBLIC_URL + "/icon/add.svg"}
+          fillColor={currentTheme.primary}
+        ></StyledAddBox>
       </Row>
       <StyledText size="12" weight="300" color={currentTheme.font2}>
         #Oreumi, #Front-end, #tag1, #tag2
@@ -70,7 +72,7 @@ let StyledText = styled.span`
   cursor: ${({ cursor = "default" }) => cursor};
 `;
 
-let StyledAddBox = styled(AddBoxIcon)`
+let StyledAddBox = styled.img`
   width: 32px;
   height: 32px;
   margin-left: auto;

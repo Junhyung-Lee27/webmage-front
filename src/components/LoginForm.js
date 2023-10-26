@@ -1,94 +1,86 @@
 import styled, { ThemeProvider } from "styled-components";
 import { useDispatch, useSelector } from "react-redux";
 import { showSignup, showForgotPassword } from "../store/authpageSlice";
-import KakaoLogoUrl from "./../assets/images/KaKao_Logo.svg";
-import NaverLogoUrl from "./../assets/images/Naver_Logo.svg";
-import GoogleLogoUrl from "./../assets/images/Google_Logo.svg";
+import componentTheme from "./theme";
 
 function LoginForm() {
-  const theme = useSelector((state) => state.theme.themes[state.theme.currentTheme]);
+  const colorTheme = useSelector((state) => state.theme.themes[state.theme.currentTheme]);
+  const filterTheme = useSelector((state) => state.theme.filters[state.theme.currentTheme]);
+  const theme = {
+    color: colorTheme,
+    filter: filterTheme,
+    component: componentTheme,
+  };
+
   const dispatch = useDispatch();
 
   return (
     <ThemeProvider theme={theme}>
-      <div>
+      <Column>
+        <StyledText color={theme.color.font1} size="14" weight="600" margin="24px 0px 0px 0px">
+          <label htmlFor="user-id">아이디</label>
+        </StyledText>
+        <StyledForm type="email" placeholder="이메일을 입력해주세요" id="user-id"></StyledForm>
+        <StyledText color={theme.color.font1} size="14" weight="600" margin="16px 0px 0px 0px">
+          <label htmlFor="password">비밀번호</label>
+        </StyledText>
+        <StyledForm
+          type="password"
+          placeholder="비밀번호를 입력해주세요"
+          id="password"
+        ></StyledForm>
+        <StyledButton color="white">로그인</StyledButton>
+        <Row>
+          <StyledText
+            size="12"
+            weight="700"
+            align="center"
+            color={theme.color.font2}
+            cursor="pointer"
+            onClick={() => {
+              dispatch(showSignup());
+            }}
+          >
+            회원가입
+          </StyledText>
+          <StyledText
+            size="12"
+            weight="700"
+            align="center"
+            color={theme.color.font2}
+            cursor="pointer"
+            onClick={() => {
+              dispatch(showForgotPassword());
+            }}
+          >
+            비밀번호 찾기
+          </StyledText>
+        </Row>
+        <LineText>간편 로그인</LineText>
         <Column>
-          <StyledText color={theme.font1} size="14" weight="600" margin="24px 0px 0px 0px">
-            <label htmlFor="user-id">아이디</label>
-          </StyledText>
-          <StyledForm type="email" placeholder="이메일을 입력해주세요" id="user-id"></StyledForm>
-          <StyledText color={theme.font1} size="14" weight="600" margin="16px 0px 0px 0px">
-            <label htmlFor="password">비밀번호</label>
-          </StyledText>
-          <StyledForm
-            type="password"
-            placeholder="비밀번호를 입력해주세요"
-            id="password"
-          ></StyledForm>
-          <StyledButton color="white">로그인</StyledButton>
-          <Row>
-            <StyledText
-              size="12"
-              weight="700"
-              align="center"
-              color={theme.font2}
-              cursor="pointer"
-              onClick={() => {
-                dispatch(showSignup());
-              }}
-            >
-              회원가입
-            </StyledText>
-            <StyledText
-              size="12"
-              weight="700"
-              align="center"
-              color={theme.font2}
-              cursor="pointer"
-              onClick={() => {
-                dispatch(showForgotPassword());
-              }}
-            >
-              비밀번호 찾기
-            </StyledText>
+          <Row margin="16px 0px 0px 0px">
+            <LogoWrap backgroundcolor="#FFFFFF" border={`1px solid ${theme.color.font2}`}>
+              <SocialLogo
+                src={process.env.PUBLIC_URL + "/logo/Google_Logo.svg"}
+                size="55%"
+              ></SocialLogo>
+            </LogoWrap>
+            <LogoWrap backgroundcolor="#FEE500" border="none">
+              <SocialLogo
+                src={process.env.PUBLIC_URL + "/logo/Kakao_Logo.svg"}
+                size="55%"
+              ></SocialLogo>
+            </LogoWrap>
+            <LogoWrap backgroundcolor="#03C75A" border="none">
+              <SocialLogo
+                src={process.env.PUBLIC_URL + "/logo/Naver_logo.svg"}
+                size="100%"
+              ></SocialLogo>
+            </LogoWrap>
           </Row>
-          <LineText>간편 로그인</LineText>
-          <SocialLogin theme={theme}></SocialLogin>
         </Column>
-      </div>
+      </Column>
     </ThemeProvider>
-  );
-}
-
-function SocialLogin() {
-  return (
-    <Column>
-      <Row margin="16px 0px 0px 0px">
-        <CircleButton
-          color="black"
-          backgroundcolor="#FFFFFF"
-          border="1px solid #00000030"
-          backgroundimage={GoogleLogoUrl}
-          backgroundsize="50%"
-        ></CircleButton>
-        <CircleButton
-          color="#191919"
-          backgroundcolor="#FEE500"
-          border="none"
-          bordercolor="#FEE500"
-          backgroundimage={KakaoLogoUrl}
-          backgroundsize="50%"
-        ></CircleButton>
-        <CircleButton
-          color="white"
-          backgroundcolor="#03C75A"
-          border="none"
-          bordercolor="#03C75A"
-          backgroundimage={NaverLogoUrl}
-          backgroundsize="95%"
-        ></CircleButton>
-      </Row>
-    </Column>
   );
 }
 
@@ -119,17 +111,17 @@ let StyledForm = styled.input`
   height: 24px;
   padding: 8px 16px;
   font-size: 14px;
-  color: ${({ theme }) => theme.font1};
+  color: ${({ theme }) => theme.color.font1};
   border: none;
   border-radius: 8px;
-  background-color: ${({ theme }) => theme.bg2};
+  background-color: ${({ theme }) => theme.color.bg2};
   margin-top: 4px;
   &::placeholder {
-    color: ${({ theme }) => theme.font2};
+    color: ${({ theme }) => theme.color.font2};
     opacity: 0.5;
   }
   &:focus {
-    outline: 2px solid ${({ theme }) => theme.primary};
+    outline: 2px solid ${({ theme }) => theme.color.primary};
   }
 `;
 
@@ -140,34 +132,35 @@ let StyledButton = styled.button`
   line-height: 20px;
   margin: 24px 2px 8px 2px;
   color: ${({ color }) => color};
-  background-color: ${({ theme }) => theme.primary};
-  border: 1px solid ${({ theme }) => theme.primary};
+  background-color: ${({ theme }) => theme.color.primary};
+  border: 1px solid ${({ theme }) => theme.color.primary};
   border-radius: 8px;
   outline: none;
   cursor: pointer;
 `;
 
-let CircleButton = styled.button`
-  width: 40px;
-  height: 40px;
+let LogoWrap = styled.div`
+  ${({ theme }) => theme.component.iconSize.large};
   border-radius: 50%;
   background-color: ${({ backgroundcolor }) => backgroundcolor};
-  background-image: ${({ backgroundimage }) => `url(${backgroundimage})`};
-  background-size: ${({ backgroundsize }) => backgroundsize};
-  background-repeat: no-repeat;
-  background-position: center center;
   color: ${({ color }) => color};
   border: ${({ border }) => border};
   outline: none;
   cursor: pointer;
-  display: flex; // 버튼 내부의 텍스트를 가운데 위치
+  display: flex;
   justify-content: center;
   align-items: center;
+  overflow: hidden;
+`;
+
+let SocialLogo = styled.img`
+  width: ${({ size }) => size};
+  height: ${({ size }) => size};
 `;
 
 const LineText = styled.div`
   font-size: 13px;
-  color: ${({ theme }) => theme.font2};
+  color: ${({ theme }) => theme.color.font2};
   display: flex;
   align-items: center;
   text-align: center;
@@ -178,7 +171,7 @@ const LineText = styled.div`
   &:after {
     content: "";
     flex: 1;
-    border-bottom: 1px solid ${({ theme }) => theme.border};
+    border-bottom: 1px solid ${({ theme }) => theme.color.border};
   }
 
   &:before {

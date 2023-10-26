@@ -39,7 +39,7 @@ function SignupForm() {
 
           <StyledButton>회원가입</StyledButton>
 
-          <StyledText weight="500" align="center" theme={theme.font2}>
+          <StyledText weight="500" align="center" color={theme.font2}>
             이미 계정이 있으신가요?
           </StyledText>
           <StyledText

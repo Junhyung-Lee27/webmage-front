@@ -1,20 +1,24 @@
 import styled, { ThemeProvider } from "styled-components";
 import { useSelector } from "react-redux";
 import { NavLink } from "react-router-dom";
+import componentTheme from "./theme";
 import ThemeSwitch from "../components/ThemeSwitch";
-import MandaLogo from "./../assets/images/Manda_logo.svg";
-import {ReactComponent as AccountCircleIcon} from "./../assets/images/AccountCircle.svg";
-import {ReactComponent as NotificationsIcon} from "./../assets/images/Notifications.svg";
 
 function Header() {
-  const theme = useSelector((state) => state.theme.themes[state.theme.currentTheme]);
+  const colorTheme = useSelector((state) => state.theme.themes[state.theme.currentTheme]);
+  const filterTheme = useSelector((state) => state.theme.filters[state.theme.currentTheme]);
+  const combinedTheme = {
+    color: colorTheme,
+    filter: filterTheme,
+    component: componentTheme,
+  };
 
   return (
-    <ThemeProvider theme={theme}>
+    <ThemeProvider theme={combinedTheme}>
       <HeaderLayout position="relative" justifycontent="space-between" padding="0px 196px">
         <Row gap="48px">
           <NavLink to="/manda">
-            <MandaIcon />
+            <MandaIcon src={process.env.PUBLIC_URL + "/logo/Manda_logo2.svg"} alt="Manda Logo" />
           </NavLink>
           <Row gap="16px">
             <StyledLink to="/manda" activeclassname="active">
@@ -31,13 +35,14 @@ function Header() {
             </StyledLink>
           </Row>
         </Row>
-        <Row gap="40px">
+        <Row gap="20px">
           <SearchBox type="text" placeholder="검색" id="search-box" />
-          <Row gap="24px">
-            <StyledNotificationIcon />
-            <NavLink to="/setting">
-              <StyledAccountCircleIcon />
-            </NavLink>
+          <Row gap="16px">
+            <LargeIcon src={process.env.PUBLIC_URL + "/icon/header/Notifications.svg"} />
+            <IconLink to="/setting" activeclassname="active">
+              <LargeIcon src={process.env.PUBLIC_URL + "/icon/header/AccountCircle.svg"} />
+            </IconLink>
+            <LogoutBtn>로그아웃</LogoutBtn>
           </Row>
           <ThemeSwitch />
         </Row>
@@ -57,8 +62,8 @@ let HeaderLayout = styled.div`
   flex-direction: row;
   align-items: center;
   justify-content: ${({ justifycontent = "center" }) => justifycontent};
-  background-color: ${({ theme }) => theme.bg};
-  border-bottom: 1px solid ${({ theme }) => theme.border};
+  background-color: ${({ theme }) => theme.color.bg};
+  border-bottom: 1px solid ${({ theme }) => theme.color.border};
 `;
 
 let Row = styled.div`
@@ -73,11 +78,9 @@ let Row = styled.div`
   justify-content: ${({ justifycontent = "center" }) => justifycontent};
 `;
 
-let MandaIcon = styled.object`
-  background-image: url(${MandaLogo});
-  background-size: contain;
-  background-repeat: no-repeat;
+let MandaIcon = styled.img`
   height: 48px;
+  width: 160px;
 `;
 
 let StyledLink = styled(NavLink)`
@@ -87,14 +90,14 @@ let StyledLink = styled(NavLink)`
   text-align: center;
   padding: 16px 0px;
   text-decoration: none;
-  color: ${({ theme }) => theme.font2};
+  color: ${({ theme }) => theme.color.font2};
 
   &.active {
-    color: ${({ theme }) => theme.primary};
+    color: ${({ theme }) => theme.color.primary};
   }
 
   &:hover {
-    color: ${({ theme }) => theme.secondary};
+    color: ${({ theme }) => theme.color.secondary};
   }
 `;
 
@@ -103,33 +106,56 @@ let SearchBox = styled.input`
   padding: 9px 120px 9px 16px;
   box-sizing: border-box;
   font-size: 16px;
-  color: ${({ theme }) => theme.font1};
-  background-color: ${({ theme }) => theme.bg2};
-  border: 1px solid ${({ theme }) => theme.border};
+  color: ${({ theme }) => theme.color.font1};
+  background-color: ${({ theme }) => theme.color.bg2};
+  border: 1px solid ${({ theme }) => theme.color.border};
   border-radius: 4px;
   &::placeholder {
-    color: ${({ theme }) => theme.font2};
+    color: ${({ theme }) => theme.color.font2};
     opacity: 0.5;
   }
   &:focus {
-    outline: 1px solid ${({ theme }) => theme.primary};
+    outline: 1px solid ${({ theme }) => theme.color.primary};
   }
 `;
 
-let StyledNotificationIcon = styled(NotificationsIcon)`
-  fill: ${({ theme }) => theme.font2};
+let LargeIcon = styled.img`
+  ${({ theme }) => theme.component.iconSize.large};
+  filter: ${({ theme }) => theme.filter.font2};
+  cursor: pointer;
 
   &:hover {
-  fill: ${({ theme }) => theme.secondary};
+    filter: ${({ theme }) => theme.filter.secondary};
   }
 
+  &.active {
+    filter: ${({ theme }) => theme.filter.primary};
+  }
 `;
 
-let StyledAccountCircleIcon = styled(AccountCircleIcon)`
-  fill: ${({ theme }) => theme.font2};
+let IconLink = styled(NavLink)`
+  width: fit-content;
+  height: fit-content;
+
+  &.active ${LargeIcon} {
+    filter: ${({ theme }) => theme.filter.primary};
+  }
+`;
+
+let LogoutBtn = styled.button`
+  width: 80px;
+  height: 34px;
+  font-size: 14px;
+  font-weight: 600;
+  color: ${({ theme }) => theme.color.font2};
+  border: 2px solid ${({ theme }) => theme.color.font2};
+  border-radius: 4px;
+  background-color: ${({ theme }) => theme.color.bg};
+  cursor: pointer;
 
   &:hover {
-    fill: ${({ theme }) => theme.secondary};
+    color: ${({ theme }) => theme.color.secondary};
+    border: 2px solid ${({ theme }) => theme.color.secondary};
   }
 `;
 

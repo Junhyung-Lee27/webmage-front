@@ -1,25 +1,31 @@
 import styled, { ThemeProvider } from "styled-components";
 import { useSelector } from "react-redux";
-import MandaIconUrl from "./../assets/images/Manda_icon.svg";
 import ThemeSwitch from "../components/ThemeSwitch";
 import LoginForm from "../components/LoginForm";
 import SignupForm from "../components/SignupForm";
 import ForgotPassword from "../components/ForgotPassword";
-
+import componentTheme from "./../components/theme";
 
 function AuthPage() {
-  const theme = useSelector((state) => state.theme.themes[state.theme.currentTheme]);
   const showingForm = useSelector((state) => state.authpage.showingForm);
+  
+  const colorTheme = useSelector((state) => state.theme.themes[state.theme.currentTheme]);
+  const filterTheme = useSelector((state) => state.theme.filters[state.theme.currentTheme]);
+  const theme = {
+    color: colorTheme,
+    filter: filterTheme,
+    component: componentTheme,
+  };
   
   return (
     <ThemeProvider theme={theme}>
       <PageLayout>
-        <MandaIcon />
+        <MandaIcon src={process.env.PUBLIC_URL + "/logo/Manda_logo1.svg"} />
         <Column>
-          <StyledText color={theme.font1} size="32" weight="700">
+          <StyledText color={theme.color.font1} size="32" weight="700">
             웹법사와 함께 만드는
           </StyledText>
-          <StyledText color={theme.primary} size="32" weight="700" align="right">
+          <StyledText color={theme.color.primary} size="32" weight="700" align="right">
             만다라트
           </StyledText>
           {showingForm === "Login" && <LoginForm />}
@@ -38,14 +44,12 @@ let PageLayout = styled.div`
   align-items: center;
   height: 100vh;
   gap: 160px;
-  background-color: ${({ theme }) => theme.bg};
+  background-color: ${({ theme }) => theme.color.bg};
 `;
 
-let MandaIcon = styled.div`
-  background-image: url(${MandaIconUrl});
+let MandaIcon = styled.img`
   height: 500px;
   width: 500px;
-  background-size: cover;
 `;
 
 let Column = styled.div`

@@ -1,8 +1,6 @@
 import styled from "styled-components";
 import { useSelector, useDispatch } from "react-redux";
 import { changeTheme } from "../store/themeSlice.js";
-import DarkUrl from "./../assets/images/Dark.svg";
-import LightUrl from "./../assets/images/Light.svg";
 
 function ThemeSwitch() {
   let dispatch = useDispatch();
@@ -14,16 +12,20 @@ function ThemeSwitch() {
         dispatch(changeTheme());
       }}
       theme={currentTheme}
+      src={
+        currentTheme === "light"
+          ? process.env.PUBLIC_URL + "/icon/header/light.svg"
+          : process.env.PUBLIC_URL + "/icon/header/dark.svg"
+      }
+      alt="Theme switcher icon"
     ></SwitchContainer>
   );
 }
 
-let SwitchContainer = styled.div`
+let SwitchContainer = styled.img`
   width: 88px;
   height: 36px;
   border-radius: 18px;
-  background-size: cover;
-  background-image: url(${(props) => (props.theme === "light" ? LightUrl : DarkUrl)});
 `;
 
 export default ThemeSwitch;
