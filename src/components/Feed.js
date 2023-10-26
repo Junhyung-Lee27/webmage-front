@@ -266,7 +266,7 @@ let TextBox = styled.div`
     width: calc(100% - 4rem);
     gap: 0.25rem;
     flex-shrink: 1;
-    flex-glow: 1;
+    flex-grow: 1;
 `;
 let ProfileImgWrapper = styled.div`
     width: 4rem;
