@@ -1,6 +1,5 @@
 import styled, { ThemeProvider } from "styled-components";
 import { useSelector } from "react-redux";
-import { useState } from "react";
 import componentTheme from "./theme";
 
 function Notification() {
