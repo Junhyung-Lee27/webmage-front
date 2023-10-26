@@ -1,7 +1,7 @@
 import styled, { ThemeProvider } from "styled-components";
 import { useSelector, useDispatch } from "react-redux";
 import componentTheme from "./theme";
-import { showProfileView } from "./../store/settingpageSlice";
+import { showAccountView } from "./../store/settingpageSlice";
 
 function DeleteAccount() {
   const colorTheme = useSelector((state) => state.theme.themes[state.theme.currentTheme]);
@@ -37,7 +37,7 @@ function DeleteAccount() {
           <StyledText
             fontsize="16px"
             fontweight="600"
-            color="{theme.color.font2}"
+            color={theme.color.font1}
             margin="0px 0px 16px 0px"
           >
             탈퇴시, 계정은 삭제되며 복구되지 않습니다.
@@ -47,7 +47,7 @@ function DeleteAccount() {
               color={theme.color.font1}
               backgroundcolor={theme.color.bg3}
               border="none"
-              onClick={() => dispatch(showProfileView())}
+              onClick={() => dispatch(showAccountView())}
             >
               취소
             </StyledButton>
