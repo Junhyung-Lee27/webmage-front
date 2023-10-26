@@ -116,7 +116,7 @@ let Layout = styled.div`
 `;
 
 let PageBox = styled.div`
-    dislay:flex;
+    display:flex;
     justify-content: center;
     width: 1440px;
     @media screen and (max-width: 1440px) {
