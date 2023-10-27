@@ -1,19 +1,34 @@
-import React from 'react';
-import ReactDOM from 'react-dom/client';
-import './index.css';
-import App from './App';
-import reportWebVitals from './reportWebVitals';
-import { BrowserRouter } from "react-router-dom";
-import { Provider } from 'react-redux';
-import store from './store/store'
+import reportWebVitals from "./reportWebVitals";
 
-const root = ReactDOM.createRoot(document.getElementById('root'));
+import "./index.css";
+import App from "./App";
+
+import React from "react";
+import ReactDOM from "react-dom/client";
+import { BrowserRouter } from "react-router-dom";
+
+import store from "./store/store";
+import { Provider } from "react-redux";
+
+// 유지되는 store 값이 다시 redux에 저장될 때까지 UI재렌더링을 지연시킴
+// loading : 로딩 과정에서 보여줄 컴포넌트
+// persistor : 로컬스토리지에 저장할 스토어
+import { PersistGate } from "redux-persist/integration/react";
+
+// 유지하고 싶은 redux store를 인자로 넣으면 persistor 객체 반환
+import { persistStore } from "redux-persist";
+
+export let persistor = persistStore(store);
+
+const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
   <React.StrictMode>
     <Provider store={store}>
-      <BrowserRouter>
-        <App />
-      </BrowserRouter>
+      <PersistGate loading={null} persistor={persistor}>
+        <BrowserRouter>
+          <App />
+        </BrowserRouter>
+      </PersistGate>
     </Provider>
   </React.StrictMode>
 );
