@@ -1,43 +1,99 @@
+import { useState } from "react";
 import styled, { ThemeProvider } from "styled-components";
 import { useSelector, useDispatch } from "react-redux";
 import { showLogin } from "../store/authpageSlice";
+import { useNavigate } from "react-router-dom";
+import { signup, login } from "../services/authService";
 
 function SignupForm() {
-  const theme = useSelector((state) => state.theme.themes[state.theme.currentTheme]);
+  let navigate = useNavigate();
+  
+  // 입력값 상태 관리
+  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [passwordCheck, setPasswordCheck] = useState("");
+
+  const handleInputChange = (e, setState) => {
+    setState(e.target.value);
+  };
+
+  // 회원가입 요청
+  const handleSignupClick = async () => {
+    const signupResponse = await signup(username, email, password, passwordCheck);
+
+    // 회원가입 성공했을 경우
+    if (signupResponse.success) {
+      // 로그인 시도
+      const loginResponse = await login(username, password);
+      if (loginResponse.success) {
+        navigate("/manda");
+      } else if (loginResponse.error) {
+        alert("회원가입 완료되었으나, 로그인에 실패했습니다. 잠시 후 다시 시도해주세요.");
+      }
+    }
+    // 회원가입 실패했을 경우
+    else if (signupResponse.error) {
+      alert(signupResponse.error);
+    }
+  };
+
+  // 화면 상태관리
   const dispatch = useDispatch();
 
+  // 테마
+  const theme = useSelector((state) => state.theme.themes[state.theme.currentTheme]);
+
+  // UI
   return (
     <ThemeProvider theme={theme}>
       <Column>
         <Column>
           <StyledText color={theme.font1}>
-            <label htmlFor="user-id">아이디</label>
+            <label htmlFor="username">닉네임</label>
+          </StyledText>
+          <StyledForm
+            type="text"
+            placeholder="닉네임을 입력해주세요"
+            id="username"
+            value={username}
+            onChange={(e) => handleInputChange(e, setUsername)}
+          ></StyledForm>
+
+          <StyledText color={theme.font1}>
+            <label htmlFor="email">이메일</label>
           </StyledText>
           <StyledForm
             type="email"
-            placeholder="사용할 이메일을 입력해주세요"
-            id="user-id"
+            placeholder="이메일을 입력해주세요"
+            id="email"
+            value={email}
+            onChange={(e) => handleInputChange(e, setEmail)}
           ></StyledForm>
 
           <StyledText color={theme.font1}>
-            <label htmlFor="user-id">비밀번호</label>
+            <label htmlFor="password">비밀번호</label>
           </StyledText>
           <StyledForm
             type="password"
-            placeholder="사용할 비밀번호를 입력해주세요"
+            placeholder="비밀번호를 입력해주세요"
             id="password"
+            value={password}
+            onChange={(e) => handleInputChange(e, setPassword)}
           ></StyledForm>
 
           <StyledText color={theme.font1}>
-            <label htmlFor="password">비밀번호 확인</label>
+            <label htmlFor="password-check">비밀번호 확인</label>
           </StyledText>
           <StyledForm
             type="password"
             placeholder="비밀번호를 다시 입력해주세요"
             id="password-check"
+            value={passwordCheck}
+            onChange={(e) => handleInputChange(e, setPasswordCheck)}
           ></StyledForm>
 
-          <StyledButton>회원가입</StyledButton>
+          <StyledButton onClick={handleSignupClick}>회원가입</StyledButton>
 
           <StyledText weight="500" align="center" color={theme.font2}>
             이미 계정이 있으신가요?

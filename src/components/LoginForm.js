@@ -1,9 +1,36 @@
+import { useState } from "react";
+import { login } from "../services/authService";
+
 import styled, { ThemeProvider } from "styled-components";
+import componentTheme from "./theme";
+import { useNavigate } from "react-router-dom";
+
 import { useDispatch, useSelector } from "react-redux";
 import { showSignup, showForgotPassword } from "../store/authpageSlice";
-import componentTheme from "./theme";
+import { setUser } from '../store/userSlice';
 
 function LoginForm() {
+  let navigate = useNavigate();
+
+  // 입력값 상태 관리
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+
+  const handleUsernameChange = (e) => setUsername(e.target.value);
+  const handlePasswordChange = (e) => setPassword(e.target.value);
+
+  // 로그인 요청
+  const handleLoginClick = async () => {
+    const response = await login(username, password);
+    console.log(username);
+    if (response.success) {
+      dispatch(setUser(username));
+        navigate('/manda');
+    } else if (response.error) {
+      alert(response.error);
+    }
+  };
+  // 테마
   const colorTheme = useSelector((state) => state.theme.themes[state.theme.currentTheme]);
   const filterTheme = useSelector((state) => state.theme.filters[state.theme.currentTheme]);
   const theme = {
@@ -18,9 +45,15 @@ function LoginForm() {
     <ThemeProvider theme={theme}>
       <Column>
         <StyledText color={theme.color.font1} size="14" weight="600" margin="24px 0px 0px 0px">
-          <label htmlFor="user-id">아이디</label>
+          <label htmlFor="username">아이디</label>
         </StyledText>
-        <StyledForm type="email" placeholder="이메일을 입력해주세요" id="user-id"></StyledForm>
+        <StyledForm
+          type="username"
+          placeholder="아이디를 입력해주세요"
+          id="username"
+          value={username}
+          onChange={handleUsernameChange}
+        ></StyledForm>
         <StyledText color={theme.color.font1} size="14" weight="600" margin="16px 0px 0px 0px">
           <label htmlFor="password">비밀번호</label>
         </StyledText>
@@ -28,8 +61,12 @@ function LoginForm() {
           type="password"
           placeholder="비밀번호를 입력해주세요"
           id="password"
+          value={password}
+          onChange={handlePasswordChange}
         ></StyledForm>
-        <StyledButton color="white">로그인</StyledButton>
+        <StyledButton color="white" onClick={handleLoginClick}>
+          로그인
+        </StyledButton>
         <Row>
           <StyledText
             size="12"
