@@ -8,7 +8,7 @@ import componentTheme from "./../components/theme";
 
 function AuthPage() {
   const showingForm = useSelector((state) => state.authpage.showingForm);
-  
+
   const colorTheme = useSelector((state) => state.theme.themes[state.theme.currentTheme]);
   const filterTheme = useSelector((state) => state.theme.filters[state.theme.currentTheme]);
   const theme = {
@@ -16,7 +16,7 @@ function AuthPage() {
     filter: filterTheme,
     component: componentTheme,
   };
-  
+
   return (
     <ThemeProvider theme={theme}>
       <PageLayout>

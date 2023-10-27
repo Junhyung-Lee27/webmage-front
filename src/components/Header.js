@@ -1,16 +1,18 @@
 import styled, { ThemeProvider } from "styled-components";
 import { useState } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { NavLink } from "react-router-dom";
 import componentTheme from "./theme";
 import ThemeSwitch from "../components/ThemeSwitch";
 import Notification from "./notification";
 
 import { logout } from "../services/authService";
+import { userStateInit } from "../store/userSlice";
 import { useNavigate } from "react-router-dom";
 
 function Header() {
   let navigate = useNavigate();
+  let dispatch = useDispatch();
 
   // 테마
   const colorTheme = useSelector((state) => state.theme.themes[state.theme.currentTheme]);
@@ -28,7 +30,8 @@ function Header() {
   const handleLogoutClick = async () => {
     const response = await logout();
     if (response.success) {
-      navigate("/");
+      dispatch(userStateInit())
+        navigate("/");
     } else if (response.error) {
       alert(response.error);
     }
