@@ -5,7 +5,7 @@ function UserRecommend() {
   const currentTheme = useSelector((state) => state.theme.themes[state.theme.currentTheme]);
 
   return (
-    <RecommendContainer backgroundColor={currentTheme.bg}>
+    <RecommendContainer backgroundcolor={currentTheme.bg}>
       <Row>
         <StyledProfile />
         <Column>
@@ -18,7 +18,7 @@ function UserRecommend() {
         </Column>
         <StyledAddBox
           src={process.env.PUBLIC_URL + "/icon/add.svg"}
-          fillColor={currentTheme.primary}
+          fillcolor={currentTheme.primary}
         ></StyledAddBox>
       </Row>
       <StyledText size="12" weight="300" color={currentTheme.font2}>
@@ -38,7 +38,7 @@ let RecommendContainer = styled.div`
   border-radius: 8px;
   box-sizing: border-box;
   box-shadow: 0px 8px 24px 0px rgba(0, 0, 0, 0.15);
-  background-color: ${({ backgroundColor }) => backgroundColor};
+  background-color: ${({ backgroundcolor }) => backgroundcolor};
   /* 아래는 제거 필요 */
   margin-left: 24px;
 `;
@@ -76,7 +76,7 @@ let StyledAddBox = styled.img`
   width: 32px;
   height: 32px;
   margin-left: auto;
-  fill: ${({ fillColor }) => fillColor};
+  fill: ${({ fillcolor }) => fillcolor};
 `;
 
 export default UserRecommend;
