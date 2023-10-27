@@ -6,7 +6,13 @@ import componentTheme from "./theme";
 import ThemeSwitch from "../components/ThemeSwitch";
 import Notification from "./notification";
 
+import { logout } from "../services/authService";
+import { useNavigate } from "react-router-dom";
+
 function Header() {
+  let navigate = useNavigate();
+
+  // 테마
   const colorTheme = useSelector((state) => state.theme.themes[state.theme.currentTheme]);
   const filterTheme = useSelector((state) => state.theme.filters[state.theme.currentTheme]);
   const combinedTheme = {
@@ -15,7 +21,18 @@ function Header() {
     component: componentTheme,
   };
 
+  // 상태관리
   const [isNotiVisible, setIsNotiVisible] = useState(false);
+
+  // 로그아웃 요청
+  const handleLogoutClick = async () => {
+    const response = await logout();
+    if (response.success) {
+      navigate("/");
+    } else if (response.error) {
+      alert(response.error);
+    }
+  };
 
   return (
     <ThemeProvider theme={combinedTheme}>
@@ -55,7 +72,7 @@ function Header() {
             <IconLink to="/setting" activeclassname="active">
               <LargeIcon src={process.env.PUBLIC_URL + "/icon/header/AccountCircle.svg"} />
             </IconLink>
-            <LogoutBtn>로그아웃</LogoutBtn>
+            <LogoutBtn onClick={handleLogoutClick}>로그아웃</LogoutBtn>
           </Row>
           <ThemeSwitch />
         </Row>
