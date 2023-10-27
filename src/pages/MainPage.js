@@ -2,14 +2,10 @@ import styled from "styled-components";
 import { useSelector } from "react-redux";
 import Header from "../components/Header";
 import { useNavigate } from "react-router";
-import MandaPart from "../components/MandaPart";
 import Manda from "../components/Manda";
 
 function MainPage() {
   const currentTheme = useSelector((state) => state.theme.themes[state.theme.currentTheme]);
-
-  const subData = [ ['', '', ''], ['', '', ''], ['', '', ''] ];
-  const mainData = [ ['', '', ''], ['', '코딩 왕', ''], ['', '', ''] ];
 
   let navigate = useNavigate();
 
@@ -34,20 +30,5 @@ let PageLayout = styled.div`
   background-color: ${({ backgroundColor }) => backgroundColor};
 `;
 
-// let GridContainer = styled.div`
-//   display: grid;
-//   grid-template-columns: repeat(3, 1fr);
-//   grid-template-rows: repeat(3, 1fr);
-//   margin: 20px;
-//   width: 720px;
-//   height: 630px;
-// `;
-
-// let GridItem = styled.div`
-//   display: flex;
-//   justify-content: center;
-//   align-items: center;
-//   background-color: white
-// `;
 
 export default MainPage;

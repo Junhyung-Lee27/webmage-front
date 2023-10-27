@@ -24,32 +24,14 @@ function Manda() {
         contentsGroup.push(data.contents.slice(i, i + groupSize));
       }
       setContents(contentsGroup);
-
-
-      // console.log(data);
     })
     .catch(()=>{
       console.log('ajax 요청 실패');
     });
   }, []);
 
-
-  // console.log(contents[0][0].content);
-  // console.log(contents);
-  // console.log(contents[7][7].content);
-
   // 특정 테이블의 cell을 가져오는 함수
   const getTableCell = (tableIndex, cellIndex) => {
-
-    // if (tableIndex === 8) {
-    //   if (cellIndex === 4) {
-    //     return subs[7]?.sub_title || '';
-    //   } else {
-    //     const b = cellIndex > 4 ? cellIndex - 1 : cellIndex;
-    //     return contents[7][b]?.content || '';
-    //   }
-    // } 
-
     if (contents.length > tableIndex && contents[tableIndex].length >= cellIndex) {
       if (tableIndex === 4) {
         if (cellIndex === 4) {
@@ -76,10 +58,18 @@ function Manda() {
           return content;
         }
       }
+    } else {
+      if (tableIndex === 8) {
+        if (cellIndex === 4) {
+          return subs[7]?.sub_title || '';
+        } else {
+          const c = cellIndex > 4 ? cellIndex - 1 : cellIndex;
+          return contents[7] && c < contents[7].length ? contents[7][c]?.content || '' : '';
+        }
+      } 
     }
     return ''; 
   };
-
 
 
   return (
@@ -126,40 +116,7 @@ const TableCell = styled.td`
   border: 1px solid #ccc;
   width: 80px;
   height: 70px;
+  word-break: keep-all;
 `;
-
-
-
-// let GridContainer = styled.div`
-//   display: grid;
-//   grid-template-columns: repeat(3, 1fr);
-//   grid-template-rows: repeat(3, 1fr);
-//   margin: 20px;
-//   width: 720px;
-//   height: 630px;
-// `;
-
-// let GridItem = styled.div`
-//   display: flex;
-//   justify-content: center;
-//   align-items: center;
-//   background-color : #FFFFFF;
-//   border : black;
-// `;
-
-// const SmallTableWrapper = styled.table`
-// border-collapse: collapse;
-// width: 100%;
-// height: 100%;
-// table-layout: fixed;
-
-// td {
-//   border: 1px solid #ccc;
-//   padding: 0; 
-//   text-align: center;
-//   width: 80px;
-//   height: 70px;
-// }
-// `;
 
 export default Manda;
