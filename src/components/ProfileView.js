@@ -1,9 +1,10 @@
 import styled, { ThemeProvider } from "styled-components";
-import { useSelector } from "react-redux";
 import { useState } from "react";
+import { useSelector } from "react-redux";
 import componentTheme from "./theme";
 
 function ProfileView() {
+  // 테마
   const colorTheme = useSelector((state) => state.theme.themes[state.theme.currentTheme]);
   const filterTheme = useSelector((state) => state.theme.filters[state.theme.currentTheme]);
   const theme = {
@@ -12,18 +13,26 @@ function ProfileView() {
     component: componentTheme,
   };
 
+  // 편집 중 상태 관리
   const [isEditing, setIsEditing] = useState(false);
+
+  // 현재 로그인 사용자
+  const username = useSelector((state) => state.user.username)
 
   return (
     <ThemeProvider theme={theme}>
       <ProfileViewLayout>
-        {isEditing ? <ProfileEdit /> : <ProfileInfo setIsEditing={setIsEditing} />}
+        {isEditing ? (
+          <ProfileEdit />
+        ) : (
+          <ProfileInfo setIsEditing={setIsEditing} username={username} />
+        )}
       </ProfileViewLayout>
     </ThemeProvider>
   );
 }
 
-function ProfileInfo({ setIsEditing }) {
+function ProfileInfo({ setIsEditing, username }) {
   return (
     <FormLayout>
       <ProfileImgLayout>
@@ -31,7 +40,7 @@ function ProfileInfo({ setIsEditing }) {
       </ProfileImgLayout>
 
       <LabelText>닉네임</LabelText>
-      <StyledBox>만다라트만들기</StyledBox>
+      <StyledBox>{username}</StyledBox>
 
       <LabelText>소속</LabelText>
       <StyledBox>이스트소프트 오르미 2기</StyledBox>
