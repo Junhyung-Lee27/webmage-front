@@ -7,7 +7,7 @@ import ThemeSwitch from "../components/ThemeSwitch";
 import Notification from "./notification";
 
 import { logout } from "../services/authService";
-import { userStateInit } from "../store/userSlice";
+import { userLogout } from "../store/userSlice";
 import { useNavigate } from "react-router-dom";
 
 function Header() {
@@ -30,7 +30,7 @@ function Header() {
   const handleLogoutClick = async () => {
     const response = await logout();
     if (response.success) {
-      dispatch(userStateInit())
+      dispatch(userLogout());
         navigate("/");
     } else if (response.error) {
       alert(response.error);
