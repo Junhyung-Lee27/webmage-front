@@ -29,8 +29,6 @@ function SignupForm() {
       // 로그인 시도
       const loginResponse = await login(username, password);
       if (loginResponse.success) {
-        console.log(username);
-        console.log(email);
         dispatch(setUser({username:username}));
         dispatch(setUserEmail(email));
         navigate("/manda");
