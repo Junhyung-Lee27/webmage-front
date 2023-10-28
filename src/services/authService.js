@@ -63,3 +63,30 @@ export const logout = async () => {
     return { error: "로그아웃 중 오류가 발생했습니다. 나중에 다시 시도해주세요." };
   }
 };
+
+// 프로필 수정
+export const editAccount = async (username, email, password, passwordCheck) => {
+  // 비밀번호 불일치할 경우
+  if (password !== passwordCheck) {
+    return { error: "비밀번호가 일치하지 않습니다." };
+  }
+
+  try {
+    const response = await axios.patch("http://15.164.217.203:8000/user/edit/", {
+      username,
+      email,
+      password,
+    });
+
+    if (response.status === 200 && response.statusText === "OK") {
+      return { success: true };
+    } else {
+      return { error: "프로필 수정에 실패했습니다. 나중에 다시 시도해주세요" };
+    }
+  } catch (error) {
+    console.error("userEdit Api Error:", error);
+    return { error: " 프로필 수정 중 오류가 발생했습니다. 나중에 다시 시도해주세요." };
+  }
+};
+
+// 회원탈퇴
