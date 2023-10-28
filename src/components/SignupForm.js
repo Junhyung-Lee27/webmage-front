@@ -4,10 +4,12 @@ import { useSelector, useDispatch } from "react-redux";
 import { showLogin } from "../store/authpageSlice";
 import { useNavigate } from "react-router-dom";
 import { signup, login } from "../services/authService";
+import { setUser, setUserEmail } from "../store/userSlice";
 
 function SignupForm() {
   let navigate = useNavigate();
-  
+  const dispatch = useDispatch();
+
   // 입력값 상태 관리
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
@@ -27,9 +29,13 @@ function SignupForm() {
       // 로그인 시도
       const loginResponse = await login(username, password);
       if (loginResponse.success) {
+        console.log(username);
+        console.log(email);
+        dispatch(setUser({username:username}));
+        dispatch(setUserEmail(email));
         navigate("/manda");
       } else if (loginResponse.error) {
-        alert("회원가입 완료되었으나, 로그인에 실패했습니다. 잠시 후 다시 시도해주세요.");
+        alert("로그인에 실패했습니다. 잠시 후 다시 시도해주세요.");
       }
     }
     // 회원가입 실패했을 경우
@@ -37,9 +43,6 @@ function SignupForm() {
       alert(signupResponse.error);
     }
   };
-
-  // 화면 상태관리
-  const dispatch = useDispatch();
 
   // 테마
   const theme = useSelector((state) => state.theme.themes[state.theme.currentTheme]);
