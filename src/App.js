@@ -19,7 +19,7 @@ function App() {
       <Routes>
         <Route path="/" element={<AuthPage />} />
         <Route path="/manda" element={<MainPage />} />
-        <Route path="/mandawrite" element={<MandaWritePage />} />
+        <Route path="/manda/write" element={<MandaWritePage />} />
         <Route path="/setting" element={<SettingPage />} />
         <Route path="/search" element={<SearchPage />} />
         <Route path="/feed" element={<FeedPage />} />
