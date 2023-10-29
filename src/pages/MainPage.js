@@ -1,23 +1,18 @@
 import styled from "styled-components";
 import { useSelector } from "react-redux";
 import Header from "../components/Header";
-import { useNavigate } from "react-router";
 import Manda from "../components/Manda";
+import MandaTitle from "../components/MandaTitle";
 
 function MainPage() {
   const currentTheme = useSelector((state) => state.theme.themes[state.theme.currentTheme]);
 
-  let navigate = useNavigate();
-
   return (
     <PageLayout backgroundColor={currentTheme.bg2}>
       <Header></Header>
-      <div>메인페이지 입니다.
-        <button onClick={()=>{ navigate('/manda/write') }}>만다라트 작성</button>
-        <Manda />
-        
-      </div>
-      
+      <MandaTitle />
+      <Manda />
+      <div>아래 내용 추가 예정 </div>
     </PageLayout>
   );
 }

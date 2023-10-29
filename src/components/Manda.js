@@ -100,6 +100,7 @@ const GridContainer = styled.div`
   flex-wrap: wrap;
   width: 720px;
   height: 630px;
+  margin-left: 198px;
 `;
 
 const GridItem = styled.table`
