@@ -1,6 +1,8 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
-import styled from "styled-components";
+import styled, { ThemeProvider, css } from "styled-components";
+import theme from "./theme";
+import { useSelector } from "react-redux";
 
 
 function Manda() {
@@ -8,6 +10,9 @@ function Manda() {
   const [main, setMain] = useState({});
   const [subs, setSubs] = useState([]);
   const [contents, setContents] = useState([]);
+
+  const currentTheme = useSelector((state) => state.theme.themes[state.theme.currentTheme]);
+  const currentFilter = useSelector((state) => state.theme.filters[state.theme.currentTheme]);
 
   useEffect(() => {
     
@@ -76,12 +81,18 @@ function Manda() {
     <div>
       <GridContainer>
         {Array.from({ length: 9 }, (_, tableIndex) => (
-          <GridItem key={tableIndex}>
+          <GridItem
+          key={tableIndex}
+          hasTopBorder={tableIndex < 3}
+          hasLeftBorder={tableIndex % 3 === 0}
+          hasRightBorder={tableIndex % 3 === 2}
+          hasBottomBorder={tableIndex > 5}
+          >
             <tbody>
               {Array.from({ length: 3 }, (_, rowIndex) => (
                 <tr key={rowIndex}>
                   {Array.from({ length: 3 }, (_, cellIndex) => (
-                    <TableCell key={cellIndex}>
+                    <TableCell key={cellIndex} centerIndex={cellIndex === 4}>
                       {getTableCell(tableIndex, rowIndex * 3 + cellIndex)}
                     </TableCell>
                   ))}
@@ -96,28 +107,39 @@ function Manda() {
 }
 
 const GridContainer = styled.div`
-  display: flex;
+  display: inline-flex;
   flex-wrap: wrap;
-  width: 720px;
-  height: 630px;
+  width: 774px;
+  height: 648px;
   margin-left: 198px;
+  margin-top: 5px;
+  border-radius: 8px;
+  box-shadow: 0px 8px 24px 0px rgba(0, 0, 0, 0.15);
 `;
 
 const GridItem = styled.table`
-  border: 1px solid #ccc;
   margin: 0;
-  flex: 0 0 calc(33.3333% - 2px); /* 3개씩 가로로 배치, 2px는 border 두께 */
+  flex: 0 0 calc(33.3333% - 0px); /* 3개씩 가로로 배치, 0px는 border 두께 */
   box-sizing: border-box;
   table-layout: fixed;
+  border-collapse: collapse; /* 테이블 셀 간의 간격 제거 */
+  border-top: ${(props) => (props.hasTopBorder ? 'none' : '1px solid #999')};
+  border-left: ${(props) => (props.hasLeftBorder ? 'none' : '1px solid #999')};
+  border-right: ${(props) => (props.hasRightBorder ? 'none' : '1px solid #999')};
+  border-bottom: ${(props) => (props.hasBottomBorder ? 'none' : '1px solid #999')};
+  border-spacing: 1px;
 `;
 
 const TableCell = styled.td`
   text-align: center;
   vertical-align: middle;
-  border: 1px solid #ccc;
-  width: 80px;
+  width: 86px;
   height: 70px;
   word-break: keep-all;
+  padding: 0.5px;
+  border: 1px solid #FFF;
+  background: ${(props) => 
+    (props.centerIndex ? 'rgba(114, 105, 255, 1)' : 'rgba(114, 105, 255, 0.1)')};
 `;
 
 export default Manda;
