@@ -27,6 +27,11 @@ const flexBox = {
         justify-content: center;
         align-items: center;
     `,
+    rowCenterTop: `
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+    `,
     rowSpaceBetween: `
         display: flex;
         flex-direction: row;
@@ -39,12 +44,18 @@ const flexBox = {
         justify-content: center;
         align-items: center;
     `,
+    columnCenterTop: `
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+        align-items: center;
+    `,
     columnLeftCenter: `
         display: flex;
         flex-direction: column;
         justify-content: center;
         align-items: flex-start;
-    `
+    `,
 };
 
 const common = {

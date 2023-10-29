@@ -60,7 +60,7 @@ function Feed({ userInfo, contentInfo }) {
     }
     useEffect(() => {
         setEmojiInfo(getEmojiInfo(contentInfo.emoji_count));
-    }, []);
+    }, [contentInfo]);
     return (
         <ThemeProvider theme={theme}>
             <FeedBox bgcolor={currentTheme.bg3}>
@@ -248,7 +248,7 @@ let FeedBox = styled.div`
     background-color: ${({ bgcolor }) => bgcolor};
     flex-direction: column;
     // box-shadow: 0px 0.5rem 1.5rem 0px rgba(0, 0, 0, 0.15);
-    width: 60%;
+    width: calc(100% - 5rem);
     padding: 1.75rem 2.5rem;
     margin: 1rem;
     border-radius: 0.5rem;
@@ -285,13 +285,14 @@ let SmallIcon = styled.img`
     filter: ${({ filter }) => filter};
 `;
 let FallowButton = styled.button`
-    border: 1px solid ${({ color }) => color};
+    border: 2px solid ${({ color }) => color};
     color: ${({ color }) => color};
     background-color: ${({ bgcolor }) => bgcolor};
     border-radius: 1rem;
     width: 6rem;
     height: 2rem;
     font-size: 1rem;
+    font-weight: 600;
     padding: 0.25rem 1rem;
     flex-shrink: 0;
     &:hover {
@@ -302,13 +303,14 @@ let FallowButton = styled.button`
       }
 `;
 let FallowingButton = styled.button`
-    border: 1px solid ${({ color }) => color};
+    border: 2px solid ${({ color }) => color};
     background-color: ${({ color }) => color};
     color: #fff;
     border-radius: 1rem;
     width: 6rem;
     height: 2rem;
     font-size: 1rem;
+    font-weight: 600;
     padding: 0.25rem 1rem;
     flex-shrink: 0;
     &:hover {
