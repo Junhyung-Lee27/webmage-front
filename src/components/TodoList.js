@@ -38,8 +38,6 @@ function TodoList( {date, todos} ) {
     filteredTodos = todos.filter((todo) => todo.todo_date >= today && todo.todo_date <= endOfWeek);
   }
 
-  todos.forEach((todo) => console.log(todo.todo_date.toDateString()));
-
   return (
     <ThemeProvider theme={theme}>
       <Layout>
