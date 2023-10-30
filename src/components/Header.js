@@ -7,7 +7,7 @@ import ThemeSwitch from "../components/ThemeSwitch";
 import Notification from "./notification";
 
 import { logout } from "../services/authService";
-import { setIsLoggedIn, userLogout } from "../store/userSlice";
+import { setIsLoggedIn, resetUserState } from "../store/userSlice";
 import { useNavigate } from "react-router-dom";
 
 function Header() {
@@ -30,9 +30,9 @@ function Header() {
   const handleLogoutClick = async () => {
     const response = await logout();
     if (response.success) {
-      dispatch(setIsLoggedIn(false));
-        dispatch(userLogout());
-        navigate("/");
+      dispatch(setIsLoggedIn(false)); // 로그인 여부 false
+      dispatch(resetUserState()); // 유저 상태 초기화
+      navigate("/"); // 로그인 화면으로 이동
     } else if (response.error) {
       alert(response.error);
     }

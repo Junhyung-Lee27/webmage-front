@@ -11,7 +11,7 @@ const userSlice = createSlice({
     isLoggedIn: false,
   },
   reducers: {
-    // 프로필 관리
+    // 프로필, 계정 관리
     setUser: (state, action) => {
       if (action.payload.username) {
         state.username = action.payload.username;
@@ -22,10 +22,9 @@ const userSlice = createSlice({
       if (action.payload.hash) {
         state.hash = action.payload.hash;
       }
-    },
-    // 계정 관리
-    setUserEmail: (state, action) => {
-      state.email = action.payload;
+      if (action.payload.email) {
+        state.email = action.payload.email;
+      }
     },
     // 토큰 관리
     setToken: (state, action) => {
@@ -35,15 +34,12 @@ const userSlice = createSlice({
     setIsLoggedIn: (state, action) => {
       state.isLoggedIn = action.payload;
     },
-    // 로그아웃
-    userLogout: (state) => {
-      state.username = "";
-      state.position = "";
-      state.hash = "";
-      state.email = "";
+    // 초기화(로그아웃, 탈퇴)
+    resetUserState: (state) => {
+      return { ...state, ...userSlice.initialState };
     },
   },
 });
 
-export const { setUser, setUserEmail, setToken, setIsLoggedIn, userLogout } = userSlice.actions;
+export const { setUser, setToken, setIsLoggedIn, resetUserState } = userSlice.actions;
 export default userSlice.reducer;
