@@ -86,6 +86,8 @@ function Header() {
 }
 
 let HeaderLayout = styled.div`
+  ${({ theme }) => theme.component.font.importPretendard};
+  font-family: Pretendard-Regular;
   position: ${({ position }) => position};
   z-index: 1;
   height: 56px;
