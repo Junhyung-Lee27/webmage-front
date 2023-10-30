@@ -6,6 +6,7 @@ import SearchPage from "./pages/SearchPage";
 import MainPage from "./pages/MainPage.js";
 import MandaWritePage from "./pages/MandaWritePage.js";
 import FeedPage from "./pages/FeedPage";
+import ChatPage from "./pages/ChatPage";
 import { ThemeProvider } from "styled-components";
 import { useSelector } from "react-redux";
 import { Reset } from 'styled-reset'
@@ -23,6 +24,7 @@ function App() {
         <Route path="/setting" element={<SettingPage />} />
         <Route path="/search" element={<SearchPage />} />
         <Route path="/feed" element={<FeedPage />} />
+        <Route path="/chat" element={<ChatPage />} />
       </Routes>
     </ThemeProvider>
   );
