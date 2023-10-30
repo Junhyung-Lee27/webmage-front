@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 import componentTheme from "./theme";
 import { showDeleteAccount } from "../store/settingpageSlice";
 import { setUserEmail } from "../store/userSlice";
-import { editAccount, deleteUser } from "../services/authService";
+import { editAccount } from "../services/authService";
 
 function AccountView() {  
   // 테마
@@ -43,6 +43,7 @@ function AccountInfo({ user, setIsEditing }) {
     <FormLayout>
       <LabelText>이메일</LabelText>
       <StyledBox>{user.email}</StyledBox>
+      <StyledBox>{user.token}</StyledBox>
       <StyledButton onClick={() => setIsEditing(true)}>수정하기</StyledButton>
       <WithdrawText onClick={() => dispatch(showDeleteAccount())}>Manda 탈퇴하기</WithdrawText>
     </FormLayout>
@@ -62,17 +63,21 @@ function AccountEdit({user}) {
     setState(e.target.value);
   };
 
+  // get token
+  const token = useSelector((state) => state.user.token);
+
   // 계정정보 수정 요청
-  const handleEditAccount = async () => {
-    const response = await editAccount(user.username, email, password, passwordCheck);
+  const handleEditAccount = async (token) => {
+    
+    const response = await editAccount(user.username, email, password, passwordCheck, token);
     // 계정정보 수정 성공했을 경우
     if (response.success) {
       dispatch(setUserEmail(email));
-      navigate(-1)
+      navigate(-1);
     } else if (response.error) {
       alert(response.error);
     }
-  }
+  };
 
   return (
     <FormLayout>
@@ -106,7 +111,7 @@ function AccountEdit({user}) {
         value={passwordCheck}
         onChange={(e) => handleInputChange(e, setPasswordCheck)}
       ></StyledForm>
-      <StyledButton onClick={handleEditAccount}>완료</StyledButton>
+      <StyledButton onClick={() => handleEditAccount(token)}>완료</StyledButton>
     </FormLayout>
   );
 }
