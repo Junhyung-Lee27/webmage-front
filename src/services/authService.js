@@ -1,4 +1,19 @@
 import axios from "axios";
+// 토큰 가져오기
+export const getToken = async () => {
+  try {
+    const response = await axios.get("http://15.164.217.203:8000/get_token/");
+
+    if (response.status === 200) {
+      return { success: true, csrfToken: response.data.csrf_token };
+    } else {
+      return { error: "나중에 다시 시도해주세요." };
+    }
+  } catch (error) {
+    console.error("getToken API error:", error);
+    return { error: "나중에 다시 시도해주세요." };
+  }
+};
 
 // 회원가입
 export const signup = async (username, email, password, passwordCheck) => {
