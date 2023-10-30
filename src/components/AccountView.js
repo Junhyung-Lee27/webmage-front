@@ -1,10 +1,14 @@
 import styled, { ThemeProvider } from "styled-components";
 import { useSelector, useDispatch } from "react-redux";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import componentTheme from "./theme";
 import { showDeleteAccount } from "../store/settingpageSlice";
+import { setUserEmail } from "../store/userSlice";
+import { editAccount, deleteUser } from "../services/authService";
 
-function AccountView() {
+function AccountView() {  
+  // 테마
   const colorTheme = useSelector((state) => state.theme.themes[state.theme.currentTheme]);
   const filterTheme = useSelector((state) => state.theme.filters[state.theme.currentTheme]);
   const theme = {
@@ -13,41 +17,75 @@ function AccountView() {
     component: componentTheme,
   };
 
+  // '계정 정보 편집' 상태 관리
   const [isEditing, setIsEditing] = useState(false);
+
+  // 현재 사용자 정보
+  const user = useSelector((state) => state.user);
 
   return (
     <ThemeProvider theme={theme}>
       <AccountViewLayout>
         {isEditing ? (
-          <AccountEdit theme={theme} />
+          <AccountEdit theme={theme} user={user} />
         ) : (
-          <AccountInfo theme={theme} setIsEditing={setIsEditing} />
+          <AccountInfo theme={theme} user={user} setIsEditing={setIsEditing} />
         )}
       </AccountViewLayout>
     </ThemeProvider>
   );
 }
 
-function AccountInfo({ setIsEditing }) {
+function AccountInfo({ user, setIsEditing }) {
   const dispatch = useDispatch();
-  
+
   return (
     <FormLayout>
       <LabelText>이메일</LabelText>
-      <StyledBox>test@manda.com</StyledBox>
+      <StyledBox>{user.email}</StyledBox>
       <StyledButton onClick={() => setIsEditing(true)}>수정하기</StyledButton>
       <WithdrawText onClick={() => dispatch(showDeleteAccount())}>Manda 탈퇴하기</WithdrawText>
     </FormLayout>
   );
 }
 
-function AccountEdit() {
+function AccountEdit({user}) {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
+  // 입력값 상태 관리
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [passwordCheck, setPasswordCheck] = useState("");
+
+  const handleInputChange = (e, setState) => {
+    setState(e.target.value);
+  };
+
+  // 계정정보 수정 요청
+  const handleEditAccount = async () => {
+    const response = await editAccount(user.username, email, password, passwordCheck);
+    // 계정정보 수정 성공했을 경우
+    if (response.success) {
+      dispatch(setUserEmail(email));
+      navigate(-1)
+    } else if (response.error) {
+      alert(response.error);
+    }
+  }
+
   return (
     <FormLayout>
       <LabelText>
         <label htmlFor="email">이메일</label>
       </LabelText>
-      <StyledForm type="email" placeholder="변경할 이메일을 입력해주세요" id="email"></StyledForm>
+      <StyledForm
+        type="email"
+        placeholder="변경할 이메일을 입력해주세요"
+        id="email"
+        value={email}
+        onChange={(e) => handleInputChange(e, setEmail)}
+      ></StyledForm>
       <LabelText>
         <label htmlFor="change-password">변경할 비밀번호</label>
       </LabelText>
@@ -55,6 +93,8 @@ function AccountEdit() {
         type="password"
         placeholder="변경할 비밀번호를 입력해주세요"
         id="change-password"
+        value={password}
+        onChange={(e) => handleInputChange(e, setPassword)}
       ></StyledForm>
       <LabelText>
         <label htmlFor="change-password-check">변경할 비밀번호 확인</label>
@@ -63,8 +103,10 @@ function AccountEdit() {
         type="password"
         placeholder="변경할 비밀번호를 다시 한 번 입력해주세요"
         id="change-password-check"
+        value={passwordCheck}
+        onChange={(e) => handleInputChange(e, setPasswordCheck)}
       ></StyledForm>
-      <StyledButton>완료</StyledButton>
+      <StyledButton onClick={handleEditAccount}>완료</StyledButton>
     </FormLayout>
   );
 }

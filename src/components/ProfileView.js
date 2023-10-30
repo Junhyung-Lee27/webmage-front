@@ -16,8 +16,8 @@ function ProfileView() {
   // 편집 중 상태 관리
   const [isEditing, setIsEditing] = useState(false);
 
-  // 현재 로그인 사용자
-  const username = useSelector((state) => state.user.username)
+  // 현재 사용자 정보
+  const user = useSelector((state) => state.user);
 
   return (
     <ThemeProvider theme={theme}>
@@ -25,7 +25,7 @@ function ProfileView() {
         {isEditing ? (
           <ProfileEdit />
         ) : (
-          <ProfileInfo setIsEditing={setIsEditing} username={username} />
+          <ProfileInfo setIsEditing={setIsEditing} username={user.username} />
         )}
       </ProfileViewLayout>
     </ThemeProvider>

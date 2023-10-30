@@ -11,6 +11,7 @@ import { setUser } from '../store/userSlice';
 
 function LoginForm() {
   let navigate = useNavigate();
+  const dispatch = useDispatch();
 
   // 입력값 상태 관리
   const [username, setUsername] = useState("");
@@ -38,8 +39,6 @@ function LoginForm() {
     filter: filterTheme,
     component: componentTheme,
   };
-
-  const dispatch = useDispatch();
 
   return (
     <ThemeProvider theme={theme}>
