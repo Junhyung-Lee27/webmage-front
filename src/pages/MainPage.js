@@ -1,58 +1,104 @@
 import styled from "styled-components";
 import { useSelector } from "react-redux";
 import Header from "../components/Header";
-import { useNavigate } from "react-router";
-import MandaPart from "../components/MandaPart";
+import Manda from "../components/Manda";
+import MandaTitle from "../components/MandaTitle";
 
 function MainPage() {
   const currentTheme = useSelector((state) => state.theme.themes[state.theme.currentTheme]);
 
-  const subData = [ ['', '', ''], ['', '', ''], ['', '', ''] ];
-  const mainData = [ ['', '', ''], ['', '코딩 왕', ''], ['', '', ''] ];
-
-  let navigate = useNavigate();
-
   return (
-    <PageLayout backgroundColor={currentTheme.bg2}>
+    <PageLayout backgroundcolor={currentTheme.bg2}>
       <Header></Header>
-      <div>메인페이지 입니다.
-        <button onClick={()=>{ navigate('/mandawrite') }}>만다라트 작성</button>
-        <GridContainer>
-          {Array(9).fill().map((_, index) => (
-            <GridItem key={index} isEven={(index + 1) % 2 === 0}>
-              <MandaPart data={index === 4 ? mainData : subData} />
-            </GridItem>
-          ))}
-        </GridContainer>
-      </div>
-      
+
+      <TopGroup>
+        <MyManda>
+          <MandaTitle />
+          <Manda />
+        </MyManda>
+
+        <ProfileLog>
+          <Profile>프로필</Profile>
+          <MandaLog>만다로그</MandaLog>
+        </ProfileLog>
+      </TopGroup>
+
+      <Line />
+
+      <TodoGroup>
+        <TodoList>Today</TodoList>
+        <TodoList>Tomorrow</TodoList>
+        <TodoList>This Week</TodoList>
+      </TodoGroup>
+
     </PageLayout>
   );
 }
 
-let PageLayout = styled.div`
+const PageLayout = styled.div`
   display: flex;
   flex-direction: column;
-  height: 100vh;
-  gap: 40px;
-  background-color: ${({ backgroundColor }) => backgroundColor};
+  background-color: ${({ backgroundcolor }) => backgroundcolor};
 `;
 
-let GridContainer = styled.div`
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  grid-template-rows: repeat(3, 1fr);
-  margin: 20px;
-  width: 720px;
-  height: 630px;
-`;
-
-let GridItem = styled.div`
+const TopGroup = styled.div`
   display: flex;
-  justify-content: center;
-  align-items: center;
-  ${(props) =>
-    props.isEven ? 'background-color: #F1F1F1;' : 'background-color: white;'};
+`
+
+const MyManda = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
 `;
+
+const ProfileLog = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-left: 24px;
+  margin-top: 66px;
+`
+
+
+const Profile = styled.div`
+  display: inline-flex;
+  width: 250px;
+  height: 230px;
+  background: grey;
+  color: white;
+  flex-direction: column;
+  align-items: center;
+`
+const MandaLog = styled.div`
+  display: inline-flex;
+  width: 250px;
+  height: 376px;
+  flex-direction: column;
+  align-items: center;
+  background: grey;
+  color: white;
+  margin-top: 24px;
+`
+
+const Line = styled.div`
+  border-bottom: 1px solid #BFBFBF;
+  margin: 30px 0px 30px 198px;
+  width: 1048px;
+`
+
+const TodoGroup = styled.div`
+  display: inline-flex;
+  margin-left: 198px;
+  gap: 17px;
+`
+
+const TodoList = styled.div`
+  display: inline-flex;
+  width: 338px;
+  height: 230px;
+  background: grey;
+  color: white;
+`
+
 
 export default MainPage;
