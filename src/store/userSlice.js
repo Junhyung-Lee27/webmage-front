@@ -7,6 +7,7 @@ const userSlice = createSlice({
     position: "",
     hash: "",
     email: "",
+    token: "",
   },
   reducers: {
     // 프로필 관리
@@ -25,6 +26,11 @@ const userSlice = createSlice({
     setUserEmail: (state, action) => {
       state.email = action.payload;
     },
+    // 토큰 관리
+    setToken: (state, action) => {
+        state.token = action.payload;
+    },
+    // 로그아웃
     userLogout: (state) => {
       state.username = "";
       state.position = "";
@@ -34,5 +40,5 @@ const userSlice = createSlice({
   },
 });
 
-export const { setUser, setUserEmail, userLogout } = userSlice.actions;
+export const { setUser, setUserEmail, setToken, userLogout } = userSlice.actions;
 export default userSlice.reducer;
