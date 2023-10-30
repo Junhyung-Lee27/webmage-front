@@ -236,6 +236,10 @@ let FeedInput = styled.textarea`
     background-color: ${({ bgcolor }) => bgcolor};
     color: ${({ color }) => color};
     border-radius: 0.5rem;
+    &::placeholder{
+        color: ${({ color }) => color};
+        opacity: 0.5;
+    }
 `
 let StyledButton = styled.button`
     width:100%
