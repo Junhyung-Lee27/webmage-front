@@ -98,7 +98,7 @@ export const editAccount = async (username, email, password, passwordCheck) => {
         accept: "application/json",
         "Content-Type": "application/json",
       },
-      withCredentials: true
+      withCredentials: true,
     };
 
     try {
@@ -121,14 +121,14 @@ export const editAccount = async (username, email, password, passwordCheck) => {
 };
 
 // 회원탈퇴
-export const deleteUser = async (token) => {
+export const deleteUser = async () => {
   try {
     const response = await axios.delete("http://15.164.217.203:8000/user/delete-user/", {
       headers: {
         accept: "application/json",
         "Content-Type": "application/json",
-        "X-CSRFToken": token,
       },
+      withCredentials: true,
     });
 
     if (response.status === 200 && response.statusText === "OK") {
