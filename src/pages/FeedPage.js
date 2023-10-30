@@ -5,6 +5,7 @@ import { ThemeProvider } from "styled-components";
 import Header from "../components/Header";
 import theme from "../components/theme";
 import UserRecommend from "../components/UserRecommend";
+import FeedWriteModal from "../components/FeedWriteModal";
 
 const feedInfo = [
     {
@@ -124,13 +125,7 @@ function FeedPage() {
                         </Feeds>
                     </FlexBox>
                     <Aside>
-                        <WriteFeed bgcolor={currentTheme.primary}>
-                            <StyledText
-                                size="1rem"
-                                weight="700"
-                                color={currentTheme.bg}
-                            >피드 작성</StyledText>
-                        </WriteFeed>
+                        <FeedWriteModal />
                         <Recommend>
                             <StyledText
                                 size="1rem"
@@ -159,7 +154,7 @@ let Layout = styled.div`
   align-items:center;
   gap: 160px;
   background-color: ${(props) => props.theme.bg};
-  margin-top:2rem;
+  padding-top:2rem;
 `;
 
 let PageBox = styled.div`
@@ -196,15 +191,6 @@ let Aside = styled.div`
     gap: 1.5rem;
     margin-top:2rem;
 `;
-let WriteFeed = styled.button`
-    width:250px;
-    height: 60px;
-    border:none;
-    border-radius:4px;
-    ${({ theme }) => theme.flexBox.rowCenter};
-    background-color: ${({ bgcolor }) => bgcolor};
-    margin-left:3rem;
-`;
 let Recommend = styled.div`
     width:100%;
     ${({ theme }) => theme.flexBox.columnLeftCenter};
@@ -214,7 +200,7 @@ let Nav = styled.div`
     width:100%;
     ${({ theme }) => theme.flexBox.rowLeftCenter};
     gap:1.5rem;
-    margin-left:0.5rem;
+    margin-left:3rem;
 `
 
 export default FeedPage;

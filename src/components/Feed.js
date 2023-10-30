@@ -2,12 +2,14 @@ import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import styled, { ThemeProvider } from "styled-components";
 import theme from "./theme";
+import FallowButton from "./FallowButton";
 
 function Feed({ userInfo, contentInfo }) {
     const currentTheme = useSelector((state) => state.theme.themes[state.theme.currentTheme]);
     const currentFilter = useSelector((state) => state.theme.filters[state.theme.currentTheme]);
     const userName = "오르미";
-    const [emojiInfo, setEmojiInfo] = useState({});
+    const [emojiInfo, setEmojiInfo] = useState({});//피드 최다 이모지 및 총 이모지 갯수 표시를 위한 변수
+    const [isEmojiModalOpen, setIsEmojiModalOpen] = useState(false);
 
     const formatDateAgo = (date) => {
         const now = new Date();
@@ -58,12 +60,19 @@ function Feed({ userInfo, contentInfo }) {
 
         return { total_count, maxKey, nextMaxKey };
     }
+
+    const openEmojiModal = () => {
+
+    }
+
     useEffect(() => {
         setEmojiInfo(getEmojiInfo(contentInfo.emoji_count));
     }, [contentInfo]);
+
     return (
         <ThemeProvider theme={theme}>
             <FeedBox bgcolor={currentTheme.bg3}>
+                {/*유저정보 및 팔로우버튼/메뉴버튼 */}
                 <FeedHeader>
                     <UserInfo>
                         <ProfileImgWrapper>
@@ -97,18 +106,11 @@ function Feed({ userInfo, contentInfo }) {
                     {userInfo.userName == userName ? (
                         <MediumIcon src={process.env.PUBLIC_URL + "/icon/menu-horizontal.svg"} filter={currentFilter.font1} />
                     ) : (
-                        userInfo.isFallowing ? (
-                            <FallowingButton color={currentTheme.primary} colorhover={currentTheme.secondary}>
-                                팔로잉
-                            </FallowingButton>
-                        ) : (
-                            <FallowButton bgcolor={currentTheme.bg3} color={currentTheme.font2} colorhover={currentTheme.primary}>
-                                +팔로우
-                            </FallowButton>
-                        )
+                        <FallowButton isFallowing={userInfo.isFallowing} />
                     )
                     }
                 </FeedHeader>
+                {/*주요목표, 세부목표, 하위목표*/}
                 <FeedTitle>
                     <FlexBox>
                         <StyledText
@@ -164,6 +166,7 @@ function Feed({ userInfo, contentInfo }) {
                         </TitleBox>
                     </FlexBox>
                 </FeedTitle>
+                {/*피드 본문*/}
                 <FeedArticle>
                     <PictureWrap>
                         <Picture src={contentInfo.content_img} />
@@ -190,6 +193,7 @@ function Feed({ userInfo, contentInfo }) {
                         })}
                     </div>
                 </FeedArticle>
+                {/*이모지, 댓글 등 커뮤니케이션 영역*/}
                 <FeedFooter>
                     <CommunicationBox>
                         {emojiInfo.total_count != 0 ? (
@@ -283,41 +287,6 @@ let MediumIcon = styled.img`
 let SmallIcon = styled.img`
     ${({ theme }) => theme.iconSize.small};
     filter: ${({ filter }) => filter};
-`;
-let FallowButton = styled.button`
-    border: 2px solid ${({ color }) => color};
-    color: ${({ color }) => color};
-    background-color: ${({ bgcolor }) => bgcolor};
-    border-radius: 1rem;
-    width: 6rem;
-    height: 2rem;
-    font-size: 1rem;
-    font-weight: 600;
-    padding: 0.25rem 1rem;
-    flex-shrink: 0;
-    &:hover {
-        border: 1px solid ${({ colorhover }) => colorhover};
-        background-color: ${({ colorhover }) => colorhover};
-        color: #fff;
-        transition: 0.5s;
-      }
-`;
-let FallowingButton = styled.button`
-    border: 2px solid ${({ color }) => color};
-    background-color: ${({ color }) => color};
-    color: #fff;
-    border-radius: 1rem;
-    width: 6rem;
-    height: 2rem;
-    font-size: 1rem;
-    font-weight: 600;
-    padding: 0.25rem 1rem;
-    flex-shrink: 0;
-    &:hover {
-        border: 1px solid ${({ colorhover }) => colorhover};
-        background-color: ${({ colorhover }) => colorhover};
-        transition: 0.5s;
-      }
 `;
 let FeedTitle = styled.div`
     ${({ theme }) => theme.flexBox.columnLeftCenter};
