@@ -1,4 +1,4 @@
-import { configureStore, getDefaultMiddleware } from "@reduxjs/toolkit";
+import { configureStore } from "@reduxjs/toolkit";
 import { combineReducers } from "redux"; // 여러 개의 reducer를 하나의 root reducer로 합쳐줌
 import { persistReducer } from "redux-persist"; // storage를 사용하기 위한 라이브러리
 import storage from "redux-persist/lib/storage";
