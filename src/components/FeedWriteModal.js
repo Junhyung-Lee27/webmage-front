@@ -153,9 +153,15 @@ function FeedWriteModal() {
                         color={currentTheme.font1}
                         rows={8}
                     />
-                    <PictureWrap>
-                        <Picture src={imgFile == "" ? process.env.PUBLIC_URL + "/input_image.svg" : imgFile} />
-                    </PictureWrap>
+                    {imgFile == "" ? (
+                        <PictureWrap bgcolor={currentTheme.bg3}>
+                            <ImageInput src={imgFile == "" ? process.env.PUBLIC_URL + "/input_image.svg" : imgFile} />
+                        </PictureWrap>
+                    ) : (
+                        <PictureWrap bgcolor={currentTheme.bg3}>
+                            <Picture src={imgFile == "" ? process.env.PUBLIC_URL + "/input_image.svg" : imgFile} />
+                        </PictureWrap>
+                    )}
                     <input
                         type="file"
                         accept="image/*"
@@ -209,7 +215,7 @@ function FeedWriteModal() {
                     </Button>
                 </Modal.Footer>
             </Modal>
-        </ThemeProvider>
+        </ThemeProvider >
     )
 }
 
@@ -240,14 +246,14 @@ let FeedInput = styled.textarea`
         color: ${({ color }) => color};
         opacity: 0.5;
     }
-`
-let StyledButton = styled.button`
-    width:100%
+    margin: 1rem 0;
 `
 let PictureWrap = styled.div`
     padding-top: 65%;
     position: relative;
     width: 100%;
+    border-radius:0.25rem;
+    background-color: ${({ bgcolor }) => bgcolor};
 `;
 let Picture = styled.img`
     height: 100%;
@@ -258,6 +264,15 @@ let Picture = styled.img`
     top: 0;
     border-radius:0.25rem;
 `;
+let ImageInput = styled.img`
+height: 100%;
+position: absolute;
+width: 100%;
+object-fit: scale-down;
+left: 0;
+top: 0;
+border-radius:0.25rem;
+`
 let Dropdown = styled.div`
     ${({ theme }) => theme.flexBox.columnLeftCenter};
     gap:0.5rem;

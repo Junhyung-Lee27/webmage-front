@@ -161,8 +161,8 @@ let PageBox = styled.div`
     display:flex;
     flex-direction: row;
     justify-content: center;
-    width: 1440px;
-    @media screen and (max-width: 1440px) {
+    width: 1080px;
+    @media screen and (max-width: 1080px) {
         width: 100vw;
     }
     gap:0.5rem;
