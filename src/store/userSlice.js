@@ -9,6 +9,7 @@ const userSlice = createSlice({
     email: "",
   },
   reducers: {
+    // 프로필 관리
     setUser: (state, action) => {
       if (action.payload.username) {
         state.username = action.payload.username;
@@ -20,6 +21,7 @@ const userSlice = createSlice({
         state.hash = action.payload.hash;
       }
     },
+    // 계정 관리
     setUserEmail: (state, action) => {
       state.email = action.payload;
     },
