@@ -18,7 +18,6 @@ function ProfileView() {
 
   // 현재 사용자 정보
   const user = useSelector((state) => state.user);
-  console.log(user);
 
   return (
     <ThemeProvider theme={theme}>
