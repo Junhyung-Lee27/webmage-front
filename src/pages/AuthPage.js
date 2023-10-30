@@ -45,11 +45,14 @@ function AuthPage() {
 }
 
 let PageLayout = styled.div`
+  ${({ theme }) => theme.component.font.importPretendard};
+  font-family: Pretendard-Regular;
   display: flex;
   justify-content: center;
   align-items: center;
   height: 100vh;
-  gap: 160px;
+  gap: 80px;
+  margin-right: 60px;
   background-color: ${({ theme }) => theme.color.bg};
 `;
 
@@ -65,6 +68,7 @@ let Column = styled.div`
 `;
 
 let StyledText = styled.span`
+  letter-spacing: 3px;
   font-size: ${({ size }) => size + "px"};
   font-weight: ${({ weight }) => weight};
   color: ${({ color }) => color};
