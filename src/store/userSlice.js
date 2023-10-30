@@ -27,6 +27,9 @@ const userSlice = createSlice({
     },
     userLogout: (state) => {
       state.username = "";
+      state.position = "";
+      state.hash = "";
+      state.email = "";
     },
   },
 });
