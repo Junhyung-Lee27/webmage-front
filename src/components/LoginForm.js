@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { login } from "../services/authService";
+import { login, getToken } from "../services/authService";
 
 import styled, { ThemeProvider } from "styled-components";
 import componentTheme from "./theme";
@@ -7,10 +7,13 @@ import { useNavigate } from "react-router-dom";
 
 import { useDispatch, useSelector } from "react-redux";
 import { showSignup, showForgotPassword } from "../store/authpageSlice";
-import { setUser } from '../store/userSlice';
+import { setUser, setToken, setIsLoggedIn } from '../store/userSlice';
 
 function LoginForm() {
-  let navigate = useNavigate();
+  const loggedin = useSelector((state) => state.user.isLoggedIn);
+  console.log(loggedin);
+  
+    let navigate = useNavigate();
   const dispatch = useDispatch();
 
   // 입력값 상태 관리
@@ -20,13 +23,25 @@ function LoginForm() {
   const handleUsernameChange = (e) => setUsername(e.target.value);
   const handlePasswordChange = (e) => setPassword(e.target.value);
 
+  // 토큰 요청
+  const handleGetToken = async () => {
+    const response = await getToken();
+    if (response.success) {
+      let token = response.token;
+      dispatch(setToken(token));
+    } else if (response.error) {
+      alert(response.error);
+    }
+  };
+
   // 로그인 요청
   const handleLoginClick = async () => {
     const response = await login(username, password);
-    console.log(username);
     if (response.success) {
-      dispatch(setUser(username));
-        navigate('/manda');
+      dispatch(setUser({username:username}));
+      dispatch(setIsLoggedIn(true))
+      navigate("/manda");
+      handleGetToken(); // 토큰 저장
     } else if (response.error) {
       alert(response.error);
     }
@@ -103,13 +118,13 @@ function LoginForm() {
             </LogoWrap>
             <LogoWrap backgroundcolor="#FEE500" border="none">
               <SocialLogo
-                src={process.env.PUBLIC_URL + "/logo/Kakao_Logo.svg"}
+                src={process.env.PUBLIC_URL + "/logo/KaKao_Logo.svg"}
                 size="55%"
               ></SocialLogo>
             </LogoWrap>
             <LogoWrap backgroundcolor="#03C75A" border="none">
               <SocialLogo
-                src={process.env.PUBLIC_URL + "/logo/Naver_logo.svg"}
+                src={process.env.PUBLIC_URL + "/logo/Naver_Logo.svg"}
                 size="100%"
               ></SocialLogo>
             </LogoWrap>
