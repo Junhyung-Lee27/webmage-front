@@ -90,3 +90,17 @@ export const editAccount = async (username, email, password, passwordCheck) => {
 };
 
 // 회원탈퇴
+export const deleteUser = async () => {
+  try {
+    const response = await axios.delete("http://15.164.217.203:8000/user/delete-user/");
+
+    if (response.status === 200 && response.statusText === "OK") {
+      return { success: true };
+    } else {
+      return { error: "회원탈퇴에 실패했습니다. 나중에 다시 시도해주세요." };
+    }
+  } catch (error) {
+    console.error("Delete-user API error:", error);
+    return { error: "회원탈퇴 중 오류가 발생했습니다. 나중에 다시 시도해주세요." };
+  }
+};

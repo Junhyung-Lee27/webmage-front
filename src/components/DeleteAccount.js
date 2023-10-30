@@ -2,14 +2,36 @@ import styled, { ThemeProvider } from "styled-components";
 import { useSelector, useDispatch } from "react-redux";
 import componentTheme from "./theme";
 import { showAccountView } from "./../store/settingpageSlice";
+import { deleteUser } from "../services/authService";
+import { setUser, setUserEmail } from "../store/userSlice";
+import { useNavigate } from "react-router-dom";
 
 function DeleteAccount() {
+  // 테마
   const colorTheme = useSelector((state) => state.theme.themes[state.theme.currentTheme]);
   const theme = {
     color: colorTheme,
     component: componentTheme,
   };
-  const dispatch = useDispatch();
+
+  // 현재 사용자 정보
+  const user = useSelector((state) => state.user);
+
+  const dispatch = useDispatch(); // 스토어 상태 업데이트
+  const navigate = useNavigate(); // 화면 네이게이터
+
+  // 회원탈퇴 요청
+  const handleDeleteUser = async () => {
+    const response = await deleteUser(user.username);
+    // 회원탈퇴 성공했을 경우
+    if (response.success) {
+      dispatch(setUserEmail(""));
+      dispatch(setUser({ username: "", position: "", hash: "" }));
+      navigate("/");
+    } else if (response.error) {
+      alert(response.error);
+    }
+  };
 
   return (
     <ThemeProvider theme={theme}>
@@ -51,7 +73,7 @@ function DeleteAccount() {
             >
               취소
             </StyledButton>
-            <StyledButton color="white" backgroundcolor="#FF4C4C">
+            <StyledButton onClick={handleDeleteUser} color="white" backgroundcolor="#FF4C4C">
               탈퇴하기
             </StyledButton>
           </Buttons>

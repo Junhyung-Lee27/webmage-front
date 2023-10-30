@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 import componentTheme from "./theme";
 import { showDeleteAccount } from "../store/settingpageSlice";
 import { setUserEmail } from "../store/userSlice";
-import { editAccount } from "../services/authService";
+import { editAccount, deleteUser } from "../services/authService";
 
 function AccountView() {  
   // 테마
