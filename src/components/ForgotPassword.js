@@ -51,6 +51,7 @@ let StyledText = styled.span`
 `;
 
 let StyledForm = styled.input`
+  box-sizing: content-box;
   height: 24px;
   padding: 8px 16px;
   font-size: 14px;
