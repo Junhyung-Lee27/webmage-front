@@ -18,6 +18,7 @@ function ProfileView() {
 
   // 현재 사용자 정보
   const user = useSelector((state) => state.user);
+  console.log(user);
 
   return (
     <ThemeProvider theme={theme}>
@@ -25,14 +26,14 @@ function ProfileView() {
         {isEditing ? (
           <ProfileEdit />
         ) : (
-          <ProfileInfo setIsEditing={setIsEditing} username={user.username} />
+          <ProfileInfo setIsEditing={setIsEditing} user={user} />
         )}
       </ProfileViewLayout>
     </ThemeProvider>
   );
 }
 
-function ProfileInfo({ setIsEditing, username }) {
+function ProfileInfo({ setIsEditing, user }) {
   return (
     <FormLayout>
       <ProfileImgLayout>
@@ -40,13 +41,13 @@ function ProfileInfo({ setIsEditing, username }) {
       </ProfileImgLayout>
 
       <LabelText>닉네임</LabelText>
-      <StyledBox>{username}</StyledBox>
+      <StyledBox>{user.username}</StyledBox>
 
       <LabelText>소속</LabelText>
-      <StyledBox>이스트소프트 오르미 2기</StyledBox>
+      <StyledBox>{user.position}</StyledBox>
 
       <LabelText>해시태그</LabelText>
-      <StyledBox>#webmage, #웹법사, #Oreumi, #Front-end</StyledBox>
+      <StyledBox>{user.hash}</StyledBox>
 
       <StyledButton onClick={() => setIsEditing(true)}>수정하기</StyledButton>
     </FormLayout>
