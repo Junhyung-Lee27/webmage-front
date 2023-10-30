@@ -128,6 +128,7 @@ let LabelText = styled.span`
 `;
 
 let StyledBox = styled.div`
+  box-sizing: content-box;
   padding: 8px 16px;
   font-size: 14px;
   height: 24px;
@@ -141,6 +142,7 @@ let StyledBox = styled.div`
 `;
 
 let StyledForm = styled.input`
+  box-sizing: content-box;
   height: 24px;
   padding: 8px 16px;
   font-size: 14px;

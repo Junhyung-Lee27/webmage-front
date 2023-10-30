@@ -43,7 +43,6 @@ function AccountInfo({ user, setIsEditing }) {
     <FormLayout>
       <LabelText>이메일</LabelText>
       <StyledBox>{user.email}</StyledBox>
-      <StyledBox>{user.token}</StyledBox>
       <StyledButton onClick={() => setIsEditing(true)}>수정하기</StyledButton>
       <WithdrawText onClick={() => dispatch(showDeleteAccount())}>Manda 탈퇴하기</WithdrawText>
     </FormLayout>
@@ -150,6 +149,7 @@ let LabelText = styled.p`
 `;
 
 let StyledForm = styled.input`
+  box-sizing: content-box;
   height: 24px;
   padding: 8px 16px;
   font-size: 14px;
@@ -168,6 +168,7 @@ let StyledForm = styled.input`
 `;
 
 let StyledBox = styled.div`
+  box-sizing: content-box;
   padding: 8px 16px;
   font-size: 14px;
   height: 24px;
