@@ -74,6 +74,8 @@ function SettingPage() {
 }
 
 let PageLayout = styled.div`
+  ${({ theme }) => theme.component.font.importPretendard};
+  font-family: Pretendard-Regular;
   display: flex;
   flex-direction: column;
   height: 100vh;
