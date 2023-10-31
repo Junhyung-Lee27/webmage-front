@@ -4,7 +4,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { showLogin } from "../store/authpageSlice";
 import { useNavigate } from "react-router-dom";
 import { signup, login } from "../services/authService";
-import { setIsLoggedIn, setUser, setToken } from "../store/userSlice";
+import { setIsLoggedIn, setUser, setAuthToken } from "../store/userSlice";
 
 function SignupForm() {
   const dispatch = useDispatch();
@@ -30,7 +30,7 @@ function SignupForm() {
       const loginResponse = await login(username, password);
       if (loginResponse.success) {
         dispatch(setUser({ username: username, email: email }));
-        dispatch(setToken(loginResponse.token));
+        dispatch(setAuthToken(loginResponse.token));
         dispatch(setIsLoggedIn(true));
         navigate("/")
       } else if (loginResponse.error) {
