@@ -17,13 +17,17 @@ function DeleteAccount() {
   const dispatch = useDispatch(); // 스토어 상태 업데이트
   const navigate = useNavigate(); // 화면 네이게이터
 
+  // get token
+  const token = useSelector((state) => state.user.token);
+  console.log(token);
+
   // 회원탈퇴 요청
-  const handleDeleteUser = async () => {
-    const response = await deleteUser();
+  const handleDeleteUser = async (token) => {
+    const response = await deleteUser(token);
     // 회원탈퇴 성공했을 경우
     if (response.success) {
       dispatch(resetUserState()); // 유저 상태 초기화
-      navigate('/') // 로그인 화면으로 이동
+      navigate("/"); // 로그인 화면으로 이동
     } else if (response.error) {
       alert(response.error);
     }
@@ -69,7 +73,11 @@ function DeleteAccount() {
             >
               취소
             </StyledButton>
-            <StyledButton onClick={handleDeleteUser} color="white" backgroundcolor="#FF4C4C">
+            <StyledButton
+              onClick={() => handleDeleteUser(token)}
+              color="white"
+              backgroundcolor="#FF4C4C"
+            >
               탈퇴하기
             </StyledButton>
           </Buttons>

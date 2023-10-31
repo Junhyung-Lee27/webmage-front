@@ -6,7 +6,7 @@ import { showDeleteAccount } from "../store/settingpageSlice";
 import { setUser } from "../store/userSlice";
 import { editAccount } from "../services/authService";
 
-function AccountView() {  
+function AccountView() {
   // 테마
   const colorTheme = useSelector((state) => state.theme.themes[state.theme.currentTheme]);
   const filterTheme = useSelector((state) => state.theme.filters[state.theme.currentTheme]);
@@ -62,17 +62,19 @@ function AccountEdit({ user, setIsEditing }) {
 
   // get token
   const token = useSelector((state) => state.user.token);
+  console.log(token);
 
   // 계정정보 수정 요청
-  const handleEditAccount = async () => {
-    const response = await editAccount(user.username, email, password, passwordCheck);
+  const handleEditAccount = async (token) => {
+    const response = await editAccount(user.username, email, password, passwordCheck, token);
     // 계정정보 수정 성공했을 경우
     if (response.success) {
-      dispatch(setUser({email:email})); // 이메일 상태 업데이트
+      dispatch(setUser({ email: email })); // 이메일 상태 업데이트
+      setIsEditing(false); // 수정 모드 종료
+      alert("수정 완료")
     } else if (response.error) {
       alert(response.error);
     }
-    setIsEditing(true); // 수정 모드 종료
   };
 
   return (
@@ -107,7 +109,13 @@ function AccountEdit({ user, setIsEditing }) {
         value={passwordCheck}
         onChange={(e) => handleInputChange(e, setPasswordCheck)}
       ></StyledForm>
-      <StyledButton onClick={() => handleEditAccount(token)}>완료</StyledButton>
+      <StyledButton
+        onClick={() => {
+          handleEditAccount(token);
+        }}
+      >
+        완료
+      </StyledButton>
     </FormLayout>
   );
 }

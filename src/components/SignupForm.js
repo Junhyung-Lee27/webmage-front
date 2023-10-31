@@ -4,11 +4,11 @@ import { useSelector, useDispatch } from "react-redux";
 import { showLogin } from "../store/authpageSlice";
 import { useNavigate } from "react-router-dom";
 import { signup, login } from "../services/authService";
-import { setUser } from "../store/userSlice";
+import { setIsLoggedIn, setUser, setToken } from "../store/userSlice";
 
 function SignupForm() {
-  let navigate = useNavigate();
   const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   // 입력값 상태 관리
   const [username, setUsername] = useState("");
@@ -29,8 +29,10 @@ function SignupForm() {
       // 로그인 시도
       const loginResponse = await login(username, password);
       if (loginResponse.success) {
-        dispatch(setUser({username:username, email:email}));
-        navigate("/manda");
+        dispatch(setUser({ username: username, email: email }));
+        dispatch(setToken(loginResponse.token));
+        dispatch(setIsLoggedIn(true));
+        navigate("/")
       } else if (loginResponse.error) {
         alert("로그인에 실패했습니다. 잠시 후 다시 시도해주세요.");
       }

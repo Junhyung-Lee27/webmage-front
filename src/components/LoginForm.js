@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { login, getToken } from "../services/authService";
+import { login } from "../services/authService";
 
 import styled, { ThemeProvider } from "styled-components";
 import componentTheme from "./theme";
@@ -10,9 +10,6 @@ import { showSignup, showForgotPassword } from "../store/authpageSlice";
 import { setUser, setToken, setIsLoggedIn } from '../store/userSlice';
 
 function LoginForm() {
-  const loggedin = useSelector((state) => state.user.isLoggedIn);
-  console.log(loggedin);
-  
     let navigate = useNavigate();
   const dispatch = useDispatch();
 
@@ -23,29 +20,19 @@ function LoginForm() {
   const handleUsernameChange = (e) => setUsername(e.target.value);
   const handlePasswordChange = (e) => setPassword(e.target.value);
 
-  // 토큰 요청
-  const handleGetToken = async () => {
-    const response = await getToken();
-    if (response.success) {
-      let token = response.token;
-      dispatch(setToken(token));
-    } else if (response.error) {
-      alert(response.error);
-    }
-  };
-
   // 로그인 요청
   const handleLoginClick = async () => {
     const response = await login(username, password);
     if (response.success) {
       dispatch(setUser({username:username}));
+      dispatch(setToken(response.token));
       dispatch(setIsLoggedIn(true))
       navigate("/manda");
-      handleGetToken(); // 토큰 저장
     } else if (response.error) {
       alert(response.error);
     }
   };
+
   // 테마
   const colorTheme = useSelector((state) => state.theme.themes[state.theme.currentTheme]);
   const filterTheme = useSelector((state) => state.theme.filters[state.theme.currentTheme]);
