@@ -6,6 +6,7 @@ import Header from "../components/Header";
 import theme from "../components/theme";
 import UserRecommend from "../components/UserRecommend";
 import FeedWriteModal from "../components/FeedWriteModal";
+import Profile from "../components/Profile";
 
 const feedInfo = [
     {
@@ -99,6 +100,17 @@ function FeedPage() {
     return (
         <ThemeProvider theme={theme}>
             <Header />
+            <Profile user_info={{
+                profile_img: process.env.PUBLIC_URL + "/testImg/profile1.jpg",
+                userName: "김도언",
+                userPosition: "ESTsoft 오르미 2기 강사",
+                userIntro: `안녕하세요 김도언입니다.\n
+                백엔드 개발에 대해 궁금한 게 있으면 편하게 메시지 주세요 :)`,
+                tags: ["백엔드개발", "프로그래머", "이스트소프트", "오르미2기", "강사"],
+                isFallowing: false,
+                fallower: 1300,
+                practice: 300,
+            }} />
             <Layout theme={currentTheme}>
                 <PageBox className="pageBox">
                     <FlexBox>
