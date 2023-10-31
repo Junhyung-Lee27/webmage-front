@@ -4,6 +4,7 @@ import styled, { ThemeProvider, css } from "styled-components";
 import theme from "./theme";
 import { useSelector } from "react-redux";
 
+
 function MandaWrite() {
 
   const currentTheme = useSelector((state) => state.theme.themes[state.theme.currentTheme]);
@@ -21,13 +22,31 @@ function MandaWrite() {
 
   return (
     <div>
+
       <Manda>
 
         <GridContainer>
-          {Array(9).fill().map((_, index) => (
-            <GridItem key={index} isEven={(index + 1) % 2 === 0}>
-            </GridItem>
-          ))}
+          {Array.from({ length: 9 }, (_, tableIndex) => (
+            <GridItem
+            key={tableIndex}
+            hasTopBorder={tableIndex < 3}
+            hasLeftBorder={tableIndex % 3 === 0}
+            hasRightBorder={tableIndex % 3 === 2}
+            hasBottomBorder={tableIndex > 5}
+            >
+              <tbody>
+                {Array.from({ length: 3 }, (_, rowIndex) => (
+                  <tr key={rowIndex}>
+                    {Array.from({ length: 3 }, (_, cellIndex) => (
+                      <TableCell key={cellIndex} centerIndex={cellIndex === 4}>
+                        {/* {getTableCell(tableIndex, rowIndex * 3 + cellIndex)} */}
+                      </TableCell>
+                    ))}
+                  </tr>
+                ))}
+              </tbody>
+        </GridItem>
+        ))}
         </GridContainer>
 
         <GoalList>
@@ -65,31 +84,48 @@ function MandaWrite() {
   );
 }
 
+
+
+
 const Manda = styled.div`
   display: flex; 
   gap: 25px; 
-  margin-left: 198px;
 `;
 
 const GridContainer = styled.div`
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  grid-template-rows: repeat(3, 1fr);
-  width: 720px;
-  height: 630px;
-
-  &:hover {
-    cursor: pointer;
-  }
+  display: inline-flex;
+  flex-wrap: wrap;
+  width: 774px;
+  height: 648px;
+  margin-left: 198px;
+  margin-top: 5px;
+  border-radius: 8px;
+  box-shadow: 0px 8px 24px 0px rgba(0, 0, 0, 0.15);
 `;
 
-const GridItem = styled.div`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  border: 1px solid #F9F8F5;
-  ${(props) =>
-    props.isEven ? 'background-color: #F1F1F1;' : 'background-color: white;'};
+const GridItem = styled.table`
+  margin: 0;
+  flex: 0 0 calc(33.3333% - 0px); /* 3개씩 가로로 배치, 0px는 border 두께 */
+  box-sizing: border-box;
+  table-layout: fixed;
+  border-collapse: collapse; /* 테이블 셀 간의 간격 제거 */
+  border-top: ${(props) => (props.hasTopBorder ? 'none' : '1px solid #999')};
+  border-left: ${(props) => (props.hasLeftBorder ? 'none' : '1px solid #999')};
+  border-right: ${(props) => (props.hasRightBorder ? 'none' : '1px solid #999')};
+  border-bottom: ${(props) => (props.hasBottomBorder ? 'none' : '1px solid #999')};
+  border-spacing: 1px;
+`;
+
+const TableCell = styled.td`
+  text-align: center;
+  vertical-align: middle;
+  width: 86px;
+  height: 70px;
+  word-break: keep-all;
+  padding: 0.5px;
+  border: 1px solid #FFF;
+  background: ${(props) => 
+    (props.centerIndex ? 'rgba(114, 105, 255, 1)' : 'rgba(114, 105, 255, 0.1)')};
 `;
 
 const GoalList = styled.div`
@@ -197,6 +233,7 @@ const SaveBtn = styled.button`
   font-weight: 700;
   cursor: pointer;
 `
+
 
 
 export default MandaWrite;
