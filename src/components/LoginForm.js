@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { login } from "../services/authService";
+import { getCsrfToken, login } from "../services/authService";
 
 import styled, { ThemeProvider } from "styled-components";
 import componentTheme from "./theme";
@@ -7,7 +7,9 @@ import { useNavigate } from "react-router-dom";
 
 import { useDispatch, useSelector } from "react-redux";
 import { showSignup, showForgotPassword } from "../store/authpageSlice";
-import { setUser, setToken, setIsLoggedIn } from '../store/userSlice';
+import { setUser, setAuthToken, setCsrfToken, setIsLoggedIn } from '../store/userSlice';
+
+import { setCookie } from "../services/cookie";
 
 function LoginForm() {
     let navigate = useNavigate();
@@ -22,14 +24,36 @@ function LoginForm() {
 
   // 로그인 요청
   const handleLoginClick = async () => {
-    const response = await login(username, password);
-    if (response.success) {
+    // csrf token
+    const csrfTokenResponse = await getCsrfToken();
+    
+
+    if (csrfTokenResponse.success && csrfTokenResponse.csrfToken) {
+      const csrfToken = csrfTokenResponse.csrfToken;
+      
+      dispatch(setCsrfToken(csrfToken));
+      console.log(csrfToken);
+
+      // 쿠키에 저장
+      setCookie('csrftoken', csrfToken, {
+        path: '/',
+      })
+
+    } else if (csrfTokenResponse.error) {
+      alert(csrfTokenResponse.error)
+    }
+    
+    
+
+
+    const loginResponse = await login(username, password);
+    if (loginResponse.success && loginResponse.token) {
       dispatch(setUser({username:username}));
-      dispatch(setToken(response.token));
+      dispatch(setAuthToken(loginResponse.token));
       dispatch(setIsLoggedIn(true))
       navigate("/manda");
-    } else if (response.error) {
-      alert(response.error);
+    } else if (loginResponse.error) {
+      alert(loginResponse.error);
     }
   };
 

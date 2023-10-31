@@ -1,5 +1,21 @@
 import axios from "axios";
 
+// 토큰 가져오기
+export const getCsrfToken = async () => {
+  try {
+    const response = await axios.get("http://127.0.0.1:8000/get_token/");
+
+    if (response.status === 200) {
+      return { success: true, csrfToken: response.data.csrf_token };
+    } else {
+      return { error: "나중에 다시 시도해주세요." };
+    }
+  } catch (error) {
+    console.error("getCsrfToken API error:", error);
+    return { error: "나중에 다시 시도해주세요." };
+  }
+};
+
 // 회원가입
 export const signup = async (username, email, password, passwordCheck) => {
   // 비밀번호 불일치할 경우
@@ -65,7 +81,7 @@ export const logout = async () => {
 };
 
 // 프로필 수정
-export const editAccount = async (username, email, password, passwordCheck, token) => {
+export const editAccount = async (username, email, password, passwordCheck, authToken) => {
   // 비밀번호 불일치할 경우
   if (password !== passwordCheck) {
     return { error: "비밀번호가 일치하지 않습니다." };
@@ -80,7 +96,7 @@ export const editAccount = async (username, email, password, passwordCheck, toke
       headers: {
         accept: "application/json",
         "Content-Type": "application/json",
-        Authorization: `Token ${token}`,
+        Authorization: `Token ${authToken}`,
       },
     };
 
@@ -104,16 +120,16 @@ export const editAccount = async (username, email, password, passwordCheck, toke
 };
 
 // 회원탈퇴
-export const deleteUser = async (user, token) => {
+export const deleteUser = async (csrfToken) => {
+  const csrftoken = csrfToken
+  
   try {
     const response = await axios.delete("http://127.0.0.1:8000/user/delete-user/", {
       headers: {
         accept: "application/json",
-        Authorization: `Token ${token}`,
+        'x-csrftoken': csrftoken,
       },
-      data: {
-        user: user,
-      },
+      withCredentials: true,
     });
 
     if (response.status === 200) {

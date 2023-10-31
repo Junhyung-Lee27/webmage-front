@@ -5,6 +5,7 @@ import { showAccountView } from "./../store/settingpageSlice";
 import { resetUserState } from "./../store/userSlice";
 import { useNavigate } from "react-router-dom";
 import { deleteUser } from "./../services/authService";
+import { getCookie } from "../services/cookie";
 
 function DeleteAccount() {
   // 테마
@@ -17,13 +18,15 @@ function DeleteAccount() {
   const dispatch = useDispatch(); // 스토어 상태 업데이트
   const navigate = useNavigate(); // 화면 네이게이터
 
-  // get token
-  const token = useSelector((state) => state.user.token);
-  console.log(token);
+  // get csrfToken
+  // const csrfToken = useSelector((state) => state.user.csrfToken);
+  // console.log(csrfToken);
+
+  const csrfToken = getCookie('csrftoken');
 
   // 회원탈퇴 요청
-  const handleDeleteUser = async (token) => {
-    const response = await deleteUser(token);
+  const handleDeleteUser = async (csrfToken) => {
+    const response = await deleteUser(csrfToken);
     // 회원탈퇴 성공했을 경우
     if (response.success) {
       dispatch(resetUserState()); // 유저 상태 초기화
@@ -74,7 +77,7 @@ function DeleteAccount() {
               취소
             </StyledButton>
             <StyledButton
-              onClick={() => handleDeleteUser(token)}
+              onClick={() => handleDeleteUser(csrfToken)}
               color="white"
               backgroundcolor="#FF4C4C"
             >

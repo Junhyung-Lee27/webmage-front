@@ -18,18 +18,23 @@ import { PersistGate } from "redux-persist/integration/react";
 // 유지하고 싶은 redux store를 인자로 넣으면 persistor 객체 반환
 import { persistStore } from "redux-persist";
 
+// 쿠키 저장, 조회, 삭제
+import { CookiesProvider } from "react-cookie";
+
 export let persistor = persistStore(store);
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
   <React.StrictMode>
-    <Provider store={store}>
-      <PersistGate loading={null} persistor={persistor}>
-        <BrowserRouter>
-          <App />
-        </BrowserRouter>
-      </PersistGate>
-    </Provider>
+    <CookiesProvider>
+      <Provider store={store}>
+        <PersistGate loading={null} persistor={persistor}>
+          <BrowserRouter>
+            <App />
+          </BrowserRouter>
+        </PersistGate>
+      </Provider>
+    </CookiesProvider>
   </React.StrictMode>
 );
 

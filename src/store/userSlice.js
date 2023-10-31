@@ -7,7 +7,8 @@ const userSlice = createSlice({
     position: "",
     hash: "",
     email: "",
-    token: "",
+    authToken: "",
+    csrfToken: "",
     isLoggedIn: false,
   },
   reducers: {
@@ -27,8 +28,11 @@ const userSlice = createSlice({
       }
     },
     // 토큰 관리
-    setToken: (state, action) => {
-      state.token = action.payload;
+    setAuthToken: (state, action) => {
+      state.authToken = action.payload;
+    },
+    setCsrfToken: (state, action) => {
+      state.csrfToken = action.payload;
     },
     // 로그인
     setIsLoggedIn: (state, action) => {
@@ -41,5 +45,5 @@ const userSlice = createSlice({
   },
 });
 
-export const { setUser, setToken, setIsLoggedIn, resetUserState } = userSlice.actions;
+export const { setUser, setAuthToken, setCsrfToken, setIsLoggedIn, resetUserState } = userSlice.actions;
 export default userSlice.reducer;

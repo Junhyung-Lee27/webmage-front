@@ -60,13 +60,12 @@ function AccountEdit({ user, setIsEditing }) {
     setState(e.target.value);
   };
 
-  // get token
-  const token = useSelector((state) => state.user.token);
-  console.log(token);
+  // get authToken
+  const authToken = useSelector((state) => state.user.authToken);
 
   // 계정정보 수정 요청
-  const handleEditAccount = async (token) => {
-    const response = await editAccount(user.username, email, password, passwordCheck, token);
+  const handleEditAccount = async (authToken) => {
+    const response = await editAccount(user.username, email, password, passwordCheck, authToken);
     // 계정정보 수정 성공했을 경우
     if (response.success) {
       dispatch(setUser({ email: email })); // 이메일 상태 업데이트
@@ -111,7 +110,7 @@ function AccountEdit({ user, setIsEditing }) {
       ></StyledForm>
       <StyledButton
         onClick={() => {
-          handleEditAccount(token);
+          handleEditAccount(authToken);
         }}
       >
         완료
