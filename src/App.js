@@ -6,6 +6,7 @@ import SearchPage from "./pages/SearchPage";
 import MainPage from "./pages/MainPage.js";
 import MandaWritePage from "./pages/MandaWritePage.js";
 import FeedPage from "./pages/FeedPage";
+import ChatPage from "./pages/ChatPage";
 import { ThemeProvider } from "styled-components";
 import { useSelector } from "react-redux";
 import { Reset } from "styled-reset";
@@ -24,6 +25,7 @@ function App() {
         <Route path="/setting" element={isLoggedIn ? <SettingPage /> : <Navigate to="/" replace />} />
         <Route path="/search" element={isLoggedIn ? <SearchPage /> : <Navigate to="/" replace />} />
         <Route path="/feed" element={isLoggedIn ? <FeedPage /> : <Navigate to="/" replace />} />
+        <Route path="/chat" element={isLoggedIn ? <ChatPage /> : <Navigate to="/" replace />} />
       </Routes>
     </ThemeProvider>
   );
