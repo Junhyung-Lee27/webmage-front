@@ -14,8 +14,8 @@ function ThemeSwitch() {
       theme={currentTheme}
       src={
         currentTheme === "light"
-          ? process.env.PUBLIC_URL + "/icon/header/light.svg"
-          : process.env.PUBLIC_URL + "/icon/header/dark.svg"
+          ? process.env.PUBLIC_URL + "/icon/header/Light.svg"
+          : process.env.PUBLIC_URL + "/icon/header/Dark.svg"
       }
       alt="Theme switcher icon"
     ></SwitchContainer>

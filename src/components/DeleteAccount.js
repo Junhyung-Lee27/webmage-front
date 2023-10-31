@@ -2,9 +2,9 @@ import styled, { ThemeProvider } from "styled-components";
 import { useSelector, useDispatch } from "react-redux";
 import componentTheme from "./theme";
 import { showAccountView } from "./../store/settingpageSlice";
-import { deleteUser } from "../services/authService";
-import { setUser, setUserEmail } from "../store/userSlice";
+import { resetUserState } from "./../store/userSlice";
 import { useNavigate } from "react-router-dom";
+import { deleteUser } from "./../services/authService";
 
 function DeleteAccount() {
   // 테마
@@ -14,20 +14,16 @@ function DeleteAccount() {
     component: componentTheme,
   };
 
-  // 현재 사용자 정보
-  const user = useSelector((state) => state.user);
-
   const dispatch = useDispatch(); // 스토어 상태 업데이트
   const navigate = useNavigate(); // 화면 네이게이터
 
   // 회원탈퇴 요청
   const handleDeleteUser = async () => {
-    const response = await deleteUser(user.username);
+    const response = await deleteUser();
     // 회원탈퇴 성공했을 경우
     if (response.success) {
-      dispatch(setUserEmail(""));
-      dispatch(setUser({ username: "", position: "", hash: "" }));
-      navigate("/");
+      dispatch(resetUserState()); // 유저 상태 초기화
+      navigate('/') // 로그인 화면으로 이동
     } else if (response.error) {
       alert(response.error);
     }

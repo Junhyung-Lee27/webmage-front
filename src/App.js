@@ -1,5 +1,5 @@
 import "./App.css";
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 import AuthPage from "./pages/AuthPage";
 import SettingPage from "./pages/SettingPage";
 import SearchPage from "./pages/SearchPage";
@@ -9,22 +9,23 @@ import FeedPage from "./pages/FeedPage";
 import ChatPage from "./pages/ChatPage";
 import { ThemeProvider } from "styled-components";
 import { useSelector } from "react-redux";
-import { Reset } from 'styled-reset'
+import { Reset } from "styled-reset";
 
 function App() {
   const currentTheme = useSelector((state) => state.theme.themes[state.theme.currentTheme]);
+  const isLoggedIn = useSelector((state) => state.user.isLoggedIn);
 
   return (
     <ThemeProvider theme={currentTheme}>
       <Reset />
       <Routes>
-        <Route path="/" element={<AuthPage />} />
-        <Route path="/manda" element={<MainPage />} />
-        <Route path="/manda/write" element={<MandaWritePage />} />
-        <Route path="/setting" element={<SettingPage />} />
-        <Route path="/search" element={<SearchPage />} />
-        <Route path="/feed" element={<FeedPage />} />
-        <Route path="/chat" element={<ChatPage />} />
+        <Route path="/" element={isLoggedIn ? <Navigate to="/manda" replace /> : <AuthPage />} />
+        <Route path="/manda" element={isLoggedIn ? <MainPage /> : <Navigate to="/" replace />} />
+        <Route path="/mandawrite" element={isLoggedIn ? <MandaWritePage /> : <Navigate to="/" replace />} />
+        <Route path="/setting" element={isLoggedIn ? <SettingPage /> : <Navigate to="/" replace />} />
+        <Route path="/search" element={isLoggedIn ? <SearchPage /> : <Navigate to="/" replace />} />
+        <Route path="/feed" element={isLoggedIn ? <FeedPage /> : <Navigate to="/" replace />} />
+        <Route path="/chat" element={isLoggedIn ? <ChatPage /> : <Navigate to="/" replace />} />
       </Routes>
     </ThemeProvider>
   );

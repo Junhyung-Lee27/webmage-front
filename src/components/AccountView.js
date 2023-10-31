@@ -1,11 +1,10 @@
 import styled, { ThemeProvider } from "styled-components";
 import { useSelector, useDispatch } from "react-redux";
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import componentTheme from "./theme";
 import { showDeleteAccount } from "../store/settingpageSlice";
-import { setUserEmail } from "../store/userSlice";
-import { editAccount, deleteUser } from "../services/authService";
+import { setUser } from "../store/userSlice";
+import { editAccount } from "../services/authService";
 
 function AccountView() {  
   // 테마
@@ -27,7 +26,7 @@ function AccountView() {
     <ThemeProvider theme={theme}>
       <AccountViewLayout>
         {isEditing ? (
-          <AccountEdit theme={theme} user={user} />
+          <AccountEdit theme={theme} user={user} setIsEditing={setIsEditing} />
         ) : (
           <AccountInfo theme={theme} user={user} setIsEditing={setIsEditing} />
         )}
@@ -49,9 +48,8 @@ function AccountInfo({ user, setIsEditing }) {
   );
 }
 
-function AccountEdit({user}) {
+function AccountEdit({ user, setIsEditing }) {
   const dispatch = useDispatch();
-  const navigate = useNavigate();
 
   // 입력값 상태 관리
   const [email, setEmail] = useState("");
@@ -62,17 +60,20 @@ function AccountEdit({user}) {
     setState(e.target.value);
   };
 
+  // get token
+  const token = useSelector((state) => state.user.token);
+
   // 계정정보 수정 요청
   const handleEditAccount = async () => {
     const response = await editAccount(user.username, email, password, passwordCheck);
     // 계정정보 수정 성공했을 경우
     if (response.success) {
-      dispatch(setUserEmail(email));
-      navigate(-1)
+      dispatch(setUser({email:email})); // 이메일 상태 업데이트
     } else if (response.error) {
       alert(response.error);
     }
-  }
+    setIsEditing(true); // 수정 모드 종료
+  };
 
   return (
     <FormLayout>
@@ -106,7 +107,7 @@ function AccountEdit({user}) {
         value={passwordCheck}
         onChange={(e) => handleInputChange(e, setPasswordCheck)}
       ></StyledForm>
-      <StyledButton onClick={handleEditAccount}>완료</StyledButton>
+      <StyledButton onClick={() => handleEditAccount(token)}>완료</StyledButton>
     </FormLayout>
   );
 }
@@ -145,6 +146,7 @@ let LabelText = styled.p`
 `;
 
 let StyledForm = styled.input`
+  box-sizing: content-box;
   height: 24px;
   padding: 8px 16px;
   font-size: 14px;
@@ -163,6 +165,7 @@ let StyledForm = styled.input`
 `;
 
 let StyledBox = styled.div`
+  box-sizing: content-box;
   padding: 8px 16px;
   font-size: 14px;
   height: 24px;

@@ -4,7 +4,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { showLogin } from "../store/authpageSlice";
 import { useNavigate } from "react-router-dom";
 import { signup, login } from "../services/authService";
-import { setUser, setUserEmail } from "../store/userSlice";
+import { setUser } from "../store/userSlice";
 
 function SignupForm() {
   let navigate = useNavigate();
@@ -29,8 +29,7 @@ function SignupForm() {
       // 로그인 시도
       const loginResponse = await login(username, password);
       if (loginResponse.success) {
-        dispatch(setUser({username:username}));
-        dispatch(setUserEmail(email));
+        dispatch(setUser({username:username, email:email}));
         navigate("/manda");
       } else if (loginResponse.error) {
         alert("로그인에 실패했습니다. 잠시 후 다시 시도해주세요.");
@@ -125,6 +124,7 @@ let StyledText = styled.span`
 `;
 
 let StyledForm = styled.input`
+  box-sizing: content-box;
   height: 24px;
   padding: 8px 16px;
   font-size: 14px;
