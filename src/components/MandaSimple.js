@@ -5,7 +5,7 @@ import componentTheme from "./theme";
 import { useSelector } from "react-redux";
 
 
-function MandaSimple() {
+function MandaSimple({ axiosURL }) {
 
   // 테마
   const colorTheme = useSelector((state) => state.theme.themes[state.theme.currentTheme]);
@@ -23,7 +23,7 @@ function MandaSimple() {
 
   useEffect(() => {
     
-    axios.get("http://15.164.217.203:8000/manda/mandamain/3")
+    axios.get(axiosURL)
     .then((result) => {
       const data = result.data;
       setMain(data.main);
@@ -32,7 +32,7 @@ function MandaSimple() {
     .catch(()=>{
       console.log('ajax 요청 실패');
     });
-  }, []);
+  }, [axiosURL]);
 
   const getTableCell = (cellIndex) => {
     if (cellIndex === 4) {
