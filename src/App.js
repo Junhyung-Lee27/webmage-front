@@ -21,7 +21,7 @@ function App() {
       <Routes>
         <Route path="/" element={isLoggedIn ? <Navigate to="/manda" replace /> : <AuthPage />} />
         <Route path="/manda" element={isLoggedIn ? <MainPage /> : <Navigate to="/" replace />} />
-        <Route path="/mandawrite" element={isLoggedIn ? <MandaWritePage /> : <Navigate to="/" replace />} />
+        <Route path="/manda/write" element={isLoggedIn ? <MandaWritePage /> : <Navigate to="/" replace />} />
         <Route path="/setting" element={isLoggedIn ? <SettingPage /> : <Navigate to="/" replace />} />
         <Route path="/search" element={isLoggedIn ? <SearchPage /> : <Navigate to="/" replace />} />
         <Route path="/feed" element={isLoggedIn ? <FeedPage /> : <Navigate to="/" replace />} />
