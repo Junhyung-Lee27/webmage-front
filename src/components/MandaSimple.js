@@ -58,13 +58,23 @@ function MandaSimple({ axiosURL }) {
             ))}
           </tbody>
         </Table>
+        <UserContainer>
+          <UserImg src={process.env.PUBLIC_URL + "/testImg/profile1.jpg"}></UserImg>
+          <UserInfo>
+            <Username>username</Username>
+            <UserPosition>userposition</UserPosition>
+          </UserInfo>
+        </UserContainer>
       </Container>
     </ThemeProvider>
   );
 }
 
 const Container = styled.div`
-  margin-bottom: 105px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  margin-bottom: 48px;
 `
 
 const Table = styled.table`
@@ -92,10 +102,42 @@ const TableCell = styled.td`
   word-break: keep-all;
   padding: 0.5px;
   background: ${({ theme }) => theme.color.bg};
-  color: ${({ theme }) => theme.font1};
+  color: ${({ theme }) => theme.color.font1};
   font-size: 14px;
   font-weight: 400;
   line-height: normal;
 `;
+
+const UserContainer = styled.div`
+  width: 256px;
+  height: 64px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+`
+
+const UserImg = styled.img`
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  object-fit: cover;
+`
+
+const UserInfo = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+`
+
+const Username = styled.h5`
+  color: ${({ theme }) => theme.color.font1};
+  font-size: 16px;
+`
+
+const UserPosition = styled.span`
+  color: ${({ theme }) => theme.color.font2};
+  font-size: 16px;
+  font-weight: 400;
+`
 
 export default MandaSimple;
