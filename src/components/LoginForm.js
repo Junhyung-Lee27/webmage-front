@@ -10,9 +10,6 @@ import { showSignup, showForgotPassword } from "../store/authpageSlice";
 import { setUser, setToken, setIsLoggedIn } from '../store/userSlice';
 
 function LoginForm() {
-  const loggedin = useSelector((state) => state.user.isLoggedIn);
-  console.log(loggedin);
-  
     let navigate = useNavigate();
   const dispatch = useDispatch();
 

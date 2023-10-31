@@ -51,8 +51,6 @@ export const login = async (username, password) => {
       password,
     });
 
-    console.log(response);
-
     // 응답 처리
     if (response.status === 200 && response.statusText === "OK") {
       return { success: true };
