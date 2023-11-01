@@ -63,17 +63,18 @@ function TodoList({ date, todos }) {
           </TodoBox>
         </Container>
       </Layout>
-      {isWriting === true && <TodoWrite theme={theme} />}
+      {isWriting === true && <TodoWrite theme={theme} setIsWriting={setIsWriting} />}
     </ThemeProvider>
   );
 }
 
-function TodoWrite({ theme }) {
+function TodoWrite({ theme, setIsWriting }) {
+  // 드롭다운 오픈 상태
   const [items, setItems] = useState([]);
-  const [isOpen, setIsOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState([false, false, false]);
 
+  // 서버에서 드롭다운 데이터 가져오기
   useEffect(() => {
-    // 서버에서 데이터 가져오기
     axios.get("").then((response) => {
       setItems([
         {
@@ -92,29 +93,135 @@ function TodoWrite({ theme }) {
     });
   }, []);
 
+  // 선택된 DropdownItem의 값을 저장할 상태
+  const [selectedItems, setSelectedItems] = useState(["", "", ""]);
+
+  // '어떻게 실천할 건가요' 값을 저장할 상태
+  const [textAreaContent, setTextAreaContent] = useState("");
+
+  // 드롭다운 버튼 동작
+  const toggleDropdown = (index) => {
+    const newIsOpen = [...isOpen];
+    newIsOpen[index] = !newIsOpen[index];
+    setIsOpen(newIsOpen);
+  };
+
+  // DropdownItem 선택 시 해당 값을 상태에 저장하는 함수
+  const handleItemSelect = (index, value) => {
+    const newSelectedItems = [...selectedItems];
+    newSelectedItems[index] = value;
+    setSelectedItems(newSelectedItems);
+    toggleDropdown(index); // 선택 후 드롭다운을 닫습니다.
+  };
+
+  // 서버에 데이터 저장 요청
+  const handleSubmit = () => {
+    const payload = {
+      coreGoal: "8구단 드래프트 1순위", // 서버 또는 스토어에서 가져온 데이터로 변경
+      detailGoal: selectedItems[0],
+      method: selectedItems[1],
+      when: selectedItems[2],
+      howTodo: textAreaContent,
+    };
+
+    axios
+      .post("YOUR_SERVER_ENDPOINT", payload)
+      .then((response) => {
+        // Handle successful response
+      })
+      .catch((error) => {
+        // Handle error
+      });
+  };
+
   return (
     <ThemeProvider theme={theme}>
       <ModalOverlay>
         <ModalContent>
           <ModalTitle>목표를 선택하고 투두리스트를 만들어보세요.</ModalTitle>
           <LabelText>
-            <label htmlFor="username">핵심 목표</label>
+            <label htmlFor="mandamain">핵심 목표</label>
           </LabelText>
           <StyledBox>8구단 드래프트 1순위</StyledBox>
           <LabelText>
-            <label htmlFor="username">세부 목표</label>
+            <label htmlFor="mandasub">세부 목표</label>
           </LabelText>
           <DropdownContainer>
-            <DropdownButton onClick={() => setIsOpen(!isOpen)}>선택</DropdownButton>
-            {isOpen && (
+            <DropdownButton onClick={() => toggleDropdown(0)}>
+              {selectedItems[0] || "선택"}
+            </DropdownButton>
+            {isOpen[0] && (
               <DropdownMenu>
                 {items.map((item) => (
-                  <DropdownItem key={item.id}>{item.name}</DropdownItem>
+                  <DropdownItem key={item.id} onClick={() => handleItemSelect(0, item.name)}>
+                    {item.name}
+                  </DropdownItem>
                 ))}
               </DropdownMenu>
             )}
             <Downarrow src={process.env.PUBLIC_URL + "/icon/expand-more.svg"}></Downarrow>
           </DropdownContainer>
+          <LabelText>
+            <label htmlFor="mandacontent">실천 방법</label>
+          </LabelText>
+          <DropdownContainer>
+            <DropdownButton onClick={() => toggleDropdown(1)}>
+              {selectedItems[1] || "선택"}
+            </DropdownButton>
+            {isOpen[1] && (
+              <DropdownMenu>
+                {items.map((item) => (
+                  <DropdownItem key={item.id} onClick={() => handleItemSelect(1, item.name)}>
+                    {item.name}
+                  </DropdownItem>
+                ))}
+              </DropdownMenu>
+            )}
+            <Downarrow src={process.env.PUBLIC_URL + "/icon/expand-more.svg"}></Downarrow>
+          </DropdownContainer>
+          <LabelText>
+            <label htmlFor="whentodo">언제 실천할 건가요?</label>
+          </LabelText>
+          <DropdownContainer>
+            <DropdownButton onClick={() => toggleDropdown(2)}>
+              {selectedItems[2] || "선택"}
+            </DropdownButton>
+            {isOpen[2] && (
+              <DropdownMenu>
+                {items.map((item) => (
+                  <DropdownItem key={item.id} onClick={() => handleItemSelect(2, item.name)}>
+                    {item.name}
+                  </DropdownItem>
+                ))}
+              </DropdownMenu>
+            )}
+            <Downarrow src={process.env.PUBLIC_URL + "/icon/expand-more.svg"}></Downarrow>
+          </DropdownContainer>
+          <LabelText>
+            <label htmlFor="howtodo">어떻게 실천할 건가요?</label>
+          </LabelText>
+          <StyledTextArea
+            placeholder="구체적으로 작성할수록 좋아요 :)"
+            value={textAreaContent}
+            onChange={(e) => setTextAreaContent(e.target.value)}
+          ></StyledTextArea>
+          <Buttons>
+            <StyledButton
+              color={theme.color.font1}
+              backgroundcolor={theme.color.bg3}
+              border="none"
+              onClick={() => setIsWriting(false)}
+            >
+              취소
+            </StyledButton>
+            <StyledButton
+              color="white"
+              backgroundcolor={theme.color.primary}
+              onClick={() => handleSubmit()}
+            >
+              완료
+            </StyledButton>
+          </Buttons>
         </ModalContent>
       </ModalOverlay>
     </ThemeProvider>
@@ -161,7 +268,7 @@ let AddBtn = styled.button`
 let TodoBox = styled.div`
   background: ${({ theme }) => theme.color.bg};
   width: 338px;
-  padding: 28px 16px;
+  padding: 28px 18px 28px 16px;
   box-shadow: 0 8px 24px 0px rgba(0, 0, 0, 0.15);
   border: none;
   border-radius: 8px;
@@ -175,7 +282,7 @@ let CheckboxLabel = styled.label`
   display: flex;
   align-items: flex-start;
   user-select: none;
-  gap: 16px;
+  gap: 12px;
 `;
 
 let CheckboxInput = styled.input`
@@ -235,7 +342,7 @@ let ModalContent = styled.div`
   justify-content: center;
   align-items: flex-start;
   background-color: ${({ theme }) => theme.color.bg};
-  padding: 54px 64px;
+  padding: 56px 80px;
   border-radius: 8px;
   width: 808px;
   max-height: 100%;
@@ -254,7 +361,7 @@ let LabelText = styled.span`
   font-size: 16px;
   font-weight: 600;
   color: ${({ theme }) => theme.color.font1};
-  margin: 24px 0px 0px 0px;
+  margin: 24px 0px 8px 0px;
   cursor: ${({ cursor = "default" }) => cursor};
 `;
 
@@ -264,11 +371,23 @@ let StyledBox = styled.div`
   font-size: 14px;
   height: 24px;
   line-height: 24px;
+  color: ${({ theme }) => theme.color.font1};
+  border: none;
+  border-radius: 8px;
+  cursor: default;
+  width: 100%;
+`;
+
+let StyledTextArea = styled.textarea`
+  box-sizing: content-box;
+  padding: 8px 16px;
+  font-size: 14px;
+  height: 96px;
+  line-height: 24px;
   color: ${({ theme }) => theme.color.font2};
   border: none;
   border-radius: 8px;
   background-color: ${({ theme }) => theme.color.bg2};
-  margin-top: 8px;
   cursor: default;
   width: 100%;
 `;
@@ -303,11 +422,12 @@ const Downarrow = styled.img`
 
 const DropdownMenu = styled.ul`
   position: absolute;
+  z-index: 999;
   top: 100%;
   left: 0;
   width: 100%;
-  height: 240px;
-  border: none;
+  height: fit-content;
+  border: 1px solid ${({ theme }) => theme.color.border};
   border-radius: 8px;
   background-color: ${({ theme }) => theme.color.bg2};
   list-style-type: none;
@@ -315,7 +435,6 @@ const DropdownMenu = styled.ul`
 `;
 
 const DropdownItem = styled.li`
-  height: 24px;
   line-height: 24px;
   padding: 8px 16px;
   font-size: 14px;
@@ -326,6 +445,32 @@ const DropdownItem = styled.li`
     background-color: ${({ theme }) => theme.color.primary};
     color: white;
   }
+`;
+
+let Buttons = styled.div`
+  box-sizing: content-box;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  gap: 8px;
+  margin-top: 32px;
+  padding: 8px 16px;
+`;
+
+let StyledButton = styled.button`
+  height: 42px;
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 20px;
+  width: 50%;
+  padding: 12px 24px;
+  color: ${({ color }) => color};
+  background-color: ${({ backgroundcolor }) => backgroundcolor};
+  border: none;
+  border-radius: 8px;
+  outline: none;
+  cursor: pointer;
 `;
 
 export default TodoList;
