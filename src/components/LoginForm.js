@@ -10,6 +10,7 @@ import { showSignup, showForgotPassword } from "../store/authpageSlice";
 import { setUser, setAuthToken, setCsrfToken, setIsLoggedIn } from "../store/userSlice";
 
 import { setCookie } from "../services/cookie";
+import axios from "axios";
 
 function LoginForm() {
   let navigate = useNavigate();
@@ -31,7 +32,6 @@ function LoginForm() {
       const csrfToken = csrfTokenResponse.csrfToken;
 
       dispatch(setCsrfToken(csrfToken));
-      console.log(csrfToken);
 
       // 쿠키에 저장
       setCookie("csrftoken", csrfToken, {
@@ -43,7 +43,7 @@ function LoginForm() {
 
     const loginResponse = await login(username, password);
     if (loginResponse.success && loginResponse.token) {
-      dispatch(setUser({ username: username }));
+      dispatch(setUser({ username: username, userId: loginResponse.userId }));
       dispatch(setAuthToken(loginResponse.token));
       dispatch(setIsLoggedIn(true));
       navigate("/manda");

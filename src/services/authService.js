@@ -54,7 +54,7 @@ export const login = async (username, password) => {
 
     // 응답 처리
     if (response.status === 200) {
-        return { success: true, token: response.data.token };
+        return { success: true, token: response.data.token, userId: response.data.user_id };
     } else {
       return { error: "로그인에 실패했습니다. 아이디나 비밀번호를 확인해주세요." };
     }

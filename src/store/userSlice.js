@@ -3,6 +3,7 @@ import { createSlice } from "@reduxjs/toolkit";
 const userSlice = createSlice({
   name: "user",
   initialState: {
+    userId: "",
     username: "",
     position: "",
     hash: "",
@@ -15,6 +16,9 @@ const userSlice = createSlice({
     // 프로필, 계정 관리
     setUser: (state, action) => {
       if (action.payload.username) {
+        state.userId = action.payload.userId;
+      }
+        if (action.payload.username) {
         state.username = action.payload.username;
       }
       if (action.payload.position) {
