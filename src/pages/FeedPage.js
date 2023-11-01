@@ -7,6 +7,7 @@ import theme from "../components/theme";
 import UserRecommend from "../components/UserRecommend";
 import FeedWriteModal from "../components/FeedWriteModal";
 import Profile from "../components/Profile";
+import MandaLog from "../components/MandaLog";
 
 const feedInfo = [
     {
@@ -111,6 +112,7 @@ function FeedPage() {
                 fallower: 1300,
                 practice: 300,
             }} />
+            <MandaLog />
             <Layout theme={currentTheme}>
                 <PageBox className="pageBox">
                     <FlexBox>
