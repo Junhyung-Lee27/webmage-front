@@ -58,6 +58,7 @@ function LoginForm() {
             info: userResponse.data.user_info,
             hash: userResponse.data.user_hash,
             email: userResponse.data.user_email,
+            successCount: userResponse.data.success_count,
           })
         );
       } catch (error) {
