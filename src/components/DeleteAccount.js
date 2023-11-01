@@ -2,7 +2,7 @@ import styled, { ThemeProvider } from "styled-components";
 import { useSelector, useDispatch } from "react-redux";
 import componentTheme from "./theme";
 import { showAccountView } from "./../store/settingpageSlice";
-import { resetUserState } from "./../store/userSlice";
+import { setIsLoggedIn, resetUserState } from "./../store/userSlice";
 import { useNavigate } from "react-router-dom";
 import { deleteUser } from "./../services/authService";
 
@@ -25,6 +25,7 @@ function DeleteAccount() {
     const response = await deleteUser(authToken);
     // 회원탈퇴 성공했을 경우
     if (response.success) {
+      dispatch(setIsLoggedIn(false)); // 로그인 여부 false
       dispatch(resetUserState()); // 유저 상태 초기화
       navigate("/"); // 로그인 화면으로 이동
     } else if (response.error) {
