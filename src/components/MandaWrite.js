@@ -1,6 +1,6 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
-import styled, { ThemeProvider } from "styled-components";
+import styled, { ThemeProvider, css } from "styled-components";
 import theme from "./theme";
 import { useSelector } from "react-redux";
 
@@ -8,6 +8,9 @@ import { useSelector } from "react-redux";
 function MandaWrite() {
 
   const currentTheme = useSelector((state) => state.theme.themes[state.theme.currentTheme]);
+
+  const subData = [ ['', '', ''], ['', '', ''], ['', '', ''] ];
+  const mainData = [ ['', '', ''], ['', '코딩 왕', ''], ['', '', ''] ];
 
   const [goals, setGoals] = useState(Array(8).fill(''));
 
@@ -17,14 +20,20 @@ function MandaWrite() {
     setGoals(updatedGoals);
   };
 
-
   return (
     <div>
 
       <Manda>
+
         <GridContainer>
           {Array.from({ length: 9 }, (_, tableIndex) => (
-            <GridItem key={tableIndex}>
+            <GridItem
+            key={tableIndex}
+            hasTopBorder={tableIndex < 3}
+            hasLeftBorder={tableIndex % 3 === 0}
+            hasRightBorder={tableIndex % 3 === 2}
+            hasBottomBorder={tableIndex > 5}
+            >
               <tbody>
                 {Array.from({ length: 3 }, (_, rowIndex) => (
                   <tr key={rowIndex}>
@@ -99,7 +108,11 @@ const GridItem = styled.table`
   flex: 0 0 calc(33.3333% - 0px); /* 3개씩 가로로 배치, 0px는 border 두께 */
   box-sizing: border-box;
   table-layout: fixed;
-  border-collapse: separate; 
+  border-collapse: collapse; /* 테이블 셀 간의 간격 제거 */
+  border-top: ${(props) => (props.hasTopBorder ? 'none' : '1px solid #999')};
+  border-left: ${(props) => (props.hasLeftBorder ? 'none' : '1px solid #999')};
+  border-right: ${(props) => (props.hasRightBorder ? 'none' : '1px solid #999')};
+  border-bottom: ${(props) => (props.hasBottomBorder ? 'none' : '1px solid #999')};
   border-spacing: 1px;
 `;
 
