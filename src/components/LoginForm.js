@@ -43,7 +43,8 @@ function LoginForm() {
 
     const loginResponse = await login(username, password);
     if (loginResponse.success && loginResponse.token) {
-      // 로그인 성공하면 store에 유저 정보, 토큰 저장
+      // 현재는 편의를 위해 이렇게 로컬스토리지에 저장하지만,
+      // 나중에는 보안을 위해 필요할 때 서버에서 불러오는 방식으로 변경되어야 할 필요가 있음!!
       try {
         const userResponse = await axios.get(
           `http://127.0.0.1:8000/user/profile/${loginResponse.userId}`
