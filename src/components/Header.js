@@ -10,6 +10,8 @@ import { logout } from "../services/authService";
 import { setIsLoggedIn, resetUserState } from "../store/userSlice";
 import { useNavigate } from "react-router-dom";
 
+import axios from "axios";
+
 function Header() {
   let navigate = useNavigate();
   let dispatch = useDispatch();
@@ -23,7 +25,7 @@ function Header() {
     component: componentTheme,
   };
 
-  // 상태관리
+  // 알림 컴포넌트 상태관리
   const [isNotiVisible, setIsNotiVisible] = useState(false);
 
   // 로그아웃 요청
@@ -35,6 +37,40 @@ function Header() {
       navigate("/"); // 로그인 화면으로 이동
     } else if (response.error) {
       alert(response.error);
+    }
+  };
+
+  // 검색어 상태
+  const [searchTerm, setSearchTerm] = useState("");
+
+  // 검색 결과 상태
+  const [searchResults, setSearchResults] = useState([]);
+  console.log(searchResults);
+
+  const handleInputChange = (event) => {
+    setSearchTerm(event.target.value);
+  };
+
+  // get authToken
+  const authToken = useSelector((state) => state.user.authToken);
+  
+  // 서버에 검색 요청
+  const handleSearch = async (event) => {
+    // Enter 키의 keyCode는 13입니다.
+    if (event.key === "Enter" && searchTerm.trim()) {
+      try {
+        const response = await axios.get("http://127.0.0.1:8000/search", {
+          headers: {
+            Authorization: `Token ${authToken}`, // 헤더에 토큰 추가
+          },
+          params: {
+            query: searchTerm,
+          },
+        });
+        setSearchResults(response.data);
+      } catch (error) {
+        console.error("검색 중 오류 발생:", error);
+      }
     }
   };
 
@@ -62,7 +98,14 @@ function Header() {
             </Row>
           </Row>
           <Row gap="20px">
-            <SearchBox type="text" placeholder="검색" id="search-box" />
+            <SearchBox
+              type="text"
+              placeholder="검색"
+              id="search-box"
+              value={searchTerm}
+              onChange={handleInputChange}
+              onKeyDown={handleSearch}
+            />
             <Row gap="16px">
               <NotiIconWrapper>
                 <LargeIcon
