@@ -43,10 +43,27 @@ function LoginForm() {
 
     const loginResponse = await login(username, password);
     if (loginResponse.success && loginResponse.token) {
-      dispatch(setUser({ username: username, userId: loginResponse.userId }));
+      // 로그인 성공하면 store에 유저 정보, 토큰 저장
+      try {
+        const userResponse = await axios.get(
+          `http://127.0.0.1:8000/user/profile/${loginResponse.userId}`
+        );
+        dispatch(
+          setUser({
+            userId: userResponse.user_id,
+            username: userResponse.username,
+            userImg: userResponse.user_img,
+            position: userResponse.user_position,
+            info: userResponse.user_info,
+            hash: userResponse.user_hash,
+            email: userResponse.user_email,
+          })
+        );
+      } catch (error) {
+        console.error(error);
+      }
       dispatch(setAuthToken(loginResponse.token));
       dispatch(setIsLoggedIn(true));
-      navigate("/manda");
     } else if (loginResponse.error) {
       alert(loginResponse.error);
     }
@@ -147,7 +164,7 @@ function LoginForm() {
   );
 }
 
-function SocialLogin({theme, setIsModalOpen}) {
+function SocialLogin({ theme, setIsModalOpen }) {
   return (
     <ModalOverlay>
       <ModalContent>
@@ -225,7 +242,7 @@ let ModifiedBtn = styled(StyledButton)`
   width: 100%;
   color: white;
   margin: initial;
-`
+`;
 
 let LogoWrap = styled.div`
   ${({ theme }) => theme.component.iconSize.large};
@@ -274,7 +291,7 @@ const LineText = styled.div`
 let NotyetContainer = styled.div`
   width: 100%;
   cursor: pointer;
-`
+`;
 
 let ModalOverlay = styled.div`
   position: fixed;

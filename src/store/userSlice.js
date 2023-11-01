@@ -5,7 +5,9 @@ const userSlice = createSlice({
   initialState: {
     userId: "",
     username: "",
+    userImg: "",
     position: "",
+    info: "",
     hash: "",
     email: "",
     authToken: "",
@@ -15,14 +17,20 @@ const userSlice = createSlice({
   reducers: {
     // 프로필, 계정 관리
     setUser: (state, action) => {
-      if (action.payload.username) {
+      if (action.payload.userId) {
         state.userId = action.payload.userId;
       }
-        if (action.payload.username) {
+      if (action.payload.username) {
         state.username = action.payload.username;
+      }
+      if (action.payload.userImg) {
+        state.userImg = action.payload.userImg;
       }
       if (action.payload.position) {
         state.position = action.payload.position;
+      }
+      if (action.payload.info) {
+        state.info = action.payload.info;
       }
       if (action.payload.hash) {
         state.hash = action.payload.hash;
