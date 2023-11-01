@@ -109,6 +109,10 @@ function SearchPage() {
     { id: 2, name: "User 2", axiosURL: "http://15.164.217.203:8000/manda/mandamain/2" },
     { id: 3, name: "User 3", axiosURL: "http://15.164.217.203:8000/manda/mandamain/3" },
     { id: 4, name: "User 4", axiosURL: "http://15.164.217.203:8000/manda/mandamain/4" },
+    { id: 4, name: "User 4", axiosURL: "http://15.164.217.203:8000/manda/mandamain/4" },
+    { id: 4, name: "User 4", axiosURL: "http://15.164.217.203:8000/manda/mandamain/4" },
+    { id: 4, name: "User 4", axiosURL: "http://15.164.217.203:8000/manda/mandamain/4" },
+    { id: 4, name: "User 4", axiosURL: "http://15.164.217.203:8000/manda/mandamain/4" },
   ];
 
   return (
@@ -157,15 +161,18 @@ let PageLayout = styled.div`
 let Contents = styled.div`
   display: flex;
   flex-direction: column;
-  align-items: center;
   justify-content: center;
-  margin: 28px 196px 80px 196px;
+  align-items: flex-start;
+  width: 1080px;
+  margin: 28px auto 80px auto;
 `;
 
 const OtherManda = styled.div`
   display: flex;
   gap: 40px;
-`
+  width: 100%;
+  overflow-x: scroll;
+`;
 
 let HorizontalBorder = styled.hr`
   border: 1px solid ${({ theme }) => theme.color.border};
@@ -199,7 +206,7 @@ let Feeds = styled.div`
 let Recommends = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 16px;
   width: auto;
   margin-top: 48px;
 `
