@@ -1,5 +1,3 @@
-//MandaWrite
-
 import axios from "axios";
 import { useEffect, useState } from "react";
 import styled, { ThemeProvider } from "styled-components";
