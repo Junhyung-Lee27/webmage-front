@@ -20,60 +20,10 @@ function MandaModal({ isOpen, onClose }) {
     setTableData(updatedTableData);
   };
 
-  const saveData = () => {
-    const requestDataCreate = {
-      user: 54,
-      main_title: tableData[1][1],
-      success: false,
-    };
-
-    // 인증 토큰을 헤더에 추가
-    const headers = {
-      Authorization: "Bearer " + user.token, // 사용자의 토큰을 넣어주세요
-    };
-
-    axios
-      .post("http://15.164.217.203:8000/manda/create", requestDataCreate, { headers })
-      .then((response) => {
-        console.log(response.data);
-        // POST 요청이 성공하면 다음 POST 요청을 보냅니다.
-        return Promise.all(
-          tableData.map((row, rowIndex) => {
-            return Promise.all(
-              row.map((cell, cellIndex) => {
-                if (cellIndex !== 4) {
-                  const main_id = 7;
-                  const id = main_id * 10 + (cellIndex < 4 ? 3 : 2) + cellIndex;
-                  const sub_title = cell;
-
-                  const requestDataEdit = {
-                    subs: [{ id, main_id, success: false, sub_title }],
-                  };
-
-                  // 인증 토큰을 헤더에 추가
-                  const headers = {
-                    Authorization: "Bearer " + user.token, // 사용자의 토큰을 넣어주세요
-                  };
-
-                  return axios.post("http://15.164.217.203:8000/manda/edit/sub", requestDataEdit, {
-                    headers,
-                  });
-                }
-              })
-            );
-          })
-        );
-      })
-      .then((responses) => {
-        console.log(responses);
-        // 모든 POST 요청이 성공하면 실행할 코드
-      })
-      .catch((error) => {
-        console.error(error);
-        // 요청이 실패한 경우 실행할 코드
-      });
+  const saveData = () => {  
+    
   };
-
+  
   const getPlaceholder = (cellIndex) => {
     if (cellIndex === 4) {
       return "핵심목표";

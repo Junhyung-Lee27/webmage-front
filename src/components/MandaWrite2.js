@@ -58,7 +58,7 @@ function MandaWrite2() {
 
 const Manda = styled.div`
   display: flex;
-  gap: 25px;
+  gap: 20px;
   position: relative;
   flex-shrink: 0;
 `;
@@ -66,10 +66,10 @@ const Manda = styled.div`
 const GridContainer = styled.div`
   display: inline-flex;
   flex-wrap: wrap;
-  width: 774px;
-  height: 648px;
+  width: 900px;
+  height: 630px;
   margin-left: 198px;
-  margin-top: 5px;
+  margin-top: -15px;
   border-radius: 8px;
   box-shadow: 0px 8px 24px 0px rgba(0, 0, 0, 0.15);
   flex-shrink: 0;
@@ -107,7 +107,7 @@ const GridItem = styled.table`
 const TableCell = styled.td`
   text-align: center;
   vertical-align: middle;
-  width: 86px;
+  width: 100px;
   height: 70px;
   word-break: keep-all;
   padding: 0.5px;
@@ -119,6 +119,7 @@ const BtnGroup = styled.div`
   display: flex;
   gap: 10px;
   border: none;
+  flex-direction: column;
 `;
 
 const SaveBtn = styled.button`
@@ -137,7 +138,7 @@ const SaveBtn = styled.button`
 `;
 
 const DeleteBtn = styled.button`
-  width: 90px;
+  width: 200px;
   height: 42px;
   border-radius: 4px;
   border: none;
@@ -148,6 +149,7 @@ const DeleteBtn = styled.button`
   font-size: 20px;
   font-weight: 700;
   cursor: pointer;
+  margin-left: 10px;
 `;
 
 export default MandaWrite2;
