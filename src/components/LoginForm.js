@@ -51,13 +51,13 @@ function LoginForm() {
         );
         dispatch(
           setUser({
-            userId: userResponse.user_id,
-            username: userResponse.username,
-            userImg: userResponse.user_img,
-            position: userResponse.user_position,
-            info: userResponse.user_info,
-            hash: userResponse.user_hash,
-            email: userResponse.user_email,
+            userId: userResponse.data.user_id,
+            username: userResponse.data.username,
+            userImg: userResponse.data.user_img,
+            position: userResponse.data.user_position,
+            info: userResponse.data.user_info,
+            hash: userResponse.data.user_hash,
+            email: userResponse.data.user_email,
           })
         );
       } catch (error) {
@@ -65,6 +65,7 @@ function LoginForm() {
       }
       dispatch(setAuthToken(loginResponse.token));
       dispatch(setIsLoggedIn(true));
+      navigate("/"); // 로그인 화면으로 이동
     } else if (loginResponse.error) {
       alert(loginResponse.error);
     }
