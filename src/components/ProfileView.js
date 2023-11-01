@@ -38,7 +38,13 @@ function ProfileInfo({ setIsEditing, user }) {
   return (
     <FormLayout>
       <ProfileImgLayout>
-        <ProfileImg src={process.env.PUBLIC_URL + "/testImg/profile1.jpg"} />
+        <ProfileImg
+          src={
+            user.userImg
+              ? URL.createObjectURL(user.userImg)
+              : process.env.PUBLIC_URL + "/logo/Manda_logo1.svg"
+          }
+        />
       </ProfileImgLayout>
 
       <LabelText>닉네임</LabelText>
@@ -46,6 +52,9 @@ function ProfileInfo({ setIsEditing, user }) {
 
       <LabelText>소속</LabelText>
       <StyledBox>{user.position}</StyledBox>
+
+      <LabelText>자기소개</LabelText>
+      <StyledBox>{user.info}</StyledBox>
 
       <LabelText>해시태그</LabelText>
       <StyledBox>{user.hash}</StyledBox>
@@ -59,18 +68,18 @@ function ProfileEdit({ user, setIsEditing }) {
   const dispatch = useDispatch();
   const authToken = useSelector((state) => state.user.authToken);
   const fileInputRef = useRef(null);
-  
+
   // 입력값 상태 관리
-  const [username, setUsername] = useState("");
-  const [userPosition, setUserPosition] = useState("");
-  const [userInfo, setUserInfo] = useState("");
-  const [userHash, setUserHash] = useState("");
-  const [selectedImage, setSelectedImage] = useState(null);
+  const [username, setUsername] = useState(user.username);
+  const [userPosition, setUserPosition] = useState(user.position);
+  const [userInfo, setUserInfo] = useState(user.info);
+  const [userHash, setUserHash] = useState(user.hash);
+  const [selectedImage, setSelectedImage] = useState(user.userImg);
 
   const handleInputChange = (e, setState) => {
     setState(e.target.value);
   };
-  
+
   const handleImageChange = (e) => {
     if (e.target.files && e.target.files[0]) {
       setSelectedImage(e.target.files[0]);
@@ -87,41 +96,87 @@ function ProfileEdit({ user, setIsEditing }) {
 
     // 전송 데이터 준비
     let formData = new FormData();
-    formData.append("username", username);
     formData.append("user_img", selectedImage); // 이미지 추가
     formData.append("user_position", userPosition);
     formData.append("user_info", userInfo);
     formData.append("user_hash", userHash);
 
-    // 서버 요청
-    const response = await axios.post(
-      "http://127.0.0.1:8000/user/profile/edit",
-      formData,
-      axiosConfig
-    );
+    formData.append("user", user.userId);
+    formData.append("username", username !== null ? username : user.username);
+    formData.append("success_count", user.successCount);
 
-    // 프로필정보 수정 성공했을 경우
-    if (response.success) {
-      dispatch(
-        setUser({
-          username: username,
-          userImg: selectedImage,
-          position: userPosition,
-          info: userInfo,
-          hash: userHash,
-        })
-      ); // 이메일 상태 업데이트
-      setIsEditing(false); // 수정 모드 종료
-      alert("수정 완료");
-    } else if (response.error) {
-      alert(response.error);
+    // 프로필 생성 요청
+    try {
+      const response = await axios.post(
+        "http://127.0.0.1:8000/user/profile/write",
+        formData,
+        axiosConfig
+      );
+
+      // 프로필정보 생성 성공했을 경우
+      if (response.status === 201) {
+        dispatch(
+          setUser({
+            username: username,
+            userImg: selectedImage,
+            position: userPosition,
+            info: userInfo,
+            hash: userHash,
+          })
+        );
+        setIsEditing(false);
+        alert("수정 완료");
+      } else if (response.error) {
+        alert(response.error);
+      }
+    } catch (error) {
+      console.log(error.response);
+
+      // 이미 프로필이 있을 경우 편집 요청
+      if (error.response && error.response.status === 400) {
+        try {
+          const editResponse = await axios.patch(
+            "http://127.0.0.1:8000/user/profile/edit",
+            formData,
+            axiosConfig
+          );
+
+          if (editResponse.status === 200) {
+            dispatch(
+              setUser({
+                username: username,
+                userImg: selectedImage,
+                position: userPosition,
+                info: userInfo,
+                hash: userHash,
+              })
+            );
+            setIsEditing(false);
+            alert("프로필 수정 완료");
+          } else {
+            alert("프로필 수정 실패: " + (editResponse.data.error || "알 수 없는 오류"));
+          }
+        } catch (editError) {
+          alert("프로필 수정 오류: " + (editError.response.data.error || "알 수 없는 오류"));
+        }
+      } else {
+        alert("프로필 생성 오류: " + (error.response.data.error || "알 수 없는 오류"));
+      }
     }
   };
 
   return (
     <FormLayout>
       <ProfileImgLayout>
-        <ProfileImg src={process.env.PUBLIC_URL + "/testImg/profile1.jpg"} />
+        <ProfileImg
+          src={
+            selectedImage
+              ? URL.createObjectURL(selectedImage)
+              : user.userImg
+              ? URL.createObjectURL(user.userImg)
+              : process.env.PUBLIC_URL + "/logo/Manda_logo1.svg"
+          }
+        />
         <ImgInput type="file" onChange={handleImageChange} ref={fileInputRef}></ImgInput>
         <ImgEditBtn
           src={process.env.PUBLIC_URL + "/icon/edit.svg"}
@@ -135,7 +190,8 @@ function ProfileEdit({ user, setIsEditing }) {
       <StyledForm
         type="text"
         id="username"
-        value={username || user.username}
+        value={username || user.username || ""}
+        placeholder={!user.username ? "닉네임을 입력해주세요" : ""}
         onChange={(e) => handleInputChange(e, setUsername)}
       ></StyledForm>
 
@@ -145,8 +201,8 @@ function ProfileEdit({ user, setIsEditing }) {
       <StyledForm
         type="text"
         id="position"
-        placeholder={user.position ? user.position : "소속을 입력해주세요"}
-        value={userPosition || user.position}
+        value={userPosition || user.position || ""}
+        placeholder={!user.position ? "소속을 입력해주세요" : ""}
         onChange={(e) => handleInputChange(e, setUserPosition)}
       ></StyledForm>
 
@@ -156,8 +212,8 @@ function ProfileEdit({ user, setIsEditing }) {
       <StyledForm
         type="text"
         id="info"
-        placeholder={user.info ? user.info : "다른 분들께 소개할 내용을 입력해주세요"}
-        value={userInfo || user.info}
+        value={userInfo || user.info || ""}
+        placeholder={!user.info ? "다른 분들께 소개할 내용을 입력해주세요" : ""}
         onChange={(e) => handleInputChange(e, setUserInfo)}
       ></StyledForm>
 
@@ -167,8 +223,8 @@ function ProfileEdit({ user, setIsEditing }) {
       <StyledForm
         type="text"
         id="hash"
-        placeholder={user.hash ? user.hash : "관심 해시태그를 입력해주세요"}
-        value={userHash || user.hash}
+        value={userHash || user.hash || ""}
+        placeholder={!user.hash ? "관심 해시태그를 입력해주세요" : ""}
         onChange={(e) => handleInputChange(e, setUserHash)}
       ></StyledForm>
 
@@ -204,11 +260,12 @@ let ProfileImg = styled.img`
   height: 120px;
   border-radius: 50%;
   object-fit: cover;
+  border: 1px solid ${({ theme }) => theme.color.border};
 `;
 
 let ImgInput = styled.input`
   display: none;
-`
+`;
 
 let ImgEditBtn = styled.img`
   ${({ theme }) => theme.component.iconSize.small};
