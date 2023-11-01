@@ -166,4 +166,5 @@ let ReceivedAt = styled.span`
   color: ${({ theme }) => theme.color.font2};
 `;
 
+
 export default Notification;
