@@ -5,6 +5,7 @@ import { showAccountView } from "./../store/settingpageSlice";
 import { setIsLoggedIn, resetUserState } from "./../store/userSlice";
 import { useNavigate } from "react-router-dom";
 import { deleteUser } from "./../services/authService";
+import { useState } from "react";
 
 function DeleteAccount() {
   // 테마
@@ -20,9 +21,12 @@ function DeleteAccount() {
   // get authToken
   const authToken = useSelector((state) => state.user.authToken);
 
+  // 패스워드 입력 상태
+  const [password, setPassword] = useState("")
+
   // 회원탈퇴 요청
   const handleDeleteUser = async (authToken) => {
-    const response = await deleteUser(authToken);
+    const response = await deleteUser(authToken, password);
     // 회원탈퇴 성공했을 경우
     if (response.success) {
       dispatch(setIsLoggedIn(false)); // 로그인 여부 false
@@ -55,7 +59,12 @@ function DeleteAccount() {
           >
             안전한 탈퇴를 위해 비밀번호를 입력해주세요.
           </StyledText>
-          <StyledForm type="password" placeholder="비밀번호 입력"></StyledForm>
+          <StyledForm
+            type="password"
+            placeholder="비밀번호 입력"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+          ></StyledForm>
           <StyledText
             fontsize="16px"
             fontweight="600"

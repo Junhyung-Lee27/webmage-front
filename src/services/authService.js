@@ -120,14 +120,14 @@ export const editAccount = async (username, email, password, passwordCheck, auth
 };
 
 // 회원탈퇴
-export const deleteUser = async (authToken) => {
-
+export const deleteUser = async (authToken, password) => {
   try {
     const response = await axios.delete("http://127.0.0.1:8000/user/delete-user/", {
       headers: {
         accept: "application/json",
         Authorization: `Token ${authToken}`,
       },
+      data: { password: password },
     });
 
     if (response.status === 200) {
@@ -137,6 +137,9 @@ export const deleteUser = async (authToken) => {
     }
   } catch (error) {
     console.error("Delete-user API error:", error);
+    if (error.response && error.response.data.error) {
+      return { error: error.response.data.error }; // 서버에서 제공하는 에러 메시지 사용
+    }
     return { error: "회원탈퇴 중 오류가 발생했습니다. 나중에 다시 시도해주세요." };
   }
 };
