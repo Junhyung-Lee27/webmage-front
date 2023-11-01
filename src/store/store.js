@@ -1,6 +1,6 @@
 import { configureStore } from "@reduxjs/toolkit";
 import { combineReducers } from "redux"; // 여러 개의 reducer를 하나의 root reducer로 합쳐줌
-import { persistReducer } from "redux-persist"; // storage를 사용하기 위한 라이브러리
+import { persistReducer, persistStore } from "redux-persist"; // storage를 사용하기 위한 라이브러리
 import storage from "redux-persist/lib/storage";
 
 // Slices
@@ -20,7 +20,7 @@ const persistConfig = {
   key: "root",
   storage,
   whitelist: ["user", "theme"], // 영속성 유지 O
-  blacklist: [], // 영속성 유지 X
+  blacklist: ["authpage", "settingpage"], // 영속성 유지 X
 };
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);
@@ -33,4 +33,5 @@ const store = configureStore({
     }),
 });
 
+export const persistor = persistStore(store);
 export default store;

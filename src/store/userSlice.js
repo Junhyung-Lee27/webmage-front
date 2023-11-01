@@ -56,7 +56,7 @@ const userSlice = createSlice({
     },
     // 초기화(로그아웃, 탈퇴)
     resetUserState: (state) => {
-      state = userSlice.initialState;
+      Object.assign(state, userSlice.initialState);
     },
   },
 });

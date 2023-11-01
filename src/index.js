@@ -7,7 +7,7 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 import { BrowserRouter } from "react-router-dom";
 
-import store from "./store/store";
+import store, { persistor } from "./store/store";
 import { Provider } from "react-redux";
 
 // 유지되는 store 값이 다시 redux에 저장될 때까지 UI재렌더링을 지연시킴
@@ -15,13 +15,8 @@ import { Provider } from "react-redux";
 // persistor : 로컬스토리지에 저장할 스토어
 import { PersistGate } from "redux-persist/integration/react";
 
-// 유지하고 싶은 redux store를 인자로 넣으면 persistor 객체 반환
-import { persistStore } from "redux-persist";
-
 // 쿠키 저장, 조회, 삭제
 import { CookiesProvider } from "react-cookie";
-
-export let persistor = persistStore(store);
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(

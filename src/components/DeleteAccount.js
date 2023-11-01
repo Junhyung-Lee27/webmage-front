@@ -6,6 +6,7 @@ import { setIsLoggedIn, resetUserState } from "./../store/userSlice";
 import { useNavigate } from "react-router-dom";
 import { deleteUser } from "./../services/authService";
 import { useState } from "react";
+import { persistor } from "../store/store"
 
 function DeleteAccount() {
   // 테마
@@ -31,7 +32,13 @@ function DeleteAccount() {
     if (response.success) {
       dispatch(setIsLoggedIn(false)); // 로그인 여부 false
       dispatch(resetUserState()); // 유저 상태 초기화
+
       navigate("/"); // 로그인 화면으로 이동
+
+      // 로컬스토리지에 저장된 유저 데이터 삭제
+      setTimeout(() => {
+        persistor.purge();
+      }, 2000);
     } else if (response.error) {
       alert(response.error);
     }
