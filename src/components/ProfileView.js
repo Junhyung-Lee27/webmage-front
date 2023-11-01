@@ -1,7 +1,9 @@
 import styled, { ThemeProvider } from "styled-components";
-import { useState } from "react";
-import { useSelector } from "react-redux";
+import { useState, useRef } from "react";
+import { useSelector, useDispatch } from "react-redux";
 import componentTheme from "./theme";
+import axios from "axios";
+import { setUser } from "../store/userSlice";
 
 function ProfileView() {
   // 테마
@@ -23,7 +25,7 @@ function ProfileView() {
     <ThemeProvider theme={theme}>
       <ProfileViewLayout>
         {isEditing ? (
-          <ProfileEdit />
+          <ProfileEdit setIsEditing={setIsEditing} user={user} />
         ) : (
           <ProfileInfo setIsEditing={setIsEditing} user={user} />
         )}
@@ -53,30 +55,130 @@ function ProfileInfo({ setIsEditing, user }) {
   );
 }
 
-function ProfileEdit() {
+function ProfileEdit({ user, setIsEditing }) {
+  const dispatch = useDispatch();
+  const authToken = useSelector((state) => state.user.authToken);
+  const fileInputRef = useRef(null);
+  
+  // 입력값 상태 관리
+  const [username, setUsername] = useState("");
+  const [userPosition, setUserPosition] = useState("");
+  const [userInfo, setUserInfo] = useState("");
+  const [userHash, setUserHash] = useState("");
+  const [selectedImage, setSelectedImage] = useState(null);
+
+  const handleInputChange = (e, setState) => {
+    setState(e.target.value);
+  };
+  
+  const handleImageChange = (e) => {
+    if (e.target.files && e.target.files[0]) {
+      setSelectedImage(e.target.files[0]);
+    }
+  };
+
+  // 변경된 프로필 정보 저장 요청
+  const handleEditProfile = async (authToken) => {
+    const axiosConfig = {
+      headers: {
+        Authorization: `Token ${authToken}`, // 헤더에 토큰 추가
+      },
+    };
+
+    // 전송 데이터 준비
+    let formData = new FormData();
+    formData.append("username", username);
+    formData.append("user_img", selectedImage); // 이미지 추가
+    formData.append("user_position", userPosition);
+    formData.append("user_info", userInfo);
+    formData.append("user_hash", userHash);
+
+    // 서버 요청
+    const response = await axios.post(
+      "http://127.0.0.1:8000/user/profile/edit",
+      formData,
+      axiosConfig
+    );
+
+    // 프로필정보 수정 성공했을 경우
+    if (response.success) {
+      dispatch(
+        setUser({
+          username: username,
+          userImg: selectedImage,
+          position: userPosition,
+          info: userInfo,
+          hash: userHash,
+        })
+      ); // 이메일 상태 업데이트
+      setIsEditing(false); // 수정 모드 종료
+      alert("수정 완료");
+    } else if (response.error) {
+      alert(response.error);
+    }
+  };
+
   return (
     <FormLayout>
       <ProfileImgLayout>
         <ProfileImg src={process.env.PUBLIC_URL + "/testImg/profile1.jpg"} />
-        <ImgEditBtn src={process.env.PUBLIC_URL + "/icon/edit.svg"} />
+        <ImgInput type="file" onChange={handleImageChange} ref={fileInputRef}></ImgInput>
+        <ImgEditBtn
+          src={process.env.PUBLIC_URL + "/icon/edit.svg"}
+          onClick={() => fileInputRef.current.click()}
+        />
       </ProfileImgLayout>
 
       <LabelText>
         <label htmlFor="username">닉네임</label>
       </LabelText>
-      <StyledForm type="text" placeholder="닉네임을 입력해주세요" id="username"></StyledForm>
+      <StyledForm
+        type="text"
+        id="username"
+        value={username || user.username}
+        onChange={(e) => handleInputChange(e, setUsername)}
+      ></StyledForm>
 
       <LabelText>
-        <label htmlFor="organization">소속</label>
+        <label htmlFor="position">소속</label>
       </LabelText>
-      <StyledForm type="text" placeholder="소속을 입력해주세요" id="organization"></StyledForm>
+      <StyledForm
+        type="text"
+        id="position"
+        placeholder={user.position ? user.position : "소속을 입력해주세요"}
+        value={userPosition || user.position}
+        onChange={(e) => handleInputChange(e, setUserPosition)}
+      ></StyledForm>
 
       <LabelText>
-        <label htmlFor="tag">태그</label>
+        <label htmlFor="info">자기소개</label>
       </LabelText>
-      <StyledForm type="text" placeholder="태그를 입력해주세요" id="tag"></StyledForm>
+      <StyledForm
+        type="text"
+        id="info"
+        placeholder={user.info ? user.info : "다른 분들께 소개할 내용을 입력해주세요"}
+        value={userInfo || user.info}
+        onChange={(e) => handleInputChange(e, setUserInfo)}
+      ></StyledForm>
 
-      <StyledButton>완료</StyledButton>
+      <LabelText>
+        <label htmlFor="hash">해시태그</label>
+      </LabelText>
+      <StyledForm
+        type="text"
+        id="hash"
+        placeholder={user.hash ? user.hash : "관심 해시태그를 입력해주세요"}
+        value={userHash || user.hash}
+        onChange={(e) => handleInputChange(e, setUserHash)}
+      ></StyledForm>
+
+      <StyledButton
+        onClick={() => {
+          handleEditProfile(authToken);
+        }}
+      >
+        완료
+      </StyledButton>
     </FormLayout>
   );
 }
@@ -104,12 +206,17 @@ let ProfileImg = styled.img`
   object-fit: cover;
 `;
 
+let ImgInput = styled.input`
+  display: none;
+`
+
 let ImgEditBtn = styled.img`
   ${({ theme }) => theme.component.iconSize.small};
   filter: ${({ theme }) => theme.filter.font1};
   position: absolute;
   bottom: -10px;
   right: -10px;
+  cursor: pointer;
 `;
 
 let FormLayout = styled.div`
