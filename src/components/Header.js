@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { NavLink } from "react-router-dom";
 import componentTheme from "./theme";
 import ThemeSwitch from "../components/ThemeSwitch";
-import Notification from "./notification";
+import Notification from "./Notification";
 
 import { logout } from "../services/authService";
 import { setIsLoggedIn, resetUserState } from "../store/userSlice";
@@ -40,46 +40,48 @@ function Header() {
 
   return (
     <ThemeProvider theme={combinedTheme}>
-      <HeaderLayout position="relative" justifycontent="space-between" padding="0px 196px">
-        <Row gap="48px">
-          <NavLink to="/manda">
-            <MandaIcon src={process.env.PUBLIC_URL + "/logo/Manda_logo2.svg"} alt="Manda Logo" />
-          </NavLink>
-          <Row gap="16px">
-            <StyledLink to="/manda" activeclassname="active">
-              만다라트
-            </StyledLink>
-            <StyledLink to="/feed" activeclassname="active">
-              피드
-            </StyledLink>
-            <StyledLink to="/search" activeclassname="active">
-              탐색
-            </StyledLink>
-            <StyledLink to="/chat" activeclassname="active">
-              채팅
-            </StyledLink>
+      <HeaderLayout position="relative">
+        <Stadardized>
+          <Row gap="48px">
+            <NavLink to="/manda">
+              <MandaIcon src={process.env.PUBLIC_URL + "/logo/Manda_logo2.svg"} alt="Manda Logo" />
+            </NavLink>
+            <Row gap="16px">
+              <StyledLink to="/manda" activeclassname="active">
+                만다라트
+              </StyledLink>
+              <StyledLink to="/feed" activeclassname="active">
+                피드
+              </StyledLink>
+              <StyledLink to="/search" activeclassname="active">
+                탐색
+              </StyledLink>
+              <StyledLink to="/chat" activeclassname="active">
+                채팅
+              </StyledLink>
+            </Row>
           </Row>
-        </Row>
-        <Row gap="20px">
-          <SearchBox type="text" placeholder="검색" id="search-box" />
-          <Row gap="16px">
-            <NotiIconWrapper>
-              <LargeIcon
-                $active={isNotiVisible}
-                onClick={() => {
-                  setIsNotiVisible((prevState) => !prevState);
-                }}
-                src={process.env.PUBLIC_URL + "/icon/header/Notifications.svg"}
-              />
-              {isNotiVisible && <Notification>...</Notification>}
-            </NotiIconWrapper>
-            <IconLink to="/setting" activeclassname="active">
-              <LargeIcon src={process.env.PUBLIC_URL + "/icon/header/AccountCircle.svg"} />
-            </IconLink>
-            <LogoutBtn onClick={handleLogoutClick}>로그아웃</LogoutBtn>
+          <Row gap="20px">
+            <SearchBox type="text" placeholder="검색" id="search-box" />
+            <Row gap="16px">
+              <NotiIconWrapper>
+                <LargeIcon
+                  $active={isNotiVisible}
+                  onClick={() => {
+                    setIsNotiVisible((prevState) => !prevState);
+                  }}
+                  src={process.env.PUBLIC_URL + "/icon/header/Notifications.svg"}
+                />
+                {isNotiVisible && <Notification>...</Notification>}
+              </NotiIconWrapper>
+              <IconLink to="/setting" activeclassname="active">
+                <LargeIcon src={process.env.PUBLIC_URL + "/icon/header/AccountCircle.svg"} />
+              </IconLink>
+              <LogoutBtn onClick={handleLogoutClick}>로그아웃</LogoutBtn>
+            </Row>
+            <ThemeSwitch />
           </Row>
-          <ThemeSwitch />
-        </Row>
+        </Stadardized>
       </HeaderLayout>
     </ThemeProvider>
   );
@@ -91,7 +93,6 @@ let HeaderLayout = styled.div`
   position: ${({ position }) => position};
   z-index: 1;
   height: 56px;
-  padding: ${({ padding }) => padding};
   box-sizing: border-box;
   gap: ${({ gap = "16px" }) => gap};
   display: flex;
@@ -102,9 +103,18 @@ let HeaderLayout = styled.div`
   border-bottom: 1px solid ${({ theme }) => theme.color.border};
 `;
 
+let Stadardized = styled.div`
+  display: flex;
+  justify-content: space-between;
+  width: 1080px;
+  margin-left: auto;
+  margin-right: auto;
+`;
+
 let Row = styled.div`
   position: ${({ position }) => position};
   height: 56px;
+  width: ${({ width }) => width};
   padding: ${({ padding }) => padding};
   box-sizing: border-box;
   gap: ${({ gap = "16px" }) => gap};
@@ -139,7 +149,7 @@ let StyledLink = styled(NavLink)`
 
 let SearchBox = styled.input`
   height: 34px;
-  padding: 9px 120px 9px 16px;
+  padding: 9px 40px 9px 16px;
   box-sizing: border-box;
   font-size: 16px;
   color: ${({ theme }) => theme.color.font1};

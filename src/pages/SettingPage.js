@@ -85,7 +85,9 @@ let PageLayout = styled.div`
 let Body = styled.div`
   display: flex;
   flex-direction: row;
-  margin: 0px 196px;
+  width: 1080px;
+  margin-left: auto;
+  margin-right: auto;
   flex-grow: 1;
   background-color: ${({ theme }) => theme.color.bg};
 `;
