@@ -5,6 +5,7 @@ import UserRecommend from "../components/UserRecommend";
 import MandaSimple from "../components/MandaSimple";
 import Feed from "../components/Feed";
 import componentTheme from "./../components/theme";
+import { useState, useRef, useEffect } from "react";
 
 function SearchPage() {
   const colorTheme = useSelector((state) => state.theme.themes[state.theme.currentTheme]);
@@ -103,28 +104,68 @@ function SearchPage() {
     }
   ]
 
-  // 각 사용자의 정보와 axios URL 설정
-  const users = [
-    { id: 1, name: "User 1", axiosURL: "http://15.164.217.203:8000/manda/mandamain/1" },
-    { id: 2, name: "User 2", axiosURL: "http://15.164.217.203:8000/manda/mandamain/2" },
-    { id: 3, name: "User 3", axiosURL: "http://15.164.217.203:8000/manda/mandamain/3" },
-    { id: 4, name: "User 4", axiosURL: "http://15.164.217.203:8000/manda/mandamain/4" },
-    { id: 4, name: "User 4", axiosURL: "http://15.164.217.203:8000/manda/mandamain/4" },
-    { id: 4, name: "User 4", axiosURL: "http://15.164.217.203:8000/manda/mandamain/4" },
-    { id: 4, name: "User 4", axiosURL: "http://15.164.217.203:8000/manda/mandamain/4" },
-    { id: 4, name: "User 4", axiosURL: "http://15.164.217.203:8000/manda/mandamain/4" },
-  ];
+  //// MandaSimple 정보
+  const [searchResults, setSearchResults] = useState([]);
+
+  // OtherManda 스크롤 버튼
+  const scrollContainerRef = useRef(null);
+
+  const [showPrevButton, setShowPrevButton] = useState(false);
+  const [showNextButton, setShowNextButton] = useState(true);
+
+  const handleScroll = () => {
+    if (scrollContainerRef.current) {
+      const { scrollLeft, scrollWidth, clientWidth } = scrollContainerRef.current;
+
+      setShowPrevButton(scrollLeft > 0);
+      setShowNextButton(scrollLeft < scrollWidth - clientWidth);
+    }
+  };
+
+  useEffect(() => {
+    const container = scrollContainerRef.current;
+    if (container) {
+      container.addEventListener("scroll", handleScroll);
+      return () => {
+        container.removeEventListener("scroll", handleScroll);
+      };
+    }
+  }, []);
+
+  const handlePrevClick = () => {
+    if (scrollContainerRef.current) {
+      scrollContainerRef.current.scrollLeft -= 600;
+    }
+  };
+
+  const handleNextClick = () => {
+    if (scrollContainerRef.current) {
+      scrollContainerRef.current.scrollLeft += 600;
+    }
+  };
 
   return (
     <ThemeProvider theme={theme}>
       <PageLayout>
-        <Header></Header>
+        <Header setSearchResults={setSearchResults}></Header>
         <Contents>
-          <OtherManda>
-            {users.map((user) => (
-              <MandaSimple key={user.id} axiosURL={user.axiosURL} />
+          {showPrevButton && (
+            <PrevButton
+              onClick={handlePrevClick}
+              src={process.env.PUBLIC_URL + "/icon/arrow-left.svg"}
+            />
+          )}
+          <OtherManda ref={scrollContainerRef}>
+            {searchResults.map((searchResult) => (
+              <MandaSimple key={searchResult.id} searchResult={searchResult} />
             ))}
           </OtherManda>
+          {showNextButton && (
+            <NextButton
+              onClick={handleNextClick}
+              src={process.env.PUBLIC_URL + "/icon/arrow-right.svg"}
+            />
+          )}
           <HorizontalBorder />
           <Row>
             <Feeds>
@@ -162,16 +203,43 @@ let Contents = styled.div`
   display: flex;
   flex-direction: column;
   justify-content: center;
-  align-items: flex-start;
+  align-items: center;
   width: 1080px;
-  margin: 28px auto 80px auto;
+  margin: 40px auto 80px auto;
+  position: relative;
 `;
 
 const OtherManda = styled.div`
   display: flex;
   gap: 40px;
-  width: 100%;
+  width: calc(100% + 32px);
   overflow-x: scroll;
+  white-space: nowrap;
+  scroll-behavior: smooth;
+  &::-webkit-scrollbar {
+    height: 0px;
+  }
+`;
+
+const ScrollButton = styled.img`
+  position: absolute;
+  top: 120px;
+  border-radius: 50%;
+  border: 1px solid ${({ theme }) => theme.color.border};
+  background-color: ${({ theme }) => theme.color.bg2};
+  padding: 4px;
+
+  &:hover {
+    background-color: ${({ theme }) => theme.color.bg3};
+  }
+`;
+
+const PrevButton = styled(ScrollButton)`
+  left: -48px;
+`;
+
+const NextButton = styled(ScrollButton)`
+  right: -40px;
 `;
 
 let HorizontalBorder = styled.hr`

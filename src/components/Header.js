@@ -13,7 +13,7 @@ import { persistor } from "../store/store";
 
 import axios from "axios";
 
-function Header() {
+function Header(props) {
   let navigate = useNavigate();
   let dispatch = useDispatch();
 
@@ -50,10 +50,6 @@ function Header() {
   // 검색어 상태
   const [searchTerm, setSearchTerm] = useState("");
 
-  // 검색 결과 상태
-  const [searchResults, setSearchResults] = useState([]);
-  console.log(searchResults);
-
   const handleInputChange = (event) => {
     setSearchTerm(event.target.value);
   };
@@ -74,7 +70,7 @@ function Header() {
             query: searchTerm,
           },
         });
-        setSearchResults(response.data);
+        props.setSearchResults(response.data);
       } catch (error) {
         console.error("검색 중 오류 발생:", error);
       }

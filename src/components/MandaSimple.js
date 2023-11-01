@@ -5,7 +5,7 @@ import componentTheme from "./theme";
 import { useSelector } from "react-redux";
 
 
-function MandaSimple({ axiosURL }) {
+function MandaSimple({ axiosURL, searchResult }) {
 
   // 테마
   const colorTheme = useSelector((state) => state.theme.themes[state.theme.currentTheme]);
@@ -17,28 +17,28 @@ function MandaSimple({ axiosURL }) {
     component: componentTheme,
   };
 
-
-  const [main, setMain] = useState({});
-  const [subs, setSubs] = useState([]);
+  // 검색 결과(searchResult)가 있을 경우, 아닐 경우 고려
+  const [main, setMain] = useState(searchResult.main_title || {});
+  const [subs, setSubs] = useState(searchResult.subs || []);
 
   useEffect(() => {
-    
-    axios.get(axiosURL)
-    .then((result) => {
-      const data = result.data;
-      setMain(data.main);
-      setSubs(data.subs);
-    })
-    .catch(()=>{
-      console.log('ajax 요청 실패');
-    });
+    axios
+      .get(axiosURL)
+      .then((result) => {
+        const data = result.data;
+        setMain(data.main);
+        setSubs(data.subs);
+      })
+      .catch(() => {
+        console.log("ajax 요청 실패");
+      });
   }, [axiosURL]);
 
   const getTableCell = (cellIndex) => {
     if (cellIndex === 4) {
-      return main.main_title;
+      return main || ""; // 검색 결과 유무 확인
     } else {
-      return subs[cellIndex - (cellIndex > 4 ? 1 : 0)]?.sub_title || '';
+      return subs[cellIndex - (cellIndex > 4 ? 1 : 0)]?.sub_title || "";
     }
   };
 
@@ -50,9 +50,7 @@ function MandaSimple({ axiosURL }) {
             {Array.from({ length: 3 }, (_, rowIndex) => (
               <tr key={rowIndex}>
                 {Array.from({ length: 3 }, (_, cellIndex) => (
-                  <TableCell key={cellIndex}>
-                    {getTableCell(rowIndex * 3 + cellIndex)}
-                  </TableCell>
+                  <TableCell key={cellIndex}>{getTableCell(rowIndex * 3 + cellIndex)}</TableCell>
                 ))}
               </tr>
             ))}
@@ -61,8 +59,8 @@ function MandaSimple({ axiosURL }) {
         <UserContainer>
           <UserImg src={process.env.PUBLIC_URL + "/testImg/profile1.jpg"}></UserImg>
           <UserInfo>
-            <Username>username</Username>
-            <UserPosition>userposition</UserPosition>
+            <Username>{searchResult.username}</Username>
+            <UserPosition>{searchResult.userposition}</UserPosition>
           </UserInfo>
         </UserContainer>
       </Container>
@@ -109,16 +107,18 @@ const TableCell = styled.td`
 `;
 
 const UserContainer = styled.div`
-  width: 256px;
+  width: 80%;
   height: 64px;
   display: flex;
   align-items: center;
   gap: 16px;
+  margin-left: auto;
+  margin-right: auto;
 `
 
 const UserImg = styled.img`
-  width: 64px;
-  height: 64px;
+  width: 56px;
+  height: 56px;
   border-radius: 50%;
   object-fit: cover;
 `
@@ -136,7 +136,7 @@ const Username = styled.h5`
 
 const UserPosition = styled.span`
   color: ${({ theme }) => theme.color.font2};
-  font-size: 16px;
+  font-size: 14px;
   font-weight: 400;
 `
 
