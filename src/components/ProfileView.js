@@ -40,14 +40,14 @@ function ProfileInfo({ setIsEditing, user }) {
       <ProfileImgLayout>
         <ProfileImg
           src={
-            user.userImg
+            user.userImg instanceof File
               ? URL.createObjectURL(user.userImg)
               : process.env.PUBLIC_URL + "/logo/Manda_logo1.svg"
           }
         />
       </ProfileImgLayout>
 
-      <LabelText>닉네임</LabelText>
+      <LabelText>아이디</LabelText>
       <StyledBox>{user.username}</StyledBox>
 
       <LabelText>소속</LabelText>
@@ -170,9 +170,9 @@ function ProfileEdit({ user, setIsEditing }) {
       <ProfileImgLayout>
         <ProfileImg
           src={
-            selectedImage
+            selectedImage instanceof File
               ? URL.createObjectURL(selectedImage)
-              : user.userImg
+              : user.userImg instanceof File
               ? URL.createObjectURL(user.userImg)
               : process.env.PUBLIC_URL + "/logo/Manda_logo1.svg"
           }
@@ -185,13 +185,13 @@ function ProfileEdit({ user, setIsEditing }) {
       </ProfileImgLayout>
 
       <LabelText>
-        <label htmlFor="username">닉네임</label>
+        <label htmlFor="username">아이디</label>
       </LabelText>
       <StyledForm
         type="text"
         id="username"
         value={username || user.username || ""}
-        placeholder={!user.username ? "닉네임을 입력해주세요" : ""}
+        placeholder={!user.username ? "아이디을 입력해주세요" : ""}
         onChange={(e) => handleInputChange(e, setUsername)}
       ></StyledForm>
 
