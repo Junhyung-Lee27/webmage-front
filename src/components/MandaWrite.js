@@ -1,18 +1,15 @@
+//MandaWrite
+
 import axios from "axios";
 import { useEffect, useState } from "react";
-import styled, { ThemeProvider, css } from "styled-components";
+import styled, { ThemeProvider } from "styled-components";
 import theme from "./theme";
 import { useSelector } from "react-redux";
 
-
 function MandaWrite() {
-
   const currentTheme = useSelector((state) => state.theme.themes[state.theme.currentTheme]);
 
-  const subData = [ ['', '', ''], ['', '', ''], ['', '', ''] ];
-  const mainData = [ ['', '', ''], ['', '코딩 왕', ''], ['', '', ''] ];
-
-  const [goals, setGoals] = useState(Array(8).fill(''));
+  const [goals, setGoals] = useState(Array(8).fill(""));
 
   const handleGoalChange = (index, value) => {
     const updatedGoals = [...goals];
@@ -22,18 +19,10 @@ function MandaWrite() {
 
   return (
     <div>
-
       <Manda>
-
         <GridContainer>
           {Array.from({ length: 9 }, (_, tableIndex) => (
-            <GridItem
-            key={tableIndex}
-            hasTopBorder={tableIndex < 3}
-            hasLeftBorder={tableIndex % 3 === 0}
-            hasRightBorder={tableIndex % 3 === 2}
-            hasBottomBorder={tableIndex > 5}
-            >
+            <GridItem key={tableIndex}>
               <tbody>
                 {Array.from({ length: 3 }, (_, rowIndex) => (
                   <tr key={rowIndex}>
@@ -45,16 +34,15 @@ function MandaWrite() {
                   </tr>
                 ))}
               </tbody>
-        </GridItem>
-        ))}
+            </GridItem>
+          ))}
         </GridContainer>
 
         <GoalList>
-
           <Info>
             <div>이제 핵심 목표를 이루기 위한</div>
             <InfoLine2>
-              <p style={{ color: '#6C63FF' }}>세부 목표</p>
+              <p style={{ color: "#6C63FF" }}>세부 목표</p>
               <p>를 작성해주세요</p>
             </InfoLine2>
           </Info>
@@ -77,19 +65,15 @@ function MandaWrite() {
             <DeleteBtn>삭제</DeleteBtn>
             <SaveBtn>저장</SaveBtn>
           </BtnGroup>
-
         </GoalList>
       </Manda>
     </div>
   );
 }
 
-
-
-
 const Manda = styled.div`
-  display: flex; 
-  gap: 25px; 
+  display: flex;
+  gap: 25px;
 `;
 
 const GridContainer = styled.div`
@@ -108,11 +92,7 @@ const GridItem = styled.table`
   flex: 0 0 calc(33.3333% - 0px); /* 3개씩 가로로 배치, 0px는 border 두께 */
   box-sizing: border-box;
   table-layout: fixed;
-  border-collapse: collapse; /* 테이블 셀 간의 간격 제거 */
-  border-top: ${(props) => (props.hasTopBorder ? 'none' : '1px solid #999')};
-  border-left: ${(props) => (props.hasLeftBorder ? 'none' : '1px solid #999')};
-  border-right: ${(props) => (props.hasRightBorder ? 'none' : '1px solid #999')};
-  border-bottom: ${(props) => (props.hasBottomBorder ? 'none' : '1px solid #999')};
+  border-collapse: separate;
   border-spacing: 1px;
 `;
 
@@ -123,19 +103,19 @@ const TableCell = styled.td`
   height: 70px;
   word-break: keep-all;
   padding: 0.5px;
-  border: 1px solid #FFF;
-  background: ${(props) => 
-    (props.centerIndex ? 'rgba(114, 105, 255, 1)' : 'rgba(114, 105, 255, 0.1)')};
+  border: 1px solid #fff;
+  background: ${(props) =>
+    props.centerIndex ? "rgba(114, 105, 255, 1)" : "rgba(114, 105, 255, 0.1)"};
 `;
 
 const GoalList = styled.div`
-  background: #FFFFFF;
+  background: #ffffff;
   width: 402px;
   display: inline-flex;
   flex-direction: column;
   justify-content: space-around;
   align-items: center;
-`
+`;
 
 const Info = styled.div`
   width: 354px;
@@ -144,16 +124,16 @@ const Info = styled.div`
   font-weight: 700;
   line-height: 20px;
   display: flex;
-  flex-direction: column; 
+  flex-direction: column;
   align-items: center;
   text-align: center;
   margin-top: 20px;
-`
+`;
 
 const InfoLine2 = styled.div`
   display: flex;
   margin-top: 5px;
-`
+`;
 
 const NumberedLi = styled.li`
   display: flex;
@@ -170,7 +150,7 @@ const Number = styled.span`
   width: 24px;
   font-size: 20px;
   font-weight: 500;
-  color: #CACACA;
+  color: #cacaca;
 
   &:hover {
     color: #222222;
@@ -179,7 +159,7 @@ const Number = styled.span`
 
 const Input = styled.input`
   border: none;
-  border-bottom: 1px solid #CACACA;
+  border-bottom: 1px solid #cacaca;
   outline: none;
   width: 325px;
 
@@ -191,49 +171,47 @@ const Input = styled.input`
 const AiBtn = styled.button`
   width: 354px;
   height: 45px;
-  border: 1px solid #6C63FF;
+  border: 1px solid #6c63ff;
   border-radius: 4px;
   background: white;
-  color: #6C63FF;
+  color: #6c63ff;
   font-size: 20px;
   font-weight: 500;
   cursor: pointer;
-`
+`;
 
 const BtnGroup = styled.div`
   display: flex;
   gap: 16px;
   border: none;
-`
+`;
 
 const DeleteBtn = styled.button`
   width: 90px;
   height: 42px;
   border-radius: 4px;
   border: none;
-  background: #C31616;
+  background: #c31616;
   flex-shrink: 0;
-  color: #FFF;
+  color: #fff;
   justify-content: center;
   font-size: 20px;
   font-weight: 700;
   cursor: pointer;
-`
+`;
 
 const SaveBtn = styled.button`
   width: 248px;
   height: 42px;
   border-radius: 4px;
   border: none;
-  background: #6C63FF;
+  background: #6c63ff;
   flex-shrink: 0;
-  color: #FFF;
+  color: #fff;
   justify-content: center;
   font-size: 20px;
   font-weight: 700;
   cursor: pointer;
-`
-
-
+`;
 
 export default MandaWrite;
