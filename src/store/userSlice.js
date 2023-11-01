@@ -10,6 +10,7 @@ const userSlice = createSlice({
     info: "",
     hash: "",
     email: "",
+    successCount: 0,
     authToken: "",
     csrfToken: "",
     isLoggedIn: false,
@@ -38,6 +39,9 @@ const userSlice = createSlice({
       if (action.payload.email) {
         state.email = action.payload.email;
       }
+      if (action.payload.successCount) {
+        state.successCount = action.payload.successCount;
+      }
     },
     // 토큰 관리
     setAuthToken: (state, action) => {
@@ -52,7 +56,7 @@ const userSlice = createSlice({
     },
     // 초기화(로그아웃, 탈퇴)
     resetUserState: (state) => {
-      return { ...state, ...userSlice.initialState };
+      state = userSlice.initialState;
     },
   },
 });
