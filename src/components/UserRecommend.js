@@ -54,7 +54,6 @@ let Column = styled.div`
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: 4px;
 `;
 
 let StyledProfile = styled.div`

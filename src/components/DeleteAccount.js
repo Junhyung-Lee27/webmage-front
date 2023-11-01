@@ -2,9 +2,10 @@ import styled, { ThemeProvider } from "styled-components";
 import { useSelector, useDispatch } from "react-redux";
 import componentTheme from "./theme";
 import { showAccountView } from "./../store/settingpageSlice";
-import { setIsLoggedIn, resetUserState } from "./../store/userSlice";
+import { resetUserState } from "./../store/userSlice";
 import { useNavigate } from "react-router-dom";
 import { deleteUser } from "./../services/authService";
+import { getCookie } from "../services/cookie";
 
 function DeleteAccount() {
   // 테마
@@ -17,15 +18,17 @@ function DeleteAccount() {
   const dispatch = useDispatch(); // 스토어 상태 업데이트
   const navigate = useNavigate(); // 화면 네이게이터
 
-  // get authToken
-  const authToken = useSelector((state) => state.user.authToken);
+  // get csrfToken
+  // const csrfToken = useSelector((state) => state.user.csrfToken);
+  // console.log(csrfToken);
+
+  const csrfToken = getCookie('csrftoken');
 
   // 회원탈퇴 요청
-  const handleDeleteUser = async (authToken) => {
-    const response = await deleteUser(authToken);
+  const handleDeleteUser = async (csrfToken) => {
+    const response = await deleteUser(csrfToken);
     // 회원탈퇴 성공했을 경우
     if (response.success) {
-      dispatch(setIsLoggedIn(false)); // 로그인 여부 false
       dispatch(resetUserState()); // 유저 상태 초기화
       navigate("/"); // 로그인 화면으로 이동
     } else if (response.error) {
@@ -74,7 +77,7 @@ function DeleteAccount() {
               취소
             </StyledButton>
             <StyledButton
-              onClick={() => handleDeleteUser(authToken)}
+              onClick={() => handleDeleteUser(csrfToken)}
               color="white"
               backgroundcolor="#FF4C4C"
             >

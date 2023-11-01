@@ -120,14 +120,16 @@ export const editAccount = async (username, email, password, passwordCheck, auth
 };
 
 // 회원탈퇴
-export const deleteUser = async (authToken) => {
-
+export const deleteUser = async (csrfToken) => {
+  const csrftoken = csrfToken
+  
   try {
     const response = await axios.delete("http://127.0.0.1:8000/user/delete-user/", {
       headers: {
         accept: "application/json",
-        Authorization: `Token ${authToken}`,
+        'x-csrftoken': csrftoken,
       },
+      withCredentials: true,
     });
 
     if (response.status === 200) {
