@@ -5,8 +5,7 @@ import axios from "axios";
 
 function MandaModal({ isOpen, onClose }) {
   const user = useSelector((state) => state.user);
-
-  console.log(user);
+  const authToken = useSelector((state) => state.user.authToken);
 
   const [tableData, setTableData] = useState([
     ["", "", ""],
@@ -20,9 +19,66 @@ function MandaModal({ isOpen, onClose }) {
     setTableData(updatedTableData);
   };
 
-  const saveData = () => {  
-    
-  };
+  const saveData = async () => {
+    try {
+      // 토큰을 가져오는 부분 (유사한 방식으로 토큰을 받아온다)
+      // const authToken = useSelector((state) => state.user.authToken);
+  
+      // 데이터 생성 요청 설정
+      const requestDataCreate = {
+        user: user.userId,
+        main_title: tableData[1][1],
+        success: false,
+      };
+  
+      const createResponse = await axios.post("http://127.0.0.1:8000/manda/create/", requestDataCreate, {
+        headers: {
+          Authorization: `Token ${authToken}`,
+        },
+      });
+  
+      const mainId = createResponse.data.main.id;
+
+      console.log("Create Response:", createResponse.data);
+  
+      // 각 셀의 데이터를 수정 요청으로 보내는 부분
+      const editPromises = [];
+  
+      tableData.forEach((row, rowIndex) => {
+        row.forEach((cell, cellIndex) => {
+          if (cellIndex !== 4) {
+            // const main_id = createResponse.data.main.main.id;
+            const adjustedCellIndex = rowIndex * 3 + cellIndex;
+            const id = (mainId-1) * 8 + (adjustedCellIndex < 5 ? 1 : 0) + adjustedCellIndex;
+            const sub_title = cell;
+  
+            const requestDataEdit = {
+              subs: [{ id, sub_title, success: false }],
+            };
+  
+            const editPromise = axios.post("http://127.0.0.1:8000/manda/edit/sub/", requestDataEdit, {
+              headers: {
+                Authorization: `Token ${authToken}`,
+              },
+            });
+  
+            editPromises.push(editPromise);
+          }
+        });
+      });
+  
+      const editResponses = await Promise.all(editPromises);
+      console.log("Edit Responses:", editResponses);
+
+      onClose(mainId);
+  
+      // 모든 POST 요청이 성공하면 실행할 코드
+    } catch (error) {
+      console.error("오류 발생:", error);
+      // 요청이 실패한 경우 실행할 코드
+    }
+  }
+
   
   const getPlaceholder = (cellIndex) => {
     if (cellIndex === 4) {

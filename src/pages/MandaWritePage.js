@@ -1,7 +1,7 @@
 import styled from "styled-components";
 import { useSelector } from "react-redux";
 import Header from "../components/Header";
-import MandaWrite2 from "../components/MandaWrite2";
+import MandaWrite from "../components/MandaWrite";
 import MandaSimple from "../components/MandaSimple";
 
 function MandaWritePage() {
@@ -18,7 +18,7 @@ function MandaWritePage() {
   return (
     <PageLayout backgroundcolor={currentTheme.bg2}>
       <Header></Header>
-      <MandaWrite2 />
+      <MandaWrite />
       <Title>다른 사용자의 만다라트</Title>
       <OtherManda>
         {users.map((user) => (
