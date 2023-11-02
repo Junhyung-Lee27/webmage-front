@@ -72,11 +72,11 @@ function Feed({ userInfo, contentInfo }) {
     setEmojiInfo(getEmojiInfo(contentInfo.emoji_count));
   }, [contentInfo]);
 
-  const imgUrl = "s3://webmage-bucket/img";
+  const imgUrl = "";
 
   return (
     <ThemeProvider theme={theme}>
-      <FeedBox bgcolor={currentTheme.bg3}>
+      <FeedBox bgcolor={currentTheme.bg}>
         {/*유저정보 및 팔로우버튼/메뉴버튼 */}
         <FeedHeader>
           <UserInfo>
@@ -228,7 +228,7 @@ let FeedBox = styled.div`
   font-family: Pretendard-Regular;
   background-color: ${({ bgcolor }) => bgcolor};
   flex-direction: column;
-  // box-shadow: 0px 0.5rem 1.5rem 0px rgba(0, 0, 0, 0.15);
+  box-shadow: 0px 0.5rem 1.5rem 0px rgba(0, 0, 0, 0.15);
   /* width: calc(100% - 5rem); */
   box-sizing: border-box;
   width: 100%;
