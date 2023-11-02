@@ -104,9 +104,13 @@ function SearchPage() {
     }
   ]
 
-  //// MandaSimple 정보
-  const [searchResults, setSearchResults] = useState([]);
-
+  //// 검색 결과 상태
+const [searchResults, setSearchResults] = useState({ manda_simples: [], feeds: [], users: [] });
+  let mandaSimples = searchResults.manda_simples;
+  let feeds = searchResults.feeds;
+  let users = searchResults.users;
+  console.log(searchResults)
+  
   // OtherManda 스크롤 버튼
   const scrollContainerRef = useRef(null);
 
@@ -156,8 +160,8 @@ function SearchPage() {
             />
           )}
           <OtherManda ref={scrollContainerRef}>
-            {searchResults.map((searchResult) => (
-              <MandaSimple key={searchResult.id} searchResult={searchResult} />
+            {mandaSimples.map((mandaSimple) => (
+              <MandaSimple key={mandaSimple.id} searchResult={mandaSimple} />
             ))}
           </OtherManda>
           {showNextButton && (
@@ -169,7 +173,7 @@ function SearchPage() {
           <HorizontalBorder />
           <Row>
             <Feeds>
-              {feedInfo.map((feed) => (
+              {feeds.map((feed) => (
                 <Feed
                   key={feed.contentInfo.id}
                   userInfo={feed.userInfo}
@@ -179,9 +183,9 @@ function SearchPage() {
             </Feeds>
             <VerticalBorder />
             <Recommends>
-              <UserRecommend />
-              <UserRecommend />
-              <UserRecommend />
+              {users.map((user) => (
+                <UserRecommend key={user.id} user={user} />
+              ))}
             </Recommends>
           </Row>
         </Contents>
@@ -205,7 +209,7 @@ let Contents = styled.div`
   justify-content: center;
   align-items: center;
   width: 1080px;
-  margin: 40px auto 80px auto;
+  margin: 40px auto 0px auto;
   position: relative;
 `;
 
@@ -216,6 +220,7 @@ const OtherManda = styled.div`
   overflow-x: scroll;
   white-space: nowrap;
   scroll-behavior: smooth;
+
   &::-webkit-scrollbar {
     height: 0px;
   }
@@ -269,6 +274,7 @@ let Feeds = styled.div`
   display: flex;
   flex-direction:column;
   align-items: center;
+  margin-bottom: 80px;
 `;
 
 let Recommends = styled.div`
@@ -277,6 +283,7 @@ let Recommends = styled.div`
   gap: 16px;
   width: auto;
   margin-top: 48px;
+  margin-bottom: 80px;
 `
 
 export default SearchPage;

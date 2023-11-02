@@ -99,7 +99,7 @@ function Feed({ userInfo, contentInfo }) {
                                 weight="500"
                                 color={currentTheme.font2}
                             >
-                                {formatDateAgo(contentInfo.upload_date)}
+                                {formatDateAgo(contentInfo.created_at)}
                             </StyledText>
                         </TextBox>
                     </UserInfo>

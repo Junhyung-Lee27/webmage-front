@@ -117,7 +117,7 @@ function FeedPage() {
                         <Feeds>
                             {feedInfo.map((feed) => (
                                 <Feed
-                                    key={feed.contentInfo.id}
+                                    key={feed.contentInfo}
                                     userInfo={feed.userInfo}
                                     contentInfo={feed.contentInfo}
                                 />
