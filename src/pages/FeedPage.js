@@ -29,7 +29,6 @@ function FeedPage() {
 
   // 피드 상태
   const feeds = useSelector((state) => state.feed.feeds);
-  console.log(feeds);
 
   const user = useSelector((state) => state.user);
   const userId = user.userId;
@@ -73,9 +72,6 @@ function FeedPage() {
         setLoading(false);
       });
     }
-    Promise.all([fetchFeedData()]).then(() => {
-      setLoading(false); // 데이터가 모두 로드되면 로딩 상태를 false로 설정
-    });
   }, [activeTab]); // activeTab 값이 변경될 때마다 useEffect 실행
 
   // 유저 데이터 불러오기

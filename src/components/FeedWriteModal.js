@@ -55,8 +55,6 @@ function FeedWriteModal({ userId, authToken }) {
     setSelectedContent(selectedOption);
   };
 
-  console.log(selectedMainOption);
-
   useEffect(() => {
     // 핵심목표 가져오기
     const fetchMainOptions = async () => {

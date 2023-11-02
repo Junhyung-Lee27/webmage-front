@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import styled, { ThemeProvider } from "styled-components";
 import theme from "./theme";
 import { useSelector } from "react-redux";
-
+import { BASE_URL } from "./../config";
 
 function MandaWrite() {
   const currentTheme = useSelector((state) => state.theme.themes[state.theme.currentTheme]);

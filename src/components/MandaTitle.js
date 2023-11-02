@@ -1,4 +1,5 @@
 import axios from "axios";
+import { BASE_URL } from "./../config";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 import styled, { ThemeProvider } from "styled-components";
