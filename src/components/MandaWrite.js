@@ -31,7 +31,7 @@ function MandaWrite() {
     };
   
     try {
-      const createResponse = await axios.post('http://127.0.0.1:8000/manda/create/', requestDataCreate, {
+      const createResponse = await axios.post(`${BASE_URL}/manda/create/`, requestDataCreate, {
         headers: {
           Authorization: `Token ${authToken}`,
         },
@@ -43,7 +43,7 @@ function MandaWrite() {
 
       // POST 요청 이후 GET 요청 보내기
       try {
-        const getResponse = await axios.get(`http://127.0.0.1:8000/manda/mandamain/${mainId}`);
+        const getResponse = await axios.get(`${BASE_URL}/manda/mandamain/${mainId}`);
         // GET 요청의 응답 데이터를 추출하고 필요한 부분을 가공할 수 있습니다.
         const data = getResponse.data;
 
@@ -84,7 +84,7 @@ function MandaWrite() {
     };
   
     try {
-      const contentsResponse = await axios.post('http://127.0.0.1:8000/manda/edit/content/', contentsRequestData, {
+      const contentsResponse = await axios.post(`${BASE_URL}/manda/edit/content/`, contentsRequestData, {
         headers: {
           Authorization: `Token ${authToken}`,
         },
@@ -109,7 +109,7 @@ function MandaWrite() {
     };
   
     try {
-      const response = await axios.post('http://127.0.0.1:8000/manda/edit/sub/', requestData, {
+      const response = await axios.post(`${BASE_URL}/manda/edit/sub/`, requestData, {
         headers: {
           Authorization: `Token ${authToken}`,
         },

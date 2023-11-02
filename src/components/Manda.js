@@ -16,7 +16,7 @@ function Manda() {
 
   useEffect(() => {
     
-    axios.get("http://127.0.0.1:8000/manda/mandamain/17")
+    axios.get(`${BASE_URL}/manda/mandamain/17`)
     .then((result) => {
       const data = result.data;
       setMain(data.main);

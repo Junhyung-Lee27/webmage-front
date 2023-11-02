@@ -31,7 +31,7 @@ function MandaModal({ isOpen, onClose }) {
         success: false,
       };
   
-      const createResponse = await axios.post("http://127.0.0.1:8000/manda/create/", requestDataCreate, {
+      const createResponse = await axios.post(`${BASE_URL}/manda/create/`, requestDataCreate, {
         headers: {
           Authorization: `Token ${authToken}`,
         },
@@ -56,7 +56,7 @@ function MandaModal({ isOpen, onClose }) {
               subs: [{ id, sub_title, success: false }],
             };
   
-            const editPromise = axios.post("http://127.0.0.1:8000/manda/edit/sub/", requestDataEdit, {
+            const editPromise = axios.post(`${BASE_URL}/manda/edit/sub/`, requestDataEdit, {
               headers: {
                 Authorization: `Token ${authToken}`,
               },

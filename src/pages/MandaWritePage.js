@@ -9,10 +9,10 @@ function MandaWritePage() {
 
   // 각 사용자의 정보와 axios URL 설정
   const users = [
-    { id: 1, name: "User 1", axiosURL: "http://15.164.217.203:8000/manda/mandamain/1" },
-    { id: 2, name: "User 2", axiosURL: "http://15.164.217.203:8000/manda/mandamain/2" },
-    { id: 3, name: "User 3", axiosURL: "http://15.164.217.203:8000/manda/mandamain/3" },
-    { id: 4, name: "User 4", axiosURL: "http://15.164.217.203:8000/manda/mandamain/4" },
+    { id: 1, name: "User 1", axiosURL: `${BASE_URL}/manda/mandamain/1` },
+    { id: 2, name: "User 2", axiosURL: `${BASE_URL}/manda/mandamain/2` },
+    { id: 3, name: "User 3", axiosURL: `${BASE_URL}/manda/mandamain/3` },
+    { id: 4, name: "User 4", axiosURL: `${BASE_URL}/manda/mandamain/4` },
   ];
 
   return (

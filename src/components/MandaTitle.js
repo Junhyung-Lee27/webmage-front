@@ -18,7 +18,7 @@ function MandaTitle() {
 
   useEffect(() => {
     // API 요청을 보내어 데이터를 가져옵니다.
-    axios.get(`http://127.0.0.1:8000/manda/${userId}/`, {
+    axios.get(`${BASE_URL}/manda/${userId}/`, {
       headers: {
         Authorization: `Token ${authToken}`,
       }
