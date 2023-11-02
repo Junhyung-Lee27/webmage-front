@@ -9,13 +9,15 @@ import authpageReducer from "./authpageSlice";
 import settingpageReducer from "./settingpageSlice";
 import userReducer from "./userSlice";
 import searchReducer from './searchSlice'
+import feedReducer from './feedSlice'
 
 const rootReducer = combineReducers({
   user: userReducer,
   theme: themeReducer,
   authpage: authpageReducer,
   settingpage: settingpageReducer,
-  search: searchReducer
+  search: searchReducer,
+  feed: feedReducer,
 });
 
 const persistConfig = {

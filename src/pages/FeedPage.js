@@ -1,206 +1,239 @@
-import Feed from "../components/Feed";
-import styled from "styled-components";
-import { useSelector } from "react-redux";
-import { ThemeProvider } from "styled-components";
+import styled, { ThemeProvider } from "styled-components";
+import { useSelector, useDispatch } from "react-redux";
 import Header from "../components/Header";
-import theme from "../components/theme";
 import UserRecommend from "../components/UserRecommend";
+import Feed from "../components/Feed";
+import componentTheme from "../components/theme";
+import { useState, useEffect } from "react";
+import { setFeeds, clearFeeds } from "../store/feedSlice";
+import axios from "axios";
 import FeedWriteModal from "../components/FeedWriteModal";
 
-const feedInfo = [
-    {
-        userInfo: {
-            profile_img: process.env.PUBLIC_URL + "/testImg/profile1.jpg",
-            userName: "김도언",
-            userPosition: "ESTsoft 오르미 2기 강사",
-            isFallowing: false
-        },
-        contentInfo: {
-            id: 1,
-            content: "토요일 오전 알고리즘 보충수업",
-            main_title: "오르미 2기 모두 취업시키기",
-            sub_title: "교육생 알고리즘 역량 강화",
-            upload_date: new Date(2023, 9, 21, 3, 24, 0),
-            content_count: 2,
-            content_img: process.env.PUBLIC_URL + "/testImg/feedImg1.jpg",
-            post: "📢 주말 알고리즘 보충 수업에 참여해준 우리 오르미 여러분! 이번 주말에는 열심히 보충 수업을 진행했습니다. 새로운 내용과 풍부한 연습 문제로 더 나은 알고리즘 역량을 키워보세요. 이번 주에 배운 내용을 다시 한 번 리뷰하고, 미처 이해하지 못한 부분을 해결해보세요! 💪💡",
-            tags: [
-                "알고리즘",
-                "보충수업",
-                "교육생",
-                "프로그래밍",
-                "지식갱신",
-            ],
-            emoji_count: {
-                like: 10,
-                dislike: 0,
-                heart: 6,
-                smile: 4,
-                sad: 1,
-                angry: 1,
-            },
-            comment_info: [
-                {
-                    username: "오르미",
-                    comment: "오늘 수업 잘들었습니다!",
-                    upload_date: new Date(2023, 9, 21, 6, 18, 0),
-                },
-            ]
-        }
-    },
-    {
-        userInfo: {
-            profile_img: process.env.PUBLIC_URL + "/testImg/profile2.jpg",
-            userName: "오르미",
-            userPosition: "ESTsoft 오르미 2기",
-            isFallowing: false
-        },
-        contentInfo: {
-            id: 2,
-            content: "알고리즘 공부하기!",
-            main_title: "개발자로 취업하기",
-            sub_title: "알고리즘 실력 키우기",
-            upload_date: new Date(2023, 9, 20, 3, 24, 0),
-            content_count: 6,
-            content_img: process.env.PUBLIC_URL + "/testImg/feedImg2.jpg",
-            post: "우리 오르미 최고의 강사님이신 김도언 강사님께서 주말 보충 수업을 해주셨다. 이번주에 보충한 알고리즘은 DP인데, 항상 어렵게 느껴졌던 부분이라 더욱 집중해서 들었다. 강사님의 보충 수업을 들으니 이해가 잘 되는 것 같았다.",
-            tags: [
-                "오르미2기",
-                "남은기간화이팅",
-                "알고리즘",
-                "보충수업",
-            ],
-            emoji_count: {
-                like: 13,
-                dislike: 2,
-                heart: 4,
-                smile: 1,
-                sad: 0,
-                angry: 0,
-            },
-            comment_info: [
-                {
-                    username: "이스트",
-                    comment: "대단하세요!",
-                    upload_date: new Date(2023, 9, 21, 6, 18, 0),
-                },
-                {
-                    username: "김도언",
-                    comment: "잘 하고 계십니다",
-                    upload_date: new Date(2023, 9, 24, 1, 20, 0),
-                }
-            ]
-        }
-    }
-]
-
 function FeedPage() {
-    const currentTheme = useSelector((state) => state.theme.themes[state.theme.currentTheme]);
-    return (
-        <ThemeProvider theme={theme}>
-            <Header />
-            <Layout theme={currentTheme}>
-                <PageBox className="pageBox">
-                    <FlexBox>
-                        <Nav>
-                            <StyledText
-                                size="1rem"
-                                weight="700"
-                                color={currentTheme.border}
-                            >마이</StyledText>
-                            <StyledText
-                                size="1rem"
-                                weight="700"
-                                color={currentTheme.font1}
-                            >전체</StyledText>
-                        </Nav>
-                        <Feeds>
-                            {feedInfo.map((feed) => (
-                                <Feed
-                                    key={feed.contentInfo}
-                                    userInfo={feed.userInfo}
-                                    contentInfo={feed.contentInfo}
-                                />
-                            ))}
-                        </Feeds>
-                    </FlexBox>
-                    <Aside>
-                        <FeedWriteModal />
-                        <Recommend>
-                            <StyledText
-                                size="1rem"
-                                weight="700"
-                                color={currentTheme.font1}
-                                margin="0 0 0 1.5rem"
-                            >추천</StyledText>
-                            <UserRecommend />
-                            <UserRecommend />
-                            <UserRecommend />
-                            <UserRecommend />
-                            <UserRecommend />
-                            <UserRecommend />
-                        </Recommend>
-                    </Aside>
-                </PageBox>
-            </Layout>
-        </ThemeProvider>
-    );
+  let dispatch = useDispatch();
+
+  const colorTheme = useSelector((state) => state.theme.themes[state.theme.currentTheme]);
+  const filterTheme = useSelector((state) => state.theme.filters[state.theme.currentTheme]);
+  const theme = {
+    color: colorTheme,
+    filter: filterTheme,
+    component: componentTheme,
+  };
+
+  // 로딩 상태
+  const [loading, setLoading] = useState(true);
+
+  // 활성화된 탭을 추적하는 상태
+  const [activeTab, setActiveTab] = useState("마이");
+
+  // 피드 상태
+  const feeds = useSelector((state) => state.feed.feeds);
+  console.log(feeds);
+
+  const user = useSelector((state) => state.user);
+  const userId = user.userId;
+  const authToken = user.authToken;
+  const userHash = user.hash;
+
+  // 추천 유저 상태
+  const [recommUsers, setRecommUsers] = useState([]);
+  let users = recommUsers;
+
+  // 피드 정보 불러오기
+  useEffect(() => {
+    async function fetchFeedData() {
+      const response = await axios.get(`http://127.0.0.1:8000/feed/${userId}`, {
+        headers: {
+          Authorization: `Token ${authToken}`, // 헤더에 토큰 추가
+        },
+      });
+      dispatch(setFeeds(response.data));
+    }
+
+    async function fetchRecentFeeds() {
+      const response = await axios.get("http://127.0.0.1:8000/search/feeds", {
+        headers: {
+          Authorization: `Token ${authToken}`, // 헤더에 토큰 추가
+        },
+        params: {
+          query: "", // 공백으로 보내면 최근 생성된 피드 보내주도록 백엔드 구현되어 있음
+        },
+      });
+      dispatch(setFeeds(response.data));
+    }
+
+    if (activeTab === "마이") {
+      Promise.all([fetchFeedData()]).then(() => {
+        setLoading(false); // 데이터가 모두 로드되면 로딩 상태를 false로 설정
+      });
+    }
+    if (activeTab === "전체") {
+      Promise.all([fetchRecentFeeds()]).then(() => {
+        setLoading(false);
+      });
+    }
+    Promise.all([fetchFeedData()]).then(() => {
+      setLoading(false); // 데이터가 모두 로드되면 로딩 상태를 false로 설정
+    });
+  }, [activeTab]); // activeTab 값이 변경될 때마다 useEffect 실행
+
+  // 유저 데이터 불러오기
+  useEffect(() => {
+    async function fetchUserData() {
+      const response = await axios.get("http://127.0.0.1:8000/search/users/", {
+        headers: {
+          Authorization: `Token ${authToken}`, // 헤더에 토큰 추가
+        },
+        params: {
+          query: userHash,
+        },
+      });
+      setRecommUsers(response.data);
+    }
+    Promise.all([fetchUserData()]).then(() => {
+      setLoading(false); // 데이터가 모두 로드되면 로딩 상태를 false로 설정
+    });
+  }, []); // 빈 의존성 배열로 처음 마운트될 때 실행
+
+  // 로딩 중 표시
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
+  return (
+    <ThemeProvider theme={theme}>
+      <PageLayout>
+        <Header></Header>
+        <Body>
+          <Stadardized>
+            <FeedsNav>
+              <Nav>
+                <StyledText
+                  color={activeTab === "마이" ? theme.color.font1 : theme.color.border}
+                  onClick={() => setActiveTab("마이")}
+                >
+                  마이
+                </StyledText>
+                <StyledText
+                  color={activeTab === "전체" ? theme.color.font1 : theme.color.border}
+                  onClick={() => setActiveTab("전체")}
+                >
+                  전체
+                </StyledText>
+              </Nav>
+              <Feeds>
+                {feeds.map((feed) => (
+                  <Feed
+                    key={feed.contentInfo.id}
+                    userInfo={feed.userInfo}
+                    contentInfo={feed.contentInfo}
+                  />
+                ))}
+              </Feeds>
+            </FeedsNav>
+            <Aside>
+              <FeedWriteModal userId={userId} authToken={authToken} />
+              <StyledText color={theme.color.font1} cursor="default">
+                추천
+              </StyledText>
+              <Recommends>
+                {users.map((user) => (
+                  <UserRecommend key={user.id} user={user} />
+                ))}
+              </Recommends>
+            </Aside>
+          </Stadardized>
+        </Body>
+      </PageLayout>
+    </ThemeProvider>
+  );
 }
 
-let Layout = styled.div`
+let PageLayout = styled.div`
+  ${({ theme }) => theme.component.font.importPretendard};
+  font-family: Pretendard-Regular;
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  align-items:center;
-  gap: 160px;
-  background-color: ${(props) => props.theme.bg};
-  padding-top:2rem;
+  height: 100vh;
+  background-color: ${({ theme }) => theme.color.bg};
 `;
 
-let PageBox = styled.div`
-    display:flex;
-    flex-direction: row;
-    justify-content: center;
-    width: 1080px;
-    @media screen and (max-width: 1080px) {
-        width: 100vw;
-    }
-    gap:0.5rem;
-    padding:0 1rem;
-    ${({ theme }) => theme.font.importPretendard};
-    font-family: Pretendard-Regular;
+let Body = styled.div`
+  display: flex;
+  align-content: space-between;
+  justify-content: center;
+  width: 100%;
 `;
-let FlexBox = styled.div`
-    ${({ theme }) => theme.flexBox.columnLeftCenter};
-    width:100%;
+
+let Stadardized = styled.div`
+  display: flex;
+  justify-content: space-between;
+  width: 1080px;
+  gap: 32px;
+  margin-top: 40px;
+  margin-bottom: 80px;
 `;
-let Feeds = styled.div`
-    ${({ theme }) => theme.flexBox.columnCenterTop};
-    width:100%;
+
+let FeedsNav = styled.div`
+  width: 70%;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
 `;
-let StyledText = styled.span`
-    font-size: ${({ size }) => size};
-    font-weight: ${({ weight }) => weight};
-    color: ${({ color }) => color};
-    text-align: ${({ align }) => align};
-    margin: ${({ margin }) => margin};
-`;
-let Aside = styled.div`
-    ${({ theme }) => theme.flexBox.columnCenterTop};
-    width: 250px;
-    gap: 1.5rem;
-    margin-top:2rem;
-`;
-let Recommend = styled.div`
-    width:100%;
-    ${({ theme }) => theme.flexBox.columnLeftCenter};
-    gap:0.5rem;
-`;
+
 let Nav = styled.div`
-    width:100%;
-    ${({ theme }) => theme.flexBox.rowLeftCenter};
-    gap:1.5rem;
-    margin-left:3rem;
-`
+  display: flex;
+  gap: 1.5rem;
+  /* margin-left: 3rem; */
+`;
+
+let Feeds = styled.div`
+  width: 100%;
+  /* margin: 32px 0px 0px -40px; */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+`;
+
+let Aside = styled.aside`
+  width: 30%;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+`;
+
+let StyledText = styled.span`
+  width: 100%;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: ${({ color }) => color};
+  cursor: ${({ cursor = "pointer" }) => cursor};
+`;
+
+let Recommends = styled.div`
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-top: 8px;
+`;
+
+let StyledButton = styled.button`
+  height: 42px;
+  width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 34px;
+  margin-bottom: 32px;
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 20px;
+  color: white;
+  background-color: ${({ theme }) => theme.color.primary};
+  border: 1px solid ${({ theme }) => theme.color.primary};
+  border-radius: 8px;
+  outline: none;
+  cursor: pointer;
+`;
 
 export default FeedPage;

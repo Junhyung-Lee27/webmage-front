@@ -72,6 +72,8 @@ function Feed({ userInfo, contentInfo }) {
     setEmojiInfo(getEmojiInfo(contentInfo.emoji_count));
   }, [contentInfo]);
 
+  const imgUrl = "s3://webmage-bucket/img";
+
   return (
     <ThemeProvider theme={theme}>
       <FeedBox bgcolor={currentTheme.bg3}>
@@ -79,7 +81,7 @@ function Feed({ userInfo, contentInfo }) {
         <FeedHeader>
           <UserInfo>
             <ProfileImgWrapper>
-              <ProfileImg src={userInfo.profile_img} />
+              <ProfileImg src={`${imgUrl}/${userInfo.profile_img.replace(/'/g, "")}`} />
             </ProfileImgWrapper>
             <TextBox>
               <StyledText size="0.875rem" weight="600" color={currentTheme.font1}>
@@ -152,7 +154,7 @@ function Feed({ userInfo, contentInfo }) {
         {/*피드 본문*/}
         <FeedArticle>
           <PictureWrap>
-            <Picture src={contentInfo.content_img} />
+            <Picture src={`${imgUrl}/${contentInfo.content_img}`} />
           </PictureWrap>
           <StyledText size="1rem" weight="500" color={currentTheme.font1}>
             {contentInfo.post}
@@ -227,15 +229,18 @@ let FeedBox = styled.div`
   background-color: ${({ bgcolor }) => bgcolor};
   flex-direction: column;
   // box-shadow: 0px 0.5rem 1.5rem 0px rgba(0, 0, 0, 0.15);
-  width: calc(100% - 5rem);
+  /* width: calc(100% - 5rem); */
+  box-sizing: border-box;
+  width: 100%;
   padding: 1.75rem 2.5rem;
   margin: 1rem;
   border-radius: 0.5rem;
+  cursor: default;
 `;
 let FeedHeader = styled.div`
   ${({ theme }) => theme.flexBox.rowSpaceBetween};
   width: 100%;
-`;
+`;  
 let UserInfo = styled.div`
   ${({ theme }) => theme.flexBox.rowCenter};
   gap: 0.75rem;

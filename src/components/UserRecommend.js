@@ -55,8 +55,6 @@ let RecommendContainer = styled.div`
   box-sizing: border-box;
   box-shadow: 0px 8px 24px 0px rgba(0, 0, 0, 0.15);
   background-color: ${({ backgroundcolor }) => backgroundcolor};
-  /* 아래는 제거 필요 */
-  margin-left: 24px;
 `;
 
 let Row = styled.div`
