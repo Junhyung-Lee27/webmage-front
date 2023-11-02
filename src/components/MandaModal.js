@@ -5,8 +5,7 @@ import axios from "axios";
 
 function MandaModal({ isOpen, onClose }) {
   const user = useSelector((state) => state.user);
-
-  console.log(user);
+  const authToken = useSelector((state) => state.user.authToken);
 
   const [tableData, setTableData] = useState([
     ["", "", ""],
@@ -20,60 +19,67 @@ function MandaModal({ isOpen, onClose }) {
     setTableData(updatedTableData);
   };
 
-  const saveData = () => {
-    const requestDataCreate = {
-      user: 54,
-      main_title: tableData[1][1],
-      success: false,
-    };
-
-    // 인증 토큰을 헤더에 추가
-    const headers = {
-      Authorization: "Bearer " + user.token, // 사용자의 토큰을 넣어주세요
-    };
-
-    axios
-      .post("http://15.164.217.203:8000/manda/create", requestDataCreate, { headers })
-      .then((response) => {
-        console.log(response.data);
-        // POST 요청이 성공하면 다음 POST 요청을 보냅니다.
-        return Promise.all(
-          tableData.map((row, rowIndex) => {
-            return Promise.all(
-              row.map((cell, cellIndex) => {
-                if (cellIndex !== 4) {
-                  const main_id = 7;
-                  const id = main_id * 10 + (cellIndex < 4 ? 3 : 2) + cellIndex;
-                  const sub_title = cell;
-
-                  const requestDataEdit = {
-                    subs: [{ id, main_id, success: false, sub_title }],
-                  };
-
-                  // 인증 토큰을 헤더에 추가
-                  const headers = {
-                    Authorization: "Bearer " + user.token, // 사용자의 토큰을 넣어주세요
-                  };
-
-                  return axios.post("http://15.164.217.203:8000/manda/edit/sub", requestDataEdit, {
-                    headers,
-                  });
-                }
-              })
-            );
-          })
-        );
-      })
-      .then((responses) => {
-        console.log(responses);
-        // 모든 POST 요청이 성공하면 실행할 코드
-      })
-      .catch((error) => {
-        console.error(error);
-        // 요청이 실패한 경우 실행할 코드
+  const saveData = async () => {
+    try {
+      // 토큰을 가져오는 부분 (유사한 방식으로 토큰을 받아온다)
+      // const authToken = useSelector((state) => state.user.authToken);
+  
+      // 데이터 생성 요청 설정
+      const requestDataCreate = {
+        user: user.userId,
+        main_title: tableData[1][1],
+        success: false,
+      };
+  
+      const createResponse = await axios.post("http://15.164.217.203:8000/manda/create/", requestDataCreate, {
+        headers: {
+          Authorization: `Token ${authToken}`,
+        },
       });
-  };
+  
+      const mainId = createResponse.data.main.id;
 
+      console.log("Create Response:", createResponse.data);
+  
+      // 각 셀의 데이터를 수정 요청으로 보내는 부분
+      const editPromises = [];
+  
+      tableData.forEach((row, rowIndex) => {
+        row.forEach((cell, cellIndex) => {
+          if (cellIndex !== 4) {
+            // const main_id = createResponse.data.main.main.id;
+            const adjustedCellIndex = rowIndex * 3 + cellIndex;
+            const id = (mainId-1) * 8 + (adjustedCellIndex < 5 ? 1 : 0) + adjustedCellIndex;
+            const sub_title = cell;
+  
+            const requestDataEdit = {
+              subs: [{ id, sub_title, success: false }],
+            };
+  
+            const editPromise = axios.post("http://15.164.217.203:8000/manda/edit/sub/", requestDataEdit, {
+              headers: {
+                Authorization: `Token ${authToken}`,
+              },
+            });
+  
+            editPromises.push(editPromise);
+          }
+        });
+      });
+  
+      const editResponses = await Promise.all(editPromises);
+      console.log("Edit Responses:", editResponses);
+
+      onClose(mainId);
+  
+      // 모든 POST 요청이 성공하면 실행할 코드
+    } catch (error) {
+      console.error("오류 발생:", error);
+      // 요청이 실패한 경우 실행할 코드
+    }
+  }
+
+  
   const getPlaceholder = (cellIndex) => {
     if (cellIndex === 4) {
       return "핵심목표";
