@@ -8,12 +8,14 @@ import themeReducer from "./themeSlice";
 import authpageReducer from "./authpageSlice";
 import settingpageReducer from "./settingpageSlice";
 import userReducer from "./userSlice";
+import searchReducer from './searchSlice'
 
 const rootReducer = combineReducers({
   user: userReducer,
   theme: themeReducer,
   authpage: authpageReducer,
   settingpage: settingpageReducer,
+  search: searchReducer
 });
 
 const persistConfig = {

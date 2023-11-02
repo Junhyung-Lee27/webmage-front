@@ -1,19 +1,19 @@
 import styled, { ThemeProvider } from "styled-components";
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import componentTheme from "./theme";
 import ThemeSwitch from "../components/ThemeSwitch";
 import Notification from "./Notification";
 
 import { logout } from "../services/authService";
 import { setIsLoggedIn, resetUserState } from "../store/userSlice";
-import { useNavigate } from "react-router-dom";
 import { persistor } from "../store/store";
+import { setSearchResults, clearSearchResults } from "../store/searchSlice";
 
 import axios from "axios";
 
-function Header(props) {
+function Header() {
   let navigate = useNavigate();
   let dispatch = useDispatch();
 
@@ -58,24 +58,33 @@ function Header(props) {
   const authToken = useSelector((state) => state.user.authToken);
   
   // 서버에 검색 요청
-  const handleSearch = async (event) => {
+  const handleSearch = async (event, isNavLink = false) => {
+    let queryTerm = isNavLink ? "" : searchTerm;
+    
     // Enter 키의 keyCode는 13입니다.
-    if (event.key === "Enter" && searchTerm.trim()) {
+    if (event.key === "Enter" || isNavLink) {
+      if (queryTerm.trim() || isNavLink) {
+      // '/search' 페이지가 아닌 경우 이동
+      if (window.location.pathname !== "/search") {
+        navigate("/search");
+      }
+
       try {
         const response = await axios.get("http://127.0.0.1:8000/search", {
           headers: {
             Authorization: `Token ${authToken}`, // 헤더에 토큰 추가
           },
           params: {
-            query: searchTerm,
+            query: queryTerm,
           },
         });
-        props.setSearchResults(response.data);
+        dispatch(setSearchResults(response.data));
       } catch (error) {
         console.error("검색 중 오류 발생:", error);
       }
     }
   };
+}
 
   return (
     <ThemeProvider theme={combinedTheme}>
@@ -92,7 +101,15 @@ function Header(props) {
               <StyledLink to="/feed" activeclassname="active">
                 피드
               </StyledLink>
-              <StyledLink to="/search" activeclassname="active">
+              <StyledLink
+                to="/search"
+                activeclassname="active"
+                onClick={(e) => {
+                  // 이벤트 버블링을 방지하여 NavLink의 기본 동작에 방해되지 않게 합니다.
+                  e.stopPropagation();
+                  handleSearch(e, true);
+                }}
+              >
                 탐색
               </StyledLink>
               <StyledLink to="/chat" activeclassname="active">
