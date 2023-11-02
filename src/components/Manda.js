@@ -16,7 +16,7 @@ function Manda() {
 
   useEffect(() => {
     
-    axios.get("http://15.164.217.203:8000/manda/mandamain/3")
+    axios.get("http://127.0.0.1:8000/manda/mandamain/17")
     .then((result) => {
       const data = result.data;
       setMain(data.main);
