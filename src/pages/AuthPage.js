@@ -52,7 +52,6 @@ let PageLayout = styled.div`
   align-items: center;
   height: 100vh;
   gap: 80px;
-  margin-right: 60px;
   background-color: ${({ theme }) => theme.color.bg};
 `;
 

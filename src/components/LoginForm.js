@@ -7,12 +7,14 @@ import { useNavigate } from "react-router-dom";
 
 import { useDispatch, useSelector } from "react-redux";
 import { showSignup, showForgotPassword } from "../store/authpageSlice";
-import { setUser, setAuthToken, setCsrfToken, setIsLoggedIn } from '../store/userSlice';
+import { setUser, setAuthToken, setCsrfToken, setIsLoggedIn } from "../store/userSlice";
 
 import { setCookie } from "../services/cookie";
+import axios from "axios";
+import { BASE_URL } from "./../config";
 
 function LoginForm() {
-    let navigate = useNavigate();
+  let navigate = useNavigate();
   const dispatch = useDispatch();
 
   // 입력값 상태 관리
@@ -26,32 +28,44 @@ function LoginForm() {
   const handleLoginClick = async () => {
     // csrf token
     const csrfTokenResponse = await getCsrfToken();
-    
 
     if (csrfTokenResponse.success && csrfTokenResponse.csrfToken) {
       const csrfToken = csrfTokenResponse.csrfToken;
-      
+
       dispatch(setCsrfToken(csrfToken));
-      console.log(csrfToken);
 
       // 쿠키에 저장
-      setCookie('csrftoken', csrfToken, {
-        path: '/',
-      })
-
+      setCookie("csrftoken", csrfToken, {
+        path: "/",
+      });
     } else if (csrfTokenResponse.error) {
-      alert(csrfTokenResponse.error)
+      alert(csrfTokenResponse.error);
     }
-    
-    
-
 
     const loginResponse = await login(username, password);
     if (loginResponse.success && loginResponse.token) {
-      dispatch(setUser({username:username}));
+      // 현재는 편의를 위해 이렇게 로컬스토리지에 저장하지만,
+      // 나중에는 보안을 위해 필요할 때 서버에서 불러오는 방식으로 변경되어야 할 필요가 있음!!
+      try {
+        const userResponse = await axios.get(`${BASE_URL}/user/profile/${loginResponse.userId}`);
+        dispatch(
+          setUser({
+            userId: userResponse.data.user_id,
+            username: userResponse.data.username,
+            userImg: userResponse.data.user_img,
+            position: userResponse.data.user_position,
+            info: userResponse.data.user_info,
+            hash: userResponse.data.user_hash,
+            email: userResponse.data.user_email,
+            successCount: userResponse.data.success_count,
+          })
+        );
+      } catch (error) {
+        console.error(error);
+      }
       dispatch(setAuthToken(loginResponse.token));
-      dispatch(setIsLoggedIn(true))
-      navigate("/manda");
+      dispatch(setIsLoggedIn(true));
+      navigate("/"); // 로그인 화면으로 이동
     } else if (loginResponse.error) {
       alert(loginResponse.error);
     }
@@ -65,6 +79,9 @@ function LoginForm() {
     filter: filterTheme,
     component: componentTheme,
   };
+
+  // 소셜 로그인 모달
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   return (
     <ThemeProvider theme={theme}>
@@ -119,7 +136,7 @@ function LoginForm() {
           </StyledText>
         </Row>
         <LineText>간편 로그인</LineText>
-        <Column>
+        <NotyetContainer onClick={() => setIsModalOpen(true)}>
           <Row margin="16px 0px 0px 0px">
             <LogoWrap backgroundcolor="#FFFFFF" border={`1px solid ${theme.color.font2}`}>
               <SocialLogo
@@ -140,9 +157,30 @@ function LoginForm() {
               ></SocialLogo>
             </LogoWrap>
           </Row>
-        </Column>
+        </NotyetContainer>
       </Column>
+      {isModalOpen === true && (
+        <SocialLogin theme={theme} setIsModalOpen={setIsModalOpen}></SocialLogin>
+      )}
     </ThemeProvider>
+  );
+}
+
+function SocialLogin({ theme, setIsModalOpen }) {
+  return (
+    <ModalOverlay>
+      <ModalContent>
+        <ModalTitle>🚧편리한 서비스 이용을 위해 간편 로그인 기능을 준비중입니다🚧</ModalTitle>
+        <ModifiedBtn
+          color={theme.color.font1}
+          backgroundcolor={theme.color.bg3}
+          border="none"
+          onClick={() => setIsModalOpen(false)}
+        >
+          확인
+        </ModifiedBtn>
+      </ModalContent>
+    </ModalOverlay>
   );
 }
 
@@ -202,6 +240,12 @@ let StyledButton = styled.button`
   cursor: pointer;
 `;
 
+let ModifiedBtn = styled(StyledButton)`
+  width: 100%;
+  color: white;
+  margin: initial;
+`;
+
 let LogoWrap = styled.div`
   ${({ theme }) => theme.component.iconSize.large};
   border-radius: 50%;
@@ -244,6 +288,45 @@ const LineText = styled.div`
   &:after {
     margin-left: 0.5em;
   }
+`;
+
+let NotyetContainer = styled.div`
+  width: 100%;
+  cursor: pointer;
+`;
+
+let ModalOverlay = styled.div`
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.7); /* 검정색 배경에 70% 투명도 */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+`;
+
+let ModalContent = styled.div`
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  background-color: ${({ theme }) => theme.color.bg};
+  padding: 56px 80px;
+  border-radius: 8px;
+  width: 808px;
+  max-height: 100%;
+`;
+
+let ModalTitle = styled.span`
+  font-size: 20px;
+  font-weight: 700;
+  color: ${({ theme }) => theme.color.font1};
+  margin-bottom: 40px;
+  text-align: center;
+  width: 100%;
 `;
 
 export default LoginForm;

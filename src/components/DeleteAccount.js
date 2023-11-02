@@ -2,10 +2,11 @@ import styled, { ThemeProvider } from "styled-components";
 import { useSelector, useDispatch } from "react-redux";
 import componentTheme from "./theme";
 import { showAccountView } from "./../store/settingpageSlice";
-import { resetUserState } from "./../store/userSlice";
+import { setIsLoggedIn, resetUserState } from "./../store/userSlice";
 import { useNavigate } from "react-router-dom";
 import { deleteUser } from "./../services/authService";
-import { getCookie } from "../services/cookie";
+import { useState } from "react";
+import { persistor } from "../store/store"
 
 function DeleteAccount() {
   // 테마
@@ -18,19 +19,26 @@ function DeleteAccount() {
   const dispatch = useDispatch(); // 스토어 상태 업데이트
   const navigate = useNavigate(); // 화면 네이게이터
 
-  // get csrfToken
-  // const csrfToken = useSelector((state) => state.user.csrfToken);
-  // console.log(csrfToken);
+  // get authToken
+  const authToken = useSelector((state) => state.user.authToken);
 
-  const csrfToken = getCookie('csrftoken');
+  // 패스워드 입력 상태
+  const [password, setPassword] = useState("")
 
   // 회원탈퇴 요청
-  const handleDeleteUser = async (csrfToken) => {
-    const response = await deleteUser(csrfToken);
+  const handleDeleteUser = async (authToken) => {
+    const response = await deleteUser(authToken, password);
     // 회원탈퇴 성공했을 경우
     if (response.success) {
+      dispatch(setIsLoggedIn(false)); // 로그인 여부 false
       dispatch(resetUserState()); // 유저 상태 초기화
+
       navigate("/"); // 로그인 화면으로 이동
+
+      // 로컬스토리지에 저장된 유저 데이터 삭제
+      setTimeout(() => {
+        persistor.purge();
+      }, 2000);
     } else if (response.error) {
       alert(response.error);
     }
@@ -58,7 +66,12 @@ function DeleteAccount() {
           >
             안전한 탈퇴를 위해 비밀번호를 입력해주세요.
           </StyledText>
-          <StyledForm type="password" placeholder="비밀번호 입력"></StyledForm>
+          <StyledForm
+            type="password"
+            placeholder="비밀번호 입력"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+          ></StyledForm>
           <StyledText
             fontsize="16px"
             fontweight="600"
@@ -77,7 +90,7 @@ function DeleteAccount() {
               취소
             </StyledButton>
             <StyledButton
-              onClick={() => handleDeleteUser(csrfToken)}
+              onClick={() => handleDeleteUser(authToken)}
               color="white"
               backgroundcolor="#FF4C4C"
             >

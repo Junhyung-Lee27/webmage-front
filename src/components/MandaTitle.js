@@ -1,5 +1,6 @@
 import axios from "axios";
-import { useState } from "react";
+import { BASE_URL } from "./../config";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 import styled, { ThemeProvider } from "styled-components";
 import theme from "./theme";
@@ -12,7 +13,27 @@ function MandaTitle() {
   const [selectedTitle, setSelectedTitle] = useState(null);
   const navigate = useNavigate();
 
-  const titles = ["8구단 드래프트 1순위", "프론트엔드 개발자 취업", "백엔드 개발자 이직"]; 
+  const [titles, setTitles] = useState([]);
+  const userId = useSelector((state) => state.user.userId);
+  const authToken = useSelector((state) => state.user.authToken);
+
+  useEffect(() => {
+    // API 요청을 보내어 데이터를 가져옵니다.
+    axios.get(`${BASE_URL}/manda/${userId}/`, {
+      headers: {
+        Authorization: `Token ${authToken}`,
+      }
+    })
+      .then((response) => {
+        // main_title 필드만 추출하여 titles 상태 업데이트
+        const data = response.data;
+        const mainTitles = data.map((item) => item.main_title);
+        setTitles(mainTitles);
+      })
+      .catch((error) => {
+        console.error('데이터를 불러오는 동안 오류가 발생했습니다: ', error);
+      });
+  }, [userId, authToken]);
 
   const toggleDropdown = () => {
     setIsOpen(!isOpen);
@@ -23,6 +44,8 @@ function MandaTitle() {
     setIsOpen(false);
     // 여기에서 선택한 표 제목에 따라 다른 동작을 수행할 수 있습니다.
   };
+
+  
 
   return (
     <ThemeProvider theme={theme}>

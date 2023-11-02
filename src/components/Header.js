@@ -1,14 +1,18 @@
 import styled, { ThemeProvider } from "styled-components";
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import componentTheme from "./theme";
 import ThemeSwitch from "../components/ThemeSwitch";
 import Notification from "./Notification";
 
 import { logout } from "../services/authService";
 import { setIsLoggedIn, resetUserState } from "../store/userSlice";
-import { useNavigate } from "react-router-dom";
+import { persistor } from "../store/store";
+import { setSearchResults, clearSearchResults } from "../store/searchSlice";
+import { BASE_URL } from "./../config";
+
+import axios from "axios";
 
 function Header() {
   let navigate = useNavigate();
@@ -23,7 +27,7 @@ function Header() {
     component: componentTheme,
   };
 
-  // 상태관리
+  // 알림 컴포넌트 상태관리
   const [isNotiVisible, setIsNotiVisible] = useState(false);
 
   // 로그아웃 요청
@@ -32,11 +36,56 @@ function Header() {
     if (response.success) {
       dispatch(setIsLoggedIn(false)); // 로그인 여부 false
       dispatch(resetUserState()); // 유저 상태 초기화
+
       navigate("/"); // 로그인 화면으로 이동
+
+      // 로컬스토리지에 저장된 유저 데이터 삭제
+      setTimeout(() => {
+        persistor.purge();
+      }, 2000);
     } else if (response.error) {
       alert(response.error);
     }
   };
+
+  // 검색어 상태
+  const [searchTerm, setSearchTerm] = useState("");
+
+  const handleInputChange = (event) => {
+    setSearchTerm(event.target.value);
+  };
+
+  // get authToken
+  const authToken = useSelector((state) => state.user.authToken);
+  
+  // 서버에 검색 요청
+  const handleSearch = async (event, isNavLink = false) => {
+    let queryTerm = isNavLink ? "" : searchTerm;
+    
+    // Enter 키의 keyCode는 13입니다.
+    if (event.key === "Enter" || isNavLink) {
+      if (queryTerm.trim() || isNavLink) {
+      // '/search' 페이지가 아닌 경우 이동
+      if (window.location.pathname !== "/search") {
+        navigate("/search");
+      }
+
+      try {
+        const response = await axios.get(`${BASE_URL}/search`, {
+          headers: {
+            Authorization: `Token ${authToken}`, // 헤더에 토큰 추가
+          },
+          params: {
+            query: queryTerm,
+          },
+        });
+        dispatch(setSearchResults(response.data));
+      } catch (error) {
+        console.error("검색 중 오류 발생:", error);
+      }
+    }
+  };
+}
 
   return (
     <ThemeProvider theme={combinedTheme}>
@@ -53,7 +102,15 @@ function Header() {
               <StyledLink to="/feed" activeclassname="active">
                 피드
               </StyledLink>
-              <StyledLink to="/search" activeclassname="active">
+              <StyledLink
+                to="/search"
+                activeclassname="active"
+                onClick={(e) => {
+                  // 이벤트 버블링을 방지하여 NavLink의 기본 동작에 방해되지 않게 합니다.
+                  e.stopPropagation();
+                  handleSearch(e, true);
+                }}
+              >
                 탐색
               </StyledLink>
               <StyledLink to="/chat" activeclassname="active">
@@ -62,7 +119,14 @@ function Header() {
             </Row>
           </Row>
           <Row gap="20px">
-            <SearchBox type="text" placeholder="검색" id="search-box" />
+            <SearchBox
+              type="text"
+              placeholder="검색"
+              id="search-box"
+              value={searchTerm}
+              onChange={handleInputChange}
+              onKeyDown={handleSearch}
+            />
             <Row gap="16px">
               <NotiIconWrapper>
                 <LargeIcon

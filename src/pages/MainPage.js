@@ -8,6 +8,8 @@ import theme from "../components/theme";
 
 function MainPage() {
   const currentTheme = useSelector((state) => state.theme.themes[state.theme.currentTheme]);
+  const user = useSelector((state) => state.user)
+  console.log(user);
 
   const todoInfo = [
     {

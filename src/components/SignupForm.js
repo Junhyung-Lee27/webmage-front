@@ -5,6 +5,8 @@ import { showLogin } from "../store/authpageSlice";
 import { useNavigate } from "react-router-dom";
 import { signup, login } from "../services/authService";
 import { setIsLoggedIn, setUser, setAuthToken } from "../store/userSlice";
+import axios from "axios";
+import { BASE_URL } from "./../config";
 
 function SignupForm() {
   const dispatch = useDispatch();
@@ -28,11 +30,29 @@ function SignupForm() {
     if (signupResponse.success) {
       // 로그인 시도
       const loginResponse = await login(username, password);
+      
       if (loginResponse.success) {
-        dispatch(setUser({ username: username, email: email }));
+        try {
+          const userResponse = await axios.get(`${BASE_URL}/user/profile/${loginResponse.userId}`);
+          dispatch(
+            setUser({
+              userId: userResponse.data.user_id,
+              username: username,
+              userImg: "",
+              position: "",
+              info: "",
+              hash: "",
+              email: email,
+              successCount: 0,
+            })
+          );
+        } catch (error) {
+          console.error(error);
+        }
+
         dispatch(setAuthToken(loginResponse.token));
         dispatch(setIsLoggedIn(true));
-        navigate("/")
+        navigate("/");
       } else if (loginResponse.error) {
         alert("로그인에 실패했습니다. 잠시 후 다시 시도해주세요.");
       }
