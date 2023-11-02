@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import styled, { ThemeProvider } from "styled-components";
 import theme from "./theme";
 import { useSelector } from "react-redux";
-
+import { BASE_URL } from "./../config";
 
 function Manda() {
 
@@ -16,23 +16,24 @@ function Manda() {
 
   useEffect(() => {
     
-    axios.get("http://15.164.217.203:8000/manda/mandamain/3")
-    .then((result) => {
-      const data = result.data;
-      setMain(data.main);
-      setSubs(data.subs);
-      
-      // contents 8개씩 묶기
-      const groupSize = 8;
-      const contentsGroup = [];
-      for (let i = 0; i < data.contents.length; i += groupSize) {
-        contentsGroup.push(data.contents.slice(i, i + groupSize));
-      }
-      setContents(contentsGroup);
-    })
-    .catch(()=>{
-      console.log('ajax 요청 실패');
-    });
+    axios
+      .get(`${BASE_URL}/manda/mandamain/3`)
+      .then((result) => {
+        const data = result.data;
+        setMain(data.main);
+        setSubs(data.subs);
+
+        // contents 8개씩 묶기
+        const groupSize = 8;
+        const contentsGroup = [];
+        for (let i = 0; i < data.contents.length; i += groupSize) {
+          contentsGroup.push(data.contents.slice(i, i + groupSize));
+        }
+        setContents(contentsGroup);
+      })
+      .catch(() => {
+        console.log("ajax 요청 실패");
+      });
   }, []);
 
   // 특정 테이블의 cell을 가져오는 함수

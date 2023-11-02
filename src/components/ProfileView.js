@@ -3,6 +3,7 @@ import { useState, useRef } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import componentTheme from "./theme";
 import axios from "axios";
+import { BASE_URL } from "./../config";
 import { setUser } from "../store/userSlice";
 
 function ProfileView() {
@@ -107,11 +108,7 @@ function ProfileEdit({ user, setIsEditing }) {
 
     // 프로필 생성 요청
     try {
-      const response = await axios.post(
-        "http://127.0.0.1:8000/user/profile/write",
-        formData,
-        axiosConfig
-      );
+      const response = await axios.post(`${BASE_URL}/user/profile/write`, formData, axiosConfig);
 
       // 프로필정보 생성 성공했을 경우
       if (response.status === 201) {
@@ -136,7 +133,7 @@ function ProfileEdit({ user, setIsEditing }) {
       if (error.response && error.response.status === 400) {
         try {
           const editResponse = await axios.patch(
-            "http://127.0.0.1:8000/user/profile/edit",
+            `${BASE_URL}/user/profile/edit`,
             formData,
             axiosConfig
           );

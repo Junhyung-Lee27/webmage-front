@@ -10,6 +10,7 @@ import { logout } from "../services/authService";
 import { setIsLoggedIn, resetUserState } from "../store/userSlice";
 import { persistor } from "../store/store";
 import { setSearchResults, clearSearchResults } from "../store/searchSlice";
+import { BASE_URL } from "./../config";
 
 import axios from "axios";
 
@@ -70,7 +71,7 @@ function Header() {
       }
 
       try {
-        const response = await axios.get("http://127.0.0.1:8000/search", {
+        const response = await axios.get(`${BASE_URL}/search`, {
           headers: {
             Authorization: `Token ${authToken}`, // 헤더에 토큰 추가
           },

@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useSelector } from "react-redux";
 import styled, { ThemeProvider } from "styled-components";
 import axios from "axios";
+import { BASE_URL } from "./../config";
 
 function MandaModal({ isOpen, onClose }) {
   const user = useSelector((state) => state.user);
@@ -33,7 +34,7 @@ function MandaModal({ isOpen, onClose }) {
     };
 
     axios
-      .post("http://15.164.217.203:8000/manda/create", requestDataCreate, { headers })
+      .post(`${BASE_URL}/manda/create`, requestDataCreate, { headers })
       .then((response) => {
         console.log(response.data);
         // POST 요청이 성공하면 다음 POST 요청을 보냅니다.
@@ -55,7 +56,7 @@ function MandaModal({ isOpen, onClose }) {
                     Authorization: "Bearer " + user.token, // 사용자의 토큰을 넣어주세요
                   };
 
-                  return axios.post("http://15.164.217.203:8000/manda/edit/sub", requestDataEdit, {
+                  return axios.post(`${BASE_URL}/manda/edit/sub`, requestDataEdit, {
                     headers,
                   });
                 }

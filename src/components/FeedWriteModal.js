@@ -10,6 +10,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import theme from "./theme";
 
 import axios from "axios";
+import { BASE_URL } from "./../config";
 
 function FeedWriteModal({ userId, authToken }) {
   const currentTheme = useSelector((state) => state.theme.themes[state.theme.currentTheme]);
@@ -60,7 +61,7 @@ function FeedWriteModal({ userId, authToken }) {
     // 핵심목표 가져오기
     const fetchMainOptions = async () => {
       try {
-        const response = await axios.get(`http://127.0.0.1:8000/manda/${userId}/`, {
+        const response = await axios.get(`${BASE_URL}/manda/${userId}/`, {
           headers: {
             Authorization: `Token ${authToken}`, // 헤더에 토큰 추가
           },
@@ -80,14 +81,11 @@ function FeedWriteModal({ userId, authToken }) {
       // subOptions, contOptions 가져오기
       const fetchSubsAndContents = async () => {
         try {
-          const response = await axios.get(
-            `http://127.0.0.1:8000/manda/mandamain/${selectedMainOption.id}`,
-            {
-              headers: {
-                Authorization: `Token ${authToken}`, // 헤더에 토큰 추가
-              },
-            }
-          );
+          const response = await axios.get(`${BASE_URL}/manda/mandamain/${selectedMainOption.id}`, {
+            headers: {
+              Authorization: `Token ${authToken}`, // 헤더에 토큰 추가
+            },
+          });
           setSubsOptions(response.data.subs);
           setContentsOptions(response.data.contents);
         } catch (error) {
@@ -127,7 +125,7 @@ function FeedWriteModal({ userId, authToken }) {
     formData.append("cont_id", selectedContent?.id || "");
 
     try {
-      const response = await axios.post("http://127.0.0.1:8000/feed/write/", formData, {
+      const response = await axios.post(`${BASE_URL}/feed/write/`, formData, {
         headers: {
           Authorization: `Token ${authToken}`,
           "Content-Type": "multipart/form-data",

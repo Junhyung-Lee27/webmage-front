@@ -11,6 +11,7 @@ import { setUser, setAuthToken, setCsrfToken, setIsLoggedIn } from "../store/use
 
 import { setCookie } from "../services/cookie";
 import axios from "axios";
+import { BASE_URL } from "./../config";
 
 function LoginForm() {
   let navigate = useNavigate();
@@ -46,9 +47,7 @@ function LoginForm() {
       // 현재는 편의를 위해 이렇게 로컬스토리지에 저장하지만,
       // 나중에는 보안을 위해 필요할 때 서버에서 불러오는 방식으로 변경되어야 할 필요가 있음!!
       try {
-        const userResponse = await axios.get(
-          `http://127.0.0.1:8000/user/profile/${loginResponse.userId}`
-        );
+        const userResponse = await axios.get(`${BASE_URL}/user/profile/${loginResponse.userId}`);
         dispatch(
           setUser({
             userId: userResponse.data.user_id,

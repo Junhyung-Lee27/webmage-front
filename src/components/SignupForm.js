@@ -6,6 +6,7 @@ import { useNavigate } from "react-router-dom";
 import { signup, login } from "../services/authService";
 import { setIsLoggedIn, setUser, setAuthToken } from "../store/userSlice";
 import axios from "axios";
+import { BASE_URL } from "./../config";
 
 function SignupForm() {
   const dispatch = useDispatch();
@@ -32,9 +33,7 @@ function SignupForm() {
       
       if (loginResponse.success) {
         try {
-          const userResponse = await axios.get(
-            `http://127.0.0.1:8000/user/profile/${loginResponse.userId}`
-          );
+          const userResponse = await axios.get(`${BASE_URL}/user/profile/${loginResponse.userId}`);
           dispatch(
             setUser({
               userId: userResponse.data.user_id,

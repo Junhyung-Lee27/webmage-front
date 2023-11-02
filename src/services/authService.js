@@ -1,9 +1,10 @@
 import axios from "axios";
+import { BASE_URL } from "./../config";
 
 // 토큰 가져오기
 export const getCsrfToken = async () => {
   try {
-    const response = await axios.get("http://127.0.0.1:8000/get_token/");
+    const response = await axios.get(`${BASE_URL}/get_token/`);
 
     if (response.status === 200) {
       return { success: true, csrfToken: response.data.csrf_token };
@@ -25,7 +26,7 @@ export const signup = async (username, email, password, passwordCheck) => {
 
   // 비밀번호 일치할 경우
   try {
-    const response = await axios.post("http://127.0.0.1:8000/user/signup/", {
+    const response = await axios.post(`${BASE_URL}/user/signup/`, {
       username,
       email,
       password,
@@ -47,7 +48,7 @@ export const signup = async (username, email, password, passwordCheck) => {
 // 로그인
 export const login = async (username, password) => {
   try {
-    const response = await axios.post("http://127.0.0.1:8000/user/login/", {
+    const response = await axios.post(`${BASE_URL}/user/login/`, {
       username,
       password,
     });
@@ -67,7 +68,7 @@ export const login = async (username, password) => {
 // 로그아웃
 export const logout = async () => {
   try {
-    const response = await axios.post("http://127.0.0.1:8000/user/logout/");
+    const response = await axios.post(`${BASE_URL}/user/logout/`);
 
     if (response.status === 200) {
       return { success: true };
@@ -102,7 +103,7 @@ export const editAccount = async (username, email, password, passwordCheck, auth
 
     try {
       const response = await axios.patch(
-        "http://127.0.0.1:8000/user/edit/",
+        `${BASE_URL}/user/edit/`,
         requestData,
         axiosConfig
       );
@@ -122,7 +123,7 @@ export const editAccount = async (username, email, password, passwordCheck, auth
 // 회원탈퇴
 export const deleteUser = async (authToken, password) => {
   try {
-    const response = await axios.delete("http://127.0.0.1:8000/user/delete-user/", {
+    const response = await axios.delete(`${BASE_URL}/user/delete-user/`, {
       headers: {
         accept: "application/json",
         Authorization: `Token ${authToken}`,

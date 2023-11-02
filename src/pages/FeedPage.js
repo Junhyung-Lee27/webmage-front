@@ -7,6 +7,7 @@ import componentTheme from "../components/theme";
 import { useState, useEffect } from "react";
 import { setFeeds, clearFeeds } from "../store/feedSlice";
 import axios from "axios";
+import { BASE_URL } from "./../config";
 import FeedWriteModal from "../components/FeedWriteModal";
 
 function FeedPage() {
@@ -42,7 +43,8 @@ function FeedPage() {
   // 피드 정보 불러오기
   useEffect(() => {
     async function fetchFeedData() {
-      const response = await axios.get(`http://127.0.0.1:8000/feed/${userId}`, {
+      const response = await axios.get(`import { BASE_URL } from "./../config";
+/feed/${userId}`, {
         headers: {
           Authorization: `Token ${authToken}`, // 헤더에 토큰 추가
         },
@@ -51,7 +53,7 @@ function FeedPage() {
     }
 
     async function fetchRecentFeeds() {
-      const response = await axios.get("http://127.0.0.1:8000/search/feeds", {
+      const response = await axios.get(`${BASE_URL}/search/feeds`, {
         headers: {
           Authorization: `Token ${authToken}`, // 헤더에 토큰 추가
         },
@@ -80,7 +82,7 @@ function FeedPage() {
   // 유저 데이터 불러오기
   useEffect(() => {
     async function fetchUserData() {
-      const response = await axios.get("http://127.0.0.1:8000/search/users/", {
+      const response = await axios.get(`${BASE_URL}/search/users/`, {
         headers: {
           Authorization: `Token ${authToken}`, // 헤더에 토큰 추가
         },
