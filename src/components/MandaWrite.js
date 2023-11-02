@@ -30,7 +30,7 @@ async function fetchMandaData(mainId) {
 }
 
 
-function MandaWrite2() {
+function MandaWrite() {
   const currentTheme = useSelector((state) => state.theme.themes[state.theme.currentTheme]);
 
   const user = useSelector((state) => state.user);
@@ -127,22 +127,23 @@ function MandaWrite2() {
                           <TableCell
                             type="text"
                             maxLength="8"
+                            onChange={(e) => handleCellChange(tableIndex, rowIndex, cellIndex, e.target.value)}
                             value={
                               tableIndex === 4
                                 ? rowIndex === 1 && cellIndex === 1
-                                  ? data?.main_title
+                                  ? data?.main_title || ''
                                   : rowIndex === 0
-                                  ? data?.subs[rowIndex * 3 + cellIndex]?.sub_title
+                                  ? data?.subs[rowIndex * 3 + cellIndex]?.sub_title || ''
                                   : rowIndex === 1 && cellIndex === 0
-                                  ? data?.subs[rowIndex * 3 + cellIndex]?.sub_title
-                                  : data?.subs[rowIndex * 3 + cellIndex - 1]?.sub_title
+                                  ? data?.subs[rowIndex * 3 + cellIndex]?.sub_title || ''
+                                  : data?.subs[rowIndex * 3 + cellIndex - 1]?.sub_title || ''
                                 : tableIndex >= 0 && tableIndex <= 3
                                   ? rowIndex === 1 && cellIndex === 1
-                                    ? data?.subs[tableIndex]?.sub_title
+                                    ? data?.subs[tableIndex]?.sub_title || ''
                                     : ''
                                   : tableIndex >= 5 && tableIndex <= 8
                                     ? rowIndex === 1 && cellIndex === 1
-                                      ? data?.subs[tableIndex - 1]?.sub_title
+                                      ? data?.subs[tableIndex - 1]?.sub_title || ''
                                       : ''
                                     : ''
                             }
@@ -151,7 +152,7 @@ function MandaWrite2() {
                                 (tableIndex !== 4 && !(rowIndex === 1 && cellIndex === 1)) 
                               )
                             }
-                            onChange={(e) => handleCellChange(tableIndex, rowIndex, cellIndex, e.target.value)}
+
                           />
                         </td>
                       ))}
@@ -269,4 +270,4 @@ const DeleteBtn = styled.button`
   margin-left: 10px;
 `;
 
-export default MandaWrite2;
+export default MandaWrite;
