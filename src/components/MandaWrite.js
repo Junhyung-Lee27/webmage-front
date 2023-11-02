@@ -30,7 +30,7 @@ async function fetchMandaData(mainId) {
 }
 
 
-function MandaWrite2() {
+function MandaWrite() {
   const currentTheme = useSelector((state) => state.theme.themes[state.theme.currentTheme]);
 
   const user = useSelector((state) => state.user);
@@ -269,4 +269,4 @@ const DeleteBtn = styled.button`
   margin-left: 10px;
 `;
 
-export default MandaWrite2;
+export default MandaWrite;
