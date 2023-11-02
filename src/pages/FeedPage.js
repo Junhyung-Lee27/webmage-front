@@ -43,8 +43,7 @@ function FeedPage() {
   // 피드 정보 불러오기
   useEffect(() => {
     async function fetchFeedData() {
-      const response = await axios.get(`import { BASE_URL } from "./../config";
-/feed/${userId}`, {
+      const response = await axios.get(`${BASE_URL}/feed/${userId}`, {
         headers: {
           Authorization: `Token ${authToken}`, // 헤더에 토큰 추가
         },
