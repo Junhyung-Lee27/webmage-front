@@ -1,5 +1,5 @@
 // 백엔드 API 서버
-const BASE_URL = "http://127.0.0.1:8000";
+const BASE_URL = "http://15.164.217.203:8000";
 
 // S3
 
