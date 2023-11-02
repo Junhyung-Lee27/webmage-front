@@ -4,7 +4,7 @@ import styled, { ThemeProvider } from "styled-components";
 import axios from "axios";
 
 function MandaModal({ isOpen, onClose }) {
-  const user = useSelector((state) => state.user);
+  const userId = useSelector((state) => state.user.userId);
   const authToken = useSelector((state) => state.user.authToken);
 
   const [tableData, setTableData] = useState([
@@ -26,7 +26,7 @@ function MandaModal({ isOpen, onClose }) {
   
       // 데이터 생성 요청 설정
       const requestDataCreate = {
-        user: user.userId,
+        user: userId,
         main_title: tableData[1][1],
         success: false,
       };
