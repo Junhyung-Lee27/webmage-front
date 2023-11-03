@@ -20,7 +20,7 @@ function UserRecommend({user}) {
             src={
               user.user_image instanceof File
                 ? URL.createObjectURL(user.user_image)
-                : process.env.PUBLIC_URL + "/logo/Manda_logo1.svg"
+                : process.env.PUBLIC_URL + "/testImg/profile2.jpg"
             }
           />
           <Column>
@@ -76,6 +76,7 @@ let StyledProfile = styled.img`
   height: 56px;
   border: 1px solid ${({ theme }) => theme.color.border };
   border-radius: 50%;
+  object-fit: cover;
 `;
 
 let StyledText = styled.span`
