@@ -20,12 +20,12 @@ function MandaWritePage() {
     <PageLayout backgroundcolor={currentTheme.bg2}>
       <Header></Header>
       <MandaWrite />
-      <Title>다른 사용자의 만다라트</Title>
+      {/* <Title>다른 사용자의 만다라트</Title>
       <OtherManda>
         {users.map((user) => (
           <MandaSimple key={user.id} axiosURL={user.axiosURL} />
         ))}
-      </OtherManda>
+      </OtherManda> */}
     </PageLayout>
   );
 }
