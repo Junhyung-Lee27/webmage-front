@@ -24,7 +24,9 @@ function SignupForm() {
 
   // 회원가입 요청
   const handleSignupClick = async () => {
-    const signupResponse = await signup(username, email, password, passwordCheck);
+    const provider = "EMAIL"
+    
+    const signupResponse = await signup(username, email, password, passwordCheck, provider);
 
     // 회원가입 성공했을 경우
     if (signupResponse.success) {
@@ -52,7 +54,7 @@ function SignupForm() {
 
         dispatch(setAuthToken(loginResponse.token));
         dispatch(setIsLoggedIn(true));
-        navigate("/");
+        navigate("/manda");
       } else if (loginResponse.error) {
         alert("로그인에 실패했습니다. 잠시 후 다시 시도해주세요.");
       }
@@ -72,11 +74,11 @@ function SignupForm() {
       <Column>
         <Column>
           <StyledText color={theme.font1}>
-            <label htmlFor="username">닉네임</label>
+            <label htmlFor="username">아이디</label>
           </StyledText>
           <StyledForm
             type="text"
-            placeholder="닉네임을 입력해주세요"
+            placeholder="아이디를 입력해주세요"
             id="username"
             value={username}
             onChange={(e) => handleInputChange(e, setUsername)}
