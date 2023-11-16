@@ -1,16 +1,60 @@
 import styled, { ThemeProvider } from "styled-components";
-import { useSelector } from "react-redux";
+import { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import Header from "../components/Header";
 import Manda from "../components/Manda";
 import MandaTitle from "../components/MandaTitle";
 import TodoList from "../components/TodoList"
-import theme from "../components/theme";
+import componentTheme from "../components/theme";
+import axios from "axios";
+import { BASE_URL } from "./../config";
+import { setUser } from "../store/userSlice";
 
 function MainPage() {
-  const currentTheme = useSelector((state) => state.theme.themes[state.theme.currentTheme]);
-  const user = useSelector((state) => state.user)
-  console.log(user);
+  const dispatch = useDispatch();
+  
+  // 테마
+  const colorTheme = useSelector((state) => state.theme.themes[state.theme.currentTheme]);
+  const filterTheme = useSelector((state) => state.theme.filters[state.theme.currentTheme]);
+  const theme = {
+    color: colorTheme,
+    filter: filterTheme,
+    component: componentTheme,
+  };
 
+  // 유저 상태
+  const user = useSelector((state) => state.user);
+  console.log(user)
+
+  useEffect(() => {
+    const authToken = user.authToken;
+    const fetchData = async (authToken) => {
+      try {
+        const response = await axios.get(`${BASE_URL}/user/profile/${user.userId}`, {
+          headers: {
+            accept: "application/json",
+            Authorization: `Token ${authToken}`,
+          },
+        });
+        dispatch(
+          setUser({
+            userId: response.data.user_id,
+            username: response.data.username,
+            userImg: response.data.user_image,
+            position: response.data.user_position,
+            info: response.data.user_info,
+            hash: response.data.user_hash,
+            email: response.data.user_email,
+          })
+        );
+      } catch (error) {
+        console.error(error);
+      }
+    };
+    fetchData(authToken);
+  }, []);
+
+  // 투두리스트 샘플 데이터
   const todoInfo = [
     {
       id: 1,
@@ -52,49 +96,69 @@ function MainPage() {
 
   return (
     <ThemeProvider theme={theme}>
-      <PageLayout backgroundcolor={currentTheme.bg2}>
+        <PageLayout>
         <Header></Header>
+        <Body>
+          <Stadardized>
+            <TopGroup>
+              <MyManda>
+                <MandaTitle />
+                <Manda />
+              </MyManda>
 
-        <TopGroup>
-          <MyManda>
-            <MandaTitle />
-            <Manda />
-          </MyManda>
+              <ProfileLog>
+                <Profile>프로필</Profile>
+                <MandaLog>만다로그</MandaLog>
+              </ProfileLog>
+            </TopGroup>
 
-          <ProfileLog>
-            <Profile>프로필</Profile>
-            <MandaLog>만다로그</MandaLog>
-          </ProfileLog>
-        </TopGroup>
+            <Line />
 
-        <Line />
-
-        <TodoGroup>
-          <TodoList date="Today" todos={todoInfo}>
-            오늘
-          </TodoList>
-          <TodoList date="Tomorrow" todos={todoInfo}>
-            내일
-          </TodoList>
-          <TodoList date="This Week" todos={todoInfo}>
-            이번 주
-          </TodoList>
-        </TodoGroup>
+            <TodoGroup>
+              <TodoList date="Today" todos={todoInfo}>
+                오늘
+              </TodoList>
+              <TodoList date="Tomorrow" todos={todoInfo}>
+                내일
+              </TodoList>
+              <TodoList date="This Week" todos={todoInfo}>
+                이번 주
+              </TodoList>
+            </TodoGroup>
+          </Stadardized>
+        </Body>
       </PageLayout>
     </ThemeProvider>
   );
 }
 
 const PageLayout = styled.div`
-  ${({ theme }) => theme.font.importPretendard};
+  ${({ theme }) => theme.component.font.importPretendard};
   font-family: Pretendard-Regular;
   display: flex;
   flex-direction: column;
-  background-color: ${({ backgroundcolor }) => backgroundcolor};
+  background-color: ${({ theme }) => theme.color.bg};
+`;
+
+let Body = styled.div`
+  display: flex;
+  align-content: space-between;
+  justify-content: center;
+  width: 100%;
+`;
+
+let Stadardized = styled.div`
+  display: flex;
+  flex-direction: column;
+  width: 1080px;
+  gap: 32px;
+  margin-top: 40px;
+  margin-bottom: 80px;
 `;
 
 const TopGroup = styled.div`
   display: flex;
+  justify-content: space-between;
 `
 
 const MyManda = styled.div`
@@ -107,10 +171,8 @@ const ProfileLog = styled.div`
   display: flex;
   flex-direction: column;
   gap: 10px;
-  margin-left: 24px;
   margin-top: 66px;
 `
-
 
 const Profile = styled.div`
   display: inline-flex;
@@ -133,15 +195,14 @@ const MandaLog = styled.div`
 `
 
 const Line = styled.div`
-  border-bottom: 1px solid #BFBFBF;
-  margin: 30px 0px 30px 198px;
-  width: 1048px;
+  border-bottom: 1px solid ${({ theme }) => theme.color.border};
+  margin: 30px 0px;
+  width: 1080px;
 `
 
 const TodoGroup = styled.div`
   display: inline-flex;
-  margin-left: 198px;
-  gap: 17px;
+  justify-content: space-between;
 `
 
 // const TodoList = styled.div`
