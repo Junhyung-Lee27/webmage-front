@@ -10,6 +10,7 @@ import settingpageReducer from "./settingpageSlice";
 import userReducer from "./userSlice";
 import searchReducer from './searchSlice'
 import feedReducer from './feedSlice'
+import mandaReducer from './mandaSlice'
 
 const rootReducer = combineReducers({
   user: userReducer,
@@ -18,6 +19,7 @@ const rootReducer = combineReducers({
   settingpage: settingpageReducer,
   search: searchReducer,
   feed: feedReducer,
+  manda: mandaReducer,
 });
 
 const persistConfig = {

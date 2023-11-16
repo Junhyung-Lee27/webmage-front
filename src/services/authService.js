@@ -41,12 +41,12 @@ export const signup = async (username, email, password, passwordCheck, provider)
         return { success: true, token: response.data.token };
       }
     } else {
-      return { error: "회원가입에 실패했습니다. 아이디, 이메일, 비밀번호 형식을 확인해주세요." };
+      return { success: false, error: "회원가입에 실패했습니다. 아이디, 이메일, 비밀번호 형식을 확인해주세요."};
     }
   } catch (error) {
     //예외 처리
     console.error("Signup API error:", error);
-    return { error: error.response.data.error };
+    return { success: false, error: error.response.data.error };
   }
 };
 
