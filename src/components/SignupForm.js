@@ -39,13 +39,7 @@ function SignupForm() {
           dispatch(
             setUser({
               userId: userResponse.data.user_id,
-              username: username,
-              userImg: "",
-              position: "",
-              info: "",
-              hash: "",
-              email: email,
-              successCount: 0,
+              authToken: userResponse.data.token,
             })
           );
         } catch (error) {
