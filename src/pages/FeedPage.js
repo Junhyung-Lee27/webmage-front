@@ -9,6 +9,8 @@ import { setFeeds, clearFeeds } from "../store/feedSlice";
 import axios from "axios";
 import { BASE_URL } from "./../config";
 import FeedWriteModal from "../components/FeedWriteModal";
+import Profile from "../components/Profile";
+import MandaLog from "../components/MandaLog";
 
 function FeedPage() {
   let dispatch = useDispatch();
@@ -97,52 +99,55 @@ function FeedPage() {
     return <div>Loading...</div>;
   }
 
+  const currentTheme = useSelector((state) => state.theme.themes[state.theme.currentTheme]);
   return (
-    <ThemeProvider theme={theme}>
-      <PageLayout>
-        <Header></Header>
-        <Body>
-          <Stadardized>
-            <FeedsNav>
-              <Nav>
-                <StyledText
-                  color={activeTab === "마이" ? theme.color.font1 : theme.color.border}
-                  onClick={() => setActiveTab("마이")}
-                >
-                  마이
-                </StyledText>
-                <StyledText
-                  color={activeTab === "전체" ? theme.color.font1 : theme.color.border}
-                  onClick={() => setActiveTab("전체")}
-                >
-                  전체
-                </StyledText>
-              </Nav>
-              <Feeds>
-                {feeds.map((feed) => (
-                  <Feed
-                    key={feed.contentInfo.id}
-                    userInfo={feed.userInfo}
-                    contentInfo={feed.contentInfo}
-                  />
-                ))}
-              </Feeds>
-            </FeedsNav>
-            <Aside>
-              <FeedWriteModal userId={userId} authToken={authToken} />
-              <StyledText color={theme.color.font1} cursor="default">
-                추천
-              </StyledText>
-              <Recommends>
-                {users.map((user) => (
-                  <UserRecommend key={user.id} user={user} />
-                ))}
-              </Recommends>
-            </Aside>
-          </Stadardized>
-        </Body>
-      </PageLayout>
-    </ThemeProvider>
+      <ThemeProvider theme={theme}>
+          <Header />
+          <Layout theme={currentTheme}>
+              <PageBox className="pageBox">
+                  <FlexBox>
+                      <Nav>
+                          <StyledText
+                              size="1rem"
+                              weight="700"
+                              color={currentTheme.border}
+                          >마이</StyledText>
+                          <StyledText
+                              size="1rem"
+                              weight="700"
+                              color={currentTheme.font1}
+                          >전체</StyledText>
+                      </Nav>
+                      <Feeds>
+                          {feedInfo.map((feed) => (
+                              <Feed
+                                  key={feed.contentInfo.id}
+                                  userInfo={feed.userInfo}
+                                  contentInfo={feed.contentInfo}
+                              />
+                          ))}
+                      </Feeds>
+                  </FlexBox>
+                  <Aside>
+                      <FeedWriteModal />
+                      <Recommend>
+                          <StyledText
+                              size="1rem"
+                              weight="700"
+                              color={currentTheme.font1}
+                              margin="0 0 0 1.5rem"
+                          >추천</StyledText>
+                          <UserRecommend />
+                          <UserRecommend />
+                          <UserRecommend />
+                          <UserRecommend />
+                          <UserRecommend />
+                          <UserRecommend />
+                      </Recommend>
+                  </Aside>
+              </PageBox>
+          </Layout>
+      </ThemeProvider>
   );
 }
 
