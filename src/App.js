@@ -10,6 +10,7 @@ import ChatPage from "./pages/ChatPage";
 import { ThemeProvider } from "styled-components";
 import { useSelector } from "react-redux";
 import { Reset } from "styled-reset";
+import KakaoCallback from "./components/KakaoLogin.js";
 
 function App() {
   const currentTheme = useSelector((state) => state.theme.themes[state.theme.currentTheme]);
@@ -26,6 +27,8 @@ function App() {
         <Route path="/search" element={isLoggedIn ? <SearchPage /> : <Navigate to="/" replace />} />
         <Route path="/feed" element={isLoggedIn ? <FeedPage /> : <Navigate to="/" replace />} />
         <Route path="/chat" element={isLoggedIn ? <ChatPage /> : <Navigate to="/" replace />} />
+        <Route path="/user/kakao-callback" element={<KakaoCallback />}>
+        </Route>
       </Routes>
     </ThemeProvider>
   );

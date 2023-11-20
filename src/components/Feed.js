@@ -81,7 +81,7 @@ function Feed({ userInfo, contentInfo }) {
         <FeedHeader>
           <UserInfo>
             <ProfileImgWrapper>
-              <ProfileImg src={`${imgUrl}/${userInfo.profile_img.replace(/'/g, "")}`} />
+              <ProfileImg src={process.env.PUBLIC_URL + "/logo/Manda_logo2.svg"} />
             </ProfileImgWrapper>
             <TextBox>
               <StyledText size="0.875rem" weight="600" color={currentTheme.font1}>
@@ -154,7 +154,7 @@ function Feed({ userInfo, contentInfo }) {
         {/*피드 본문*/}
         <FeedArticle>
           <PictureWrap>
-            <Picture src={`${imgUrl}/${contentInfo.content_img}`} />
+            <Picture src={process.env.PUBLIC_URL + "/testImg/feedImg1.jpg"} />
           </PictureWrap>
           <StyledText size="1rem" weight="500" color={currentTheme.font1}>
             {contentInfo.post}
@@ -259,6 +259,8 @@ let ProfileImgWrapper = styled.div`
 `;
 let ProfileImg = styled.img`
   ${({ theme }) => theme.common.circleImg};
+  object-fit: contain;
+  border: 1px solid ${({ theme }) => theme.color.border};
 `;
 let MediumIcon = styled.img`
   ${({ theme }) => theme.iconSize.medium};

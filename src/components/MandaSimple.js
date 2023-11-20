@@ -20,6 +20,7 @@ function MandaSimple({ axiosURL, searchResult }) {
   // 검색 결과(searchResult)가 있을 경우, 아닐 경우 고려
   const [main, setMain] = useState(searchResult.main_title || {});
   const [subs, setSubs] = useState(searchResult.subs || []);
+  console.log(searchResult);
 
   useEffect(() => {
     axios
@@ -57,7 +58,7 @@ function MandaSimple({ axiosURL, searchResult }) {
           </tbody>
         </Table>
         <UserContainer>
-          <UserImg src={process.env.PUBLIC_URL + "/testImg/profile1.jpg"}></UserImg>
+          <UserImg src={process.env.PUBLIC_URL + "/testImg/profile3.jpg"}></UserImg>
           <UserInfo>
             <Username>{searchResult.username}</Username>
             <UserPosition>{searchResult.userposition}</UserPosition>
