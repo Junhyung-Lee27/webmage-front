@@ -85,26 +85,7 @@ function KakaoCallback() {
           const loginResponse = await login(username, password);
 
           if (loginResponse.success) {
-            try {
-              const userResponse = await axios.get(
-                `${BASE_URL}/user/profile/${loginResponse.userId}`
-              );
-              dispatch(
-                setUser({
-                  userId: userResponse.data.user_id,
-                  username: username,
-                  userImg: "",
-                  position: "",
-                  info: "",
-                  hash: "",
-                  email: email,
-                  successCount: 0,
-                })
-              );
-            } catch (error) {
-              console.error(error);
-            }
-
+            dispatch(setUser({ userId: loginResponse.userId }));
             dispatch(setAuthToken(loginResponse.token));
             dispatch(setIsLoggedIn(true));
             navigate("/manda");
