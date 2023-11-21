@@ -24,9 +24,13 @@ function MainPage() {
 
   // 유저 상태
   const user = useSelector((state) => state.user);
-  console.log(user)
 
+  // 만다라트 작성 상태
+  const [currPage, setCurrPage] = useState("");
+
+  // 메인페이지 로드 시 실행
   useEffect(() => {
+    // 사용자 프로필 업데이트
     const authToken = user.authToken;
     const fetchData = async (authToken) => {
       try {
@@ -52,6 +56,9 @@ function MainPage() {
       }
     };
     fetchData(authToken);
+
+    // currPage -> false로 상태 변환
+    setCurrPage("MAIN");
   }, []);
 
   // 투두리스트 샘플 데이터
@@ -96,14 +103,14 @@ function MainPage() {
 
   return (
     <ThemeProvider theme={theme}>
-        <PageLayout>
+      <PageLayout>
         <Header></Header>
         <Body>
           <Stadardized>
             <TopGroup>
               <MyManda>
                 <MandaTitle />
-                <Manda />
+                <Manda currPage={currPage} setCurrPage={setCurrPage} />
               </MyManda>
 
               <ProfileLog>

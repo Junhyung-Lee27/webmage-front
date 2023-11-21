@@ -8,6 +8,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { setMain, setSubs, setContents } from "../store/mandaSlice";
 
 function MandaTitle() {
+  const dispatch = useDispatch();
+
   // 테마
   const colorTheme = useSelector((state) => state.theme.themes[state.theme.currentTheme]);
   const filterTheme = useSelector((state) => state.theme.filters[state.theme.currentTheme]);
@@ -19,18 +21,26 @@ function MandaTitle() {
 
   // 만다라트 선택 상태
   const [isOpen, setIsOpen] = useState(false);
+  const [mandaMainList, setMandaMainList] = useState(null);
   const [titles, setTitles] = useState([]);
+  const [selectedIndex, setSelectedIndex] = useState(null);
   const [selectedTitle, setSelectedTitle] = useState(null);
 
-  // 현재 사용자 상태
+  // 디버깅
+  const manda = useSelector((state) => state.manda);
+  const main = manda.main;
+
+  // 현재 사용자
   const userId = useSelector((state) => state.user.userId);
   const authToken = useSelector((state) => state.user.authToken);
 
-  // 만다라트 - 메인 작성 상태
-  const [isWritingMandaMain, setIsWritingMandaMain] = useState(false);
+  // 드롭다운 펼치기, 줄이기 동작
+  const toggleDropdown = () => {
+    setIsOpen(!isOpen);
+  };
 
+  // 만다라트 드롭다운 리스트 불러오기
   useEffect(() => {
-    // API 요청을 보내어 데이터를 가져옵니다.
     axios
       .get(`${BASE_URL}/manda/${userId}/`, {
         headers: {
@@ -38,36 +48,50 @@ function MandaTitle() {
         },
       })
       .then((response) => {
-        // main_title 필드만 추출하여 titles 상태 업데이트
-        const data = response.data;
-        const mainTitles = data.map((item) => item.main_title);
+        const fetchedData = response.data.reverse();
+        
+        // 리스트 불러온 후 동작
+        const mainTitles = fetchedData.map((main) => main.main_title);
         setTitles(mainTitles);
+        setSelectedTitle(mainTitles[0]);
+        dispatch(setMain(fetchedData[0]));
+        setMandaMainList(fetchedData);
       })
       .catch((error) => {
         console.error("데이터를 불러오는 동안 오류가 발생했습니다: ", error);
       });
   }, [userId, authToken]);
 
-  const toggleDropdown = () => {
-    setIsOpen(!isOpen);
-  };
-
-  const selectTitle = (title) => {
+  // 만다라트 드롭다운 리스트 선택 동작
+  const selectTitle = async (title, index) => {
+    console.log(title);
+    console.log(index);
+    setSelectedIndex(index);
     setSelectedTitle(title);
     setIsOpen(false);
-    // 여기에서 선택한 표 제목에 따라 다른 동작을 수행할 수 있습니다.
   };
+
+  // 선택된 타이틀로 manda.main 상태 업데이트
+  useEffect(() => {
+  if (mandaMainList && typeof selectedIndex === 'number') {
+    const newMain = mandaMainList[selectedIndex];
+    dispatch(setMain(newMain));
+  }
+}, [mandaMainList, selectedIndex]);
+  
+  // 만다라트 - 메인 작성 상태
+  const [isWritingMandaMain, setIsWritingMandaMain] = useState(false);
 
   return (
     <ThemeProvider theme={theme}>
       <Container>
         <DropdownButton onClick={toggleDropdown}>
           <DropdownIcon src={process.env.PUBLIC_URL + "/manda/arrow-down.svg"} />
-          {selectedTitle ? selectedTitle : titles[0]}
+          {selectedTitle ? selectedTitle : ""}
         </DropdownButton>
         <DropdownList isOpen={isOpen}>
           {titles.map((title, index) => (
-            <ListItem key={index} onClick={() => selectTitle(title)}>
+            <ListItem key={index} onClick={() => selectTitle(title, index)}>
               {title}
             </ListItem>
           ))}
@@ -184,6 +208,7 @@ const DropdownButton = styled.button`
   font-size: 20px;
   font-weight: 700;
   display: flex;
+  color: ${({ theme }) => theme.color.font1};
 `;
 
 const DropdownIcon = styled.img`

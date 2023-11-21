@@ -6,9 +6,9 @@ import { useDispatch, useSelector } from "react-redux";
 import { BASE_URL } from "./../config";
 import { setContents, setMain, setSubs } from "../store/mandaSlice";
 
-function Manda({ writeMode, setWriteMode, setSelectedSubIndex }) {
+function Manda({ writeMode, setWriteMode, setSelectedSubIndex, currPage }) {
   const dispatch = useDispatch();
-  // console.log(writeMode);
+  console.log(currPage);
 
   // 테마
   const colorTheme = useSelector((state) => state.theme.themes[state.theme.currentTheme]);
@@ -32,7 +32,7 @@ function Manda({ writeMode, setWriteMode, setSelectedSubIndex }) {
   // 각 GridItem에 클릭 이벤트핸들러 추가
   const handleGridItemClick = (rowIndex, columnIndex) => {
     setEditingIndex([rowIndex, columnIndex]);
-    console.log(rowIndex, columnIndex)
+    console.log(rowIndex, columnIndex);
     console.log(rowIndex === 1 && columnIndex === 1);
     // 중앙 GridItem인 경우 writeMode를 "SUB"로, 그렇지 않은 경우 "CONTENT"로 설정
     if (rowIndex === 1 && columnIndex === 1) {
@@ -45,22 +45,19 @@ function Manda({ writeMode, setWriteMode, setSelectedSubIndex }) {
 
     // 선택된 sub_title의 index 상태 업데이트
     let index = rowIndex + columnIndex * 3;
-    console.log(index)
+    console.log(index);
     if (index != 4) {
       if (index >= 5) {
         index -= 1;
       }
       // sub_title이 비어있는 경우 가운데 테이블을 먼저 작성하도록 유도
-      if (subs[index].sub_title === "") {
-        
+      if (subs[index].sub_title === "" || subs[index].sub_title === null) {
         setEditingIndex([1, 1]);
         setWriteMode("SUB");
         // console.log("해당 위치의 세부목표를 먼저 작성해주세요!");
         alert("해당 위치의 세부목표를 먼저 작성해주세요!");
       }
     }
-    console.log(writeMode === "CONTENT");
-    console.log(subs[index].sub_title === "");
     setSelectedSubIndex(index);
   };
 
@@ -147,13 +144,22 @@ function Manda({ writeMode, setWriteMode, setSelectedSubIndex }) {
             const nowEditing =
               editingIndex[0] === gridRowIndex && editingIndex[1] === gridColumnIndex;
 
+            const gridItemProps = {
+              key: `${gridRowIndex}-${gridColumnIndex}`,
+              isCenterTable,
+              currPage,
+              onClick:
+                currPage === "MAIN"
+                  ? () => {}
+                  : () => handleGridItemClick(gridRowIndex, gridColumnIndex),
+            };
+
+            if (currPage !== "MAIN") {
+              gridItemProps.nowEditing = nowEditing;
+            }
+
             return (
-              <GridItem
-                key={`${gridRowIndex}-${gridColumnIndex}`}
-                isCenterTable={isCenterTable}
-                nowEditing={nowEditing}
-                onClick={() => handleGridItemClick(gridRowIndex, gridColumnIndex)}
-              >
+              <GridItem {...gridItemProps}>
                 <tbody>
                   {[...Array(3)].map((_, cellIndex) => (
                     <tr key={cellIndex}>
@@ -208,11 +214,17 @@ const GridItem = styled.table`
     props.nowEditing
       ? `3px solid ${props.theme.color.primary}`
       : `3px solid ${props.theme.color.bg2}`};
+
+  /* 조건부 hover 스타일 */
   &:hover {
-    border: 3px solid ${({ theme }) => `${theme.color.secondary}`};
+    border: ${(props) =>
+      props.currPage === "MAIN"
+        ? `3px solid ${props.theme.color.bg2}`
+        : `3px solid ${props.theme.color.secondary}`};
   }
 
-  cursor: pointer;
+  /* 조건부 cursor 스타일 */
+  cursor: ${(props) => (props.currPage === "MAIN" ? "default" : "pointer")};
 `;
 
 const TableCell = styled.td`
