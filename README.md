@@ -21,7 +21,7 @@
 <a href="https://github.com/Junhyung-Lee27/webmage">Backend Github Repo</a>
   - Django-restframework
   - Docker
-  - AWS - EC2, RDS, S3, Route53
+  - AWS - EC2, RDS, S3
   - Swagger
   - Test code
 
