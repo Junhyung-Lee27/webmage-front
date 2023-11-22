@@ -12,7 +12,7 @@ import { setUser } from "../store/userSlice";
 
 function MainPage() {
   const dispatch = useDispatch();
-  
+
   // 테마
   const colorTheme = useSelector((state) => state.theme.themes[state.theme.currentTheme]);
   const filterTheme = useSelector((state) => state.theme.filters[state.theme.currentTheme]);
@@ -28,13 +28,12 @@ function MainPage() {
   // 만다라트 작성 상태
   const [currPage, setCurrPage] = useState("");
 
-  // 메인페이지 로드 시 실행
+  // user.Id 변경되었을 때 실행
   useEffect(() => {
     // 사용자 프로필 업데이트
-    const authToken = user.authToken;
-    const fetchData = async (authToken) => {
+    const fetchData = async (userId, authToken) => {
       try {
-        const response = await axios.get(`${BASE_URL}/user/profile/${user.userId}`, {
+        const response = await axios.get(`${BASE_URL}/user/profile/${userId}`, {
           headers: {
             accept: "application/json",
             Authorization: `Token ${authToken}`,
@@ -42,7 +41,6 @@ function MainPage() {
         });
         dispatch(
           setUser({
-            userId: response.data.user_id,
             username: response.data.username,
             userImg: response.data.user_image,
             position: response.data.user_position,
@@ -55,11 +53,11 @@ function MainPage() {
         console.error(error);
       }
     };
-    fetchData(authToken);
+    fetchData(user.userId, user.authToken);
 
     // currPage -> false로 상태 변환
     setCurrPage("MAIN");
-  }, []);
+  }, [user.userId]);
 
   // 투두리스트 샘플 데이터
   const todoInfo = [
@@ -171,7 +169,6 @@ const TopGroup = styled.div`
 const MyManda = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 5px;
 `;
 
 const ProfileLog = styled.div`
