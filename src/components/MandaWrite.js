@@ -28,7 +28,6 @@ function MandaWrite() {
 
   // 스토어에서 mandaMain 불러오기
   let manda = useSelector((state) => state.manda);
-  // console.log(manda);
 
   return (
     <ThemeProvider theme={theme}>
@@ -60,7 +59,7 @@ function WriteBoxComponent({ manda, writeMode, selectedSubIndex }) {
   const [focusedIndex, setFocusedIndex] = useState(null);
 
   // 입력 상태
-  const [textInputs, setTextInputs] = useState(Array(8).fill(""));
+  const [textInputs, setTextInputs] = useState(Array(8).fill(null));
 
   // 입력 변경 핸들러
   const handleTextInputChange = (index, value) => {
@@ -168,11 +167,11 @@ function WriteBoxComponent({ manda, writeMode, selectedSubIndex }) {
         </WriteBoxTitle>
       )}
       <WriteList>
-        {textInputs.map((subTitle, index) => (
+        {textInputs.map((inputs, index) => (
           <ListItem key={index}>
             <Number isFocused={focusedIndex === index}>{index + 1}</Number>
             <ItemInput
-              value={subTitle}
+              value={inputs || ""} // 입력된 값이 null일 경우 ""으로 변경
               onChange={(e) => handleTextInputChange(index, e.target.value)}
               onFocus={() => setFocusedIndex(index)}
               onBlur={() => setFocusedIndex(null)}

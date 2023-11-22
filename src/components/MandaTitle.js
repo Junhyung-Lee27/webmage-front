@@ -9,6 +9,7 @@ import { setMain, setSubs, setContents } from "../store/mandaSlice";
 
 function MandaTitle() {
   const dispatch = useDispatch();
+  let navigate = useNavigate();
 
   // 테마
   const colorTheme = useSelector((state) => state.theme.themes[state.theme.currentTheme]);
@@ -19,6 +20,9 @@ function MandaTitle() {
     component: componentTheme,
   };
 
+  // 만다라트 상태
+  const manda = useSelector((state) => state.manda);
+
   // 만다라트 선택 상태
   const [isOpen, setIsOpen] = useState(false);
   const [mandaMainList, setMandaMainList] = useState(null);
@@ -26,96 +30,110 @@ function MandaTitle() {
   const [selectedIndex, setSelectedIndex] = useState(null);
   const [selectedTitle, setSelectedTitle] = useState(null);
 
-  // 디버깅
-  const manda = useSelector((state) => state.manda);
-  const main = manda.main;
+  // 메인 작성 모달 상태
+  const [isOpenMandaMainModal, setisOpenMandaMainModal] = useState(false);
 
   // 현재 사용자
-  const userId = useSelector((state) => state.user.userId);
-  const authToken = useSelector((state) => state.user.authToken);
+  const user = useSelector((state) => state.user);
 
-  // 드롭다운 펼치기, 줄이기 동작
-  const toggleDropdown = () => {
-    setIsOpen(!isOpen);
-  };
+  //// 드롭다운 ////
+  // 드롭다운 동작
+  // const toggleDropdown = () => {
+  //   setIsOpen(!isOpen);
+  // };
 
-  // 만다라트 드롭다운 리스트 불러오기
+  // 만다라트 리스트 불러오기
   useEffect(() => {
-    axios
-      .get(`${BASE_URL}/manda/${userId}/`, {
-        headers: {
-          Authorization: `Token ${authToken}`,
-        },
-      })
-      .then((response) => {
-        const fetchedData = response.data.reverse();
-        
+    const fetchData = async (authToken) => {
+      try {
+        const response = await axios.get(`${BASE_URL}/manda/${user.userId}/`, {
+          headers: {
+            Authorization: `Token ${authToken}`,
+          },
+        });
+
         // 리스트 불러온 후 동작
+        const fetchedData = response.data.reverse();
+
+        // setMandaMainList(fetchedData);
+
         const mainTitles = fetchedData.map((main) => main.main_title);
         setTitles(mainTitles);
+
+        // 선택 상태 업데이트
         setSelectedTitle(mainTitles[0]);
         dispatch(setMain(fetchedData[0]));
-        setMandaMainList(fetchedData);
-      })
-      .catch((error) => {
-        console.error("데이터를 불러오는 동안 오류가 발생했습니다: ", error);
-      });
-  }, [userId, authToken]);
+      } catch (error) {
+        console.error("만다라트 리스트 불러오기 에러 : ", error);
+      }
+    };
+    console.log("만다라트 리스트 불러오기 완료")
+    fetchData(user.authToken);
+  }, [user.userId]);
 
-  // 만다라트 드롭다운 리스트 선택 동작
-  const selectTitle = async (title, index) => {
-    console.log(title);
-    console.log(index);
-    setSelectedIndex(index);
-    setSelectedTitle(title);
-    setIsOpen(false);
-  };
+  // 드롭다운 리스트 선택
+  // const selectTitle = async (title, index) => {
+  //   setSelectedIndex(index);
+  //   setSelectedTitle(title);
+  //   setIsOpen(false);
+  // };
 
-  // 선택된 타이틀로 manda.main 상태 업데이트
-  useEffect(() => {
-  if (mandaMainList && typeof selectedIndex === 'number') {
-    const newMain = mandaMainList[selectedIndex];
-    dispatch(setMain(newMain));
-  }
-}, [mandaMainList, selectedIndex]);
-  
-  // 만다라트 - 메인 작성 상태
-  const [isWritingMandaMain, setIsWritingMandaMain] = useState(false);
+  // 드롭다운에서 선택한 타이틀로 manda.main 업데이트
+  // useEffect(() => {
+  //   if (mandaMainList && typeof selectedIndex === "number") {
+  //     const newMain = mandaMainList[selectedIndex];
+  //     dispatch(setMain(newMain));
+  //   }
+  // }, [selectedIndex]);
 
   return (
     <ThemeProvider theme={theme}>
       <Container>
-        <DropdownButton onClick={toggleDropdown}>
-          <DropdownIcon src={process.env.PUBLIC_URL + "/manda/arrow-down.svg"} />
-          {selectedTitle ? selectedTitle : ""}
-        </DropdownButton>
-        <DropdownList isOpen={isOpen}>
+        <Title>{selectedTitle ? selectedTitle : ""}</Title>
+        {manda.main === undefined ? (
+          <AddManda
+            onClick={() => {
+              setisOpenMandaMainModal(true);
+            }}
+          >
+            + 만다라트 만들기
+          </AddManda>
+        ) : (
+          <ButtonGroup>
+            <IconTextButton onClick={() => navigate("/manda/write")}>
+              <EditIcon src={process.env.PUBLIC_URL + "/manda/edit-btn.svg"} />
+              <ButtonText>수정</ButtonText>
+            </IconTextButton>
+            <IconTextButton>
+              <DeleteIcon src={process.env.PUBLIC_URL + "/manda/delete-btn.svg"} />
+              <ButtonText>삭제</ButtonText>
+            </IconTextButton>
+          </ButtonGroup>
+        )}
+        {/* <DropdownButton> */}
+        {/* 만다라트를 여러 개 만드는 기능은 추후에 버그 해결 후 업데이트 예정 */}
+        {/* <DropdownIcon
+            src={process.env.PUBLIC_URL + "/manda/arrow-down.svg"}
+            // onClick={toggleDropdown}
+          /> */}
+        {/* </DropdownButton> */}
+        {/* <DropdownList isOpen={isOpen}>
           {titles.map((title, index) => (
             <ListItem key={index} onClick={() => selectTitle(title, index)}>
               {title}
             </ListItem>
           ))}
-        </DropdownList>
-        <ButtonGroup>
-          <EditIcon src={process.env.PUBLIC_URL + "/manda/edit-btn.svg"} />
-          <DeleteIcon src={process.env.PUBLIC_URL + "/manda/delete-btn.svg"} />
-        </ButtonGroup>
-        <AddManda
-          onClick={() => {
-            setIsWritingMandaMain(true);
-          }}
-        >
-          + 만다라트 추가
-        </AddManda>
+        </DropdownList> */}
       </Container>
-      {isWritingMandaMain === true && (
-        <WriteMandaMain theme={theme} setIsWritingMandaMain={setIsWritingMandaMain} />
+
+      {isOpenMandaMainModal === true && (
+        <WriteMandaMainModal theme={theme} setisOpenMandaMainModal={setisOpenMandaMainModal} />
       )}
     </ThemeProvider>
   );
 }
 
-function WriteMandaMain({ theme, setIsWritingMandaMain }) {
+function WriteMandaMainModal({ theme, setisOpenMandaMainModal }) {
   let navigate = useNavigate();
   const dispatch = useDispatch();
 
@@ -176,7 +194,7 @@ function WriteMandaMain({ theme, setIsWritingMandaMain }) {
             color={theme.color.font1}
             backgroundcolor={theme.color.bg3}
             border="none"
-            onClick={() => setIsWritingMandaMain(false)}
+            onClick={() => setisOpenMandaMainModal(false)}
           >
             취소
           </StyledButton>
@@ -194,17 +212,27 @@ function WriteMandaMain({ theme, setIsWritingMandaMain }) {
 }
 
 const Container = styled.div`
+  width: 100%;
   position: relative;
-  margin-top: 20px;
+
   display: flex;
-  max-width: 774px;
+  justify-content: flex-end;
+  align-items: center;
+`;
+
+const Title = styled.h1`
+  color: ${({ theme }) => theme.color.font1};
+  font-size: 20px;
+  font-weight: 700;
+  margin-right: auto;
+  cursor: default;
 `;
 
 const DropdownButton = styled.button`
+  width: 240px;
+  height: 34px;
   background: inherit;
   border: none;
-  padding: 5px;
-  cursor: pointer;
   font-size: 20px;
   font-weight: 700;
   display: flex;
@@ -245,46 +273,63 @@ const ListItem = styled.li`
 `;
 
 const ButtonGroup = styled.div`
-  position: relative;
-  margin-left: 10px;
   display: flex;
+  flex-direction: row;
+  align-items: center;
+  /* gap: 8px; */
+`;
+
+const IconTextButton = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 6px;
 
   &:hover {
+    cursor: pointer;
+    background: ${({ theme }) => theme.color.bg3};
+  }
+`;
+
+const AddManda = styled.button`
+  width: 160px;
+  height: 34px;
+  flex-shrink: 0;
+
+  border: none;
+  border-radius: 8px;
+  background: ${({ theme }) => theme.color.primary};
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  color: #fff;
+  font-size: 16px;
+  font-weight: 700;
+
+  &:hover {
+    background-color: ${({ theme }) => theme.color.secondary};
     cursor: pointer;
   }
 `;
 
 const EditIcon = styled.img`
-  margin-right: 10px;
+  ${({ theme }) => theme.component.iconSize.small};
+  filter: ${({ theme }) => theme.filter.font2};
 `;
 
 const DeleteIcon = styled.img`
-  margin-right: 10px;
+  ${({ theme }) => theme.component.iconSize.small};
+  filter: ${({ theme }) => theme.filter.font2};
 `;
 
-const AddManda = styled.button`
-  width: 150px;
-  height: 34px;
-  flex-shrink: 0;
-  border-radius: 8px;
-  background: #6c63ff;
-  border: none;
-
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  color: #fff;
-  font-size: 16px;
-  font-weight: 700;
-  position: absolute;
-  right: 6px;
-  top: 0;
-  z-index: 1;
-
-  &:hover {
-    background-color: #251f4b;
-    cursor: pointer;
-  }
+const ButtonText = styled.span`
+  color: ${({ theme }) => theme.color.font2};
+  font-size: 14px;
 `;
 
 let ModalOverlay = styled.div`
