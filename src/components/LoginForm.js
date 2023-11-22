@@ -9,12 +9,9 @@ import { useDispatch, useSelector } from "react-redux";
 import { showSignup, showForgotPassword } from "../store/authpageSlice";
 import { setUser, setAuthToken, setIsLoggedIn } from "../store/userSlice";
 
-import axios from "axios";
-import { BASE_URL } from "./../config";
-
 function LoginForm() {
   let navigate = useNavigate();
-  const dispatch = useDispatch();
+  const dispatch = useDispatch();  
 
   // 테마
   const colorTheme = useSelector((state) => state.theme.themes[state.theme.currentTheme]);
@@ -40,6 +37,7 @@ function LoginForm() {
       dispatch(setUser({ userId: loginResponse.userId }));
       dispatch(setAuthToken(loginResponse.token));
       dispatch(setIsLoggedIn(true));
+      window.location.reload(); // 페이지 리로드
       navigate("/manda");
     } else if (loginResponse.error) {
       alert(loginResponse.error);
