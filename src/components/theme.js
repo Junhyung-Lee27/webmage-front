@@ -75,16 +75,16 @@ const common = {
 
 const iconSize = {
     large: `
-        width: 2.25rem;
-        height: 2.25rem;
+        width: 1.8rem;
+        height: 1.8rem;
     `,
     medium: `
-        width: 2rem;
-        height: 2rem;
+        width: 1.6rem;
+        height: 1.6rem;
     `,
     small: `
-        width: 1.5rem;
-        height: 1.5rem;
+        width: 1.4rem;
+        height: 1.4rem;
     `,
 }
 
