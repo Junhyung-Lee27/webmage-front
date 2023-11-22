@@ -8,11 +8,12 @@ import Notification from "./Notification";
 
 import { logout } from "../services/authService";
 import { setIsLoggedIn, resetUserState } from "../store/userSlice";
-import { persistor } from "../store/store";
 import { setSearchResults, clearSearchResults } from "../store/searchSlice";
 import { BASE_URL } from "./../config";
 
 import axios from "axios";
+import { resetMandaState } from "../store/mandaSlice";
+import { persistor } from "../store/store";
 
 function Header() {
   let navigate = useNavigate();
@@ -34,15 +35,14 @@ function Header() {
   const handleLogoutClick = async () => {
     const response = await logout();
     if (response.success) {
+      await persistor.purge();
+
       dispatch(setIsLoggedIn(false)); // 로그인 여부 false
       dispatch(resetUserState()); // 유저 상태 초기화
+      dispatch(resetMandaState()); // 만다 상태 초기화
 
-      navigate("/"); // 로그인 화면으로 이동
-
-      // 로컬스토리지에 저장된 유저 데이터 삭제
-      setTimeout(() => {
-        persistor.purge();
-      }, 2000);
+      // 로그인 화면 이동
+      navigate("/");
     } else if (response.error) {
       alert(response.error);
     }
@@ -194,8 +194,8 @@ let MandaIcon = styled.img`
 `;
 
 let StyledLink = styled(NavLink)`
-  font-size: 20px;
-  line-height: 24px;
+  font-size: 16px;
+  line-height: 16px;
   font-weight: 600;
   text-align: center;
   padding: 16px 0px;
@@ -215,7 +215,7 @@ let SearchBox = styled.input`
   height: 34px;
   padding: 9px 40px 9px 16px;
   box-sizing: border-box;
-  font-size: 16px;
+  font-size: 14px;
   color: ${({ theme }) => theme.color.font1};
   background-color: ${({ theme }) => theme.color.bg2};
   border: 1px solid ${({ theme }) => theme.color.border};
@@ -231,14 +231,14 @@ let SearchBox = styled.input`
 
 let LargeIcon = styled.img`
   ${({ theme }) => theme.component.iconSize.large};
+  padding: 2px;
   filter: ${({ theme, $active }) => ($active ? theme.filter.primary : theme.filter.font2)};
-  margin: 2px;
   cursor: pointer;
 `;
 
 let IconLink = styled(NavLink)`
-  width: 40px;
-  height: 40px;
+  ${({ theme }) => theme.component.iconSize.large};
+
   border-radius: 50%;
   border: none;
 
@@ -247,7 +247,7 @@ let IconLink = styled(NavLink)`
   }
 
   &:hover {
-    background-color: ${({ theme }) => theme.color.bg3}
+    background-color: ${({ theme }) => theme.color.bg3};
   }
 `;
 
@@ -264,7 +264,7 @@ let NotiIconWrapper = styled.div`
 `;
 
 let LogoutBtn = styled.button`
-  width: 80px;
+  width: 88px;
   height: 34px;
   font-size: 14px;
   font-weight: 600;
