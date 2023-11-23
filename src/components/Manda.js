@@ -6,7 +6,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { BASE_URL } from "./../config";
 import { resetMandaState, setSubs, setContents } from "../store/mandaSlice";
 
-function Manda({ writeMode, setWriteMode, setSelectedSubIndex, currPage }) {
+function Manda({ writeMode, setWriteMode, selectedSubIndex, setSelectedSubIndex, currPage }) {
   const dispatch = useDispatch();
 
   // 테마
@@ -79,7 +79,6 @@ function Manda({ writeMode, setWriteMode, setSelectedSubIndex, currPage }) {
       if (subs[index].sub_title === "" || subs[index].sub_title === null) {
         setEditingIndex([1, 1]);
         setWriteMode("SUB");
-        // console.log("해당 위치의 세부목표를 먼저 작성해주세요!");
         alert("해당 위치의 세부목표를 먼저 작성해주세요!");
       }
     }
@@ -170,6 +169,7 @@ function Manda({ writeMode, setWriteMode, setSelectedSubIndex, currPage }) {
               key: `${gridRowIndex}-${gridColumnIndex}`,
               isCenterTable,
               currPage,
+              dataLoaded,
               onClick:
                 currPage === "MAIN"
                   ? () => {}
