@@ -87,7 +87,7 @@ function DeleteAccount() {
               border="none"
               onClick={() => dispatch(showAccountView())}
             >
-              취소
+              돌아가기
             </StyledButton>
             <StyledButton
               onClick={() => handleDeleteUser(authToken)}

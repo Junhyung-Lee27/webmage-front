@@ -20,21 +20,16 @@ function MandaTitle() {
     component: componentTheme,
   };
 
-  // 만다라트 상태
-  const manda = useSelector((state) => state.manda);
-
-  // 만다라트 선택 상태
-  const [isOpen, setIsOpen] = useState(false);
-  const [mandaMainList, setMandaMainList] = useState(null);
-  const [titles, setTitles] = useState([]);
-  const [selectedIndex, setSelectedIndex] = useState(null);
-  const [selectedTitle, setSelectedTitle] = useState(null);
-
-  // 메인 작성 모달 상태
-  const [isOpenMandaMainModal, setisOpenMandaMainModal] = useState(false);
-
-  // 현재 사용자
-  const user = useSelector((state) => state.user);
+  // 상태 관리
+  const manda = useSelector((state) => state.manda); // 만다라트 상태
+  const [isOpen, setIsOpen] = useState(false); // 드롭다운 상태
+  const [mandaMainList, setMandaMainList] = useState(null); // 드롭다운 리스트 상태
+  const [titles, setTitles] = useState([]); // 만다라트 제목 상태
+  const [selectedIndex, setSelectedIndex] = useState(null); // 선택된 입력 index 상태
+  const [selectedTitle, setSelectedTitle] = useState(null); // 선택된 제목 상태
+  const [isOpenMandaMainModal, setIsOpenMandaMainModal] = useState(false); // 만다라트 작성 모달 상태
+  const [isOpenDeleteMandaModal, setIsOpenDeleteMandaModal] = useState(false); // 만다라트 삭제 모달 상태
+  const user = useSelector((state) => state.user); // 현재 사용자
 
   //// 드롭다운 ////
   // 드롭다운 동작
@@ -67,7 +62,6 @@ function MandaTitle() {
         console.error("만다라트 리스트 불러오기 에러 : ", error);
       }
     };
-    console.log("만다라트 리스트 불러오기 완료")
     fetchData(user.authToken);
   }, [user.userId]);
 
@@ -93,7 +87,7 @@ function MandaTitle() {
         {manda.main === undefined ? (
           <AddManda
             onClick={() => {
-              setisOpenMandaMainModal(true);
+              setIsOpenMandaMainModal(true);
             }}
           >
             + 만다라트 만들기
@@ -104,7 +98,11 @@ function MandaTitle() {
               <EditIcon src={process.env.PUBLIC_URL + "/manda/edit-btn.svg"} />
               <ButtonText>수정</ButtonText>
             </IconTextButton>
-            <IconTextButton>
+            <IconTextButton
+              onClick={() => {
+                setIsOpenDeleteMandaModal(true);
+              }}
+            >
               <DeleteIcon src={process.env.PUBLIC_URL + "/manda/delete-btn.svg"} />
               <ButtonText>삭제</ButtonText>
             </IconTextButton>
@@ -127,13 +125,22 @@ function MandaTitle() {
       </Container>
 
       {isOpenMandaMainModal === true && (
-        <WriteMandaMainModal theme={theme} setisOpenMandaMainModal={setisOpenMandaMainModal} />
+        <WriteMandaMainModal theme={theme} setIsOpenMandaMainModal={setIsOpenMandaMainModal} />
+      )}
+      {isOpenDeleteMandaModal === true && (
+        <DeleteMandaModal
+          theme={theme}
+          setIsOpenDeleteMandaModal={setIsOpenDeleteMandaModal}
+          manda={manda}
+          user={user}
+          setSelectedTitle={setSelectedTitle}
+        />
       )}
     </ThemeProvider>
   );
 }
 
-function WriteMandaMainModal({ theme, setisOpenMandaMainModal }) {
+function WriteMandaMainModal({ theme, setIsOpenMandaMainModal }) {
   let navigate = useNavigate();
   const dispatch = useDispatch();
 
@@ -194,7 +201,7 @@ function WriteMandaMainModal({ theme, setisOpenMandaMainModal }) {
             color={theme.color.font1}
             backgroundcolor={theme.color.bg3}
             border="none"
-            onClick={() => setisOpenMandaMainModal(false)}
+            onClick={() => setIsOpenMandaMainModal(false)}
           >
             취소
           </StyledButton>
@@ -204,6 +211,83 @@ function WriteMandaMainModal({ theme, setisOpenMandaMainModal }) {
             onClick={() => handleSubmit(user.authToken, user.userId, mandaMain)}
           >
             완료
+          </StyledButton>
+        </Buttons>
+      </ModalContent>
+    </ModalOverlay>
+  );
+}
+
+function DeleteMandaModal({ theme, manda, user, setIsOpenDeleteMandaModal, setSelectedTitle }) {
+  const dispatch = useDispatch();
+
+  const [inputValue, setInputValue] = useState("");
+
+  const handleDeleteManda = async (user) => {
+    if (inputValue === manda.main.main_title) {
+      try {
+        const response = await axios.post(
+          `${BASE_URL}/manda/delete/${manda.main.id}`,
+          {},
+          {
+            headers: {
+              Authorization: `Token ${user.authToken}`,
+            },
+          }
+        );
+
+        // 만다라트 삭제 성공 후 로직
+        window.location.reload(); // 페이지 리로드
+        alert("만다라트 삭제가 완료되었습니다");
+      } catch (error) {
+        // 요청 실패
+        console.error("만다라트 삭제 API 에러 :", error);
+      }
+    } else {
+      alert("입력한 값이 일치하지 않습니다");
+    }
+  };
+
+  return (
+    <ModalOverlay>
+      <ModalContent>
+        <ModalTitle>
+          정말 만다라트를 <Highlight>삭제</Highlight>하시겠어요? 😢
+        </ModalTitle>
+        <Guideline>
+          <GuidelineList>만다라트는 삭제 후 다시 복구할 수 없습니다.</GuidelineList>
+          <GuidelineList>만다라트를 삭제하더라도 실천기록 게시물은 유지됩니다.</GuidelineList>
+        </Guideline>
+        <StyledText
+          fontSize="14px"
+          fontWeight="500"
+          color={theme.color.font2}
+          margin="0px 0px 12px 0px"
+          align="left"
+        >
+          삭제 확인을 위해 <Highlight>{manda.main.main_title}</Highlight>을(를) 입력해주세요.
+        </StyledText>
+        <StyledForm
+          type="text"
+          placeholder="입력"
+          value={inputValue}
+          onChange={(e) => setInputValue(e.target.value)}
+        ></StyledForm>
+        <Buttons>
+          <StyledButton
+            onClick={() => setIsOpenDeleteMandaModal(false)}
+            color={theme.color.font1}
+            backgroundcolor={theme.color.bg3}
+            border="none"
+          >
+            돌아가기
+          </StyledButton>
+          <StyledButton
+            onClick={() => handleDeleteManda(user)}
+            color="white"
+            backgroundcolor={theme.color.primary}
+          >
+            삭제
           </StyledButton>
         </Buttons>
       </ModalContent>
@@ -367,7 +451,7 @@ let ModalTitle = styled.span`
 `;
 
 let Guideline = styled.ul`
-  box-sizing: content-box;
+  box-sizing: border-box;
   padding: 16px 24px;
   border: none;
   border-radius: 8px;
@@ -406,14 +490,14 @@ let StyledTextArea = styled.textarea`
 `;
 
 let Buttons = styled.div`
-  box-sizing: content-box;
+  box-sizing: border-box;
   display: flex;
   justify-content: center;
   align-items: center;
   width: 100%;
   gap: 8px;
   margin-top: 32px;
-  padding: 8px 16px;
+  padding: 8px 0px;
 `;
 
 let StyledButton = styled.button`
@@ -429,6 +513,33 @@ let StyledButton = styled.button`
   border-radius: 8px;
   outline: none;
   cursor: pointer;
+`;
+
+let StyledText = styled.span`
+  font-size: ${({ fontSize }) => fontSize};
+  font-weight: ${({ fontWeight }) => fontWeight};
+  color: ${({ color }) => color};
+  margin: ${({ margin }) => margin};
+  text-align: ${({ align }) => align};
+  width: 100%;
+`;
+let StyledForm = styled.input`
+  width: 100%;
+  box-sizing: border-box;
+  padding: 16px;
+  font-size: 14px;
+  color: ${({ theme }) => theme.color.font1};
+  border: none;
+  border-radius: 8px;
+  background-color: ${({ theme }) => theme.color.bg2};
+  /* margin-bottom: 40px; */
+  &::placeholder {
+    color: ${({ theme }) => theme.color.font2};
+    opacity: 0.5;
+  }
+  &:focus {
+    outline: 2px solid ${({ theme }) => theme.color.primary};
+  }
 `;
 
 export default MandaTitle;
