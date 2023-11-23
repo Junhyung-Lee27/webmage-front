@@ -17,17 +17,46 @@ function MandaWrite() {
     component: componentTheme,
   };
 
-  // 작성 상태 관리 (SUB, CONTENT 중 무엇을 작성하고 있는지)
-  const [writeMode, setWriteMode] = useState("SUB");
+  // 상태 관리
+  const [writeMode, setWriteMode] = useState("SUB"); // 작성 상태 관리 (SUB, CONTENT 중 무엇을 작성하고 있는지)
+  const [selectedSubIndex, setSelectedSubIndex] = useState(); // 현재 포커스된 3*3 테이블 상태 (초기 상태 = 가운데)
+  const [isSaveBtnActive, setIsSaveBtnActive] = useState(false); // '저장' 버튼 활성화 상태
+  const user = useSelector((state) => state.user); // 유저 상태
+  let manda = useSelector((state) => state.manda); // 만다라트 상태
+  const main = manda.main;
+  const subs = manda.subs;
+  const contents = manda.contents;
 
-  // 현재 포커스된 3*3 테이블 상태 (초기 상태 = 가운데)
-  const [selectedSubIndex, setSelectedSubIndex] = useState();
+  // 입력 상태
+  const [textInputs, setTextInputs] = useState(Array(8).fill(null));
 
-  // 유저 상태
-  const user = useSelector((state) => state.user);
+  // 버튼 활성화/비활성화 (null 값을 빈 문자열로 변환해서 비교)
+  useEffect(() => {
+    const checkDifferences = () => {
+      // subs 배열에서 sub_title과 textInputs 비교
+      if (writeMode === "SUB") {
+        const subTitles = subs.map((sub) => sub.sub_title || "");
+        const isDifferent = textInputs.some((input, index) => (input || "") !== subTitles[index]);
+        setIsSaveBtnActive(isDifferent);
+      }
+      // contents 배열에서 selectedSubIndex에 해당하는 sub_id와 일치하는 contents.content와 textInputs 비교
+      else if (writeMode === "CONTENT") {
+        const selectedSubId = subs[selectedSubIndex]?.id;
+        const relatedContents = contents.filter((content) => content.sub_id === selectedSubId);
+        const contentTexts = relatedContents.map((content) => content.content || "");
+        const isDifferent = textInputs.some(
+          (input, index) => (input || "") !== contentTexts[index]
+        );
+        setIsSaveBtnActive(isDifferent);
+      }
+    };
 
-  // 스토어에서 mandaMain 불러오기
-  let manda = useSelector((state) => state.manda);
+    // 0.1초 후에 checkDifferences 함수 실행
+    const timeoutId = setTimeout(checkDifferences, 100);
+
+    // 컴포넌트가 언마운트되거나 의존성이 변경될 때 setTimeout 취소
+    return () => clearTimeout(timeoutId);
+  }, [textInputs, subs, contents, writeMode, selectedSubIndex]);
 
   return (
     <ThemeProvider theme={theme}>
@@ -36,12 +65,16 @@ function MandaWrite() {
         <Manda
           writeMode={writeMode}
           setWriteMode={setWriteMode}
+          selectedSubIndex={selectedSubIndex}
           setSelectedSubIndex={setSelectedSubIndex}
         />
         <WriteBoxComponent
           manda={manda}
           writeMode={writeMode}
           selectedSubIndex={selectedSubIndex}
+          textInputs={textInputs}
+          setTextInputs={setTextInputs}
+          isSaveBtnActive={isSaveBtnActive}
         />
       </Row>
     </ThemeProvider>
@@ -49,7 +82,14 @@ function MandaWrite() {
 }
 
 // 세부목표 및 실천방법 작성 컴포넌트
-function WriteBoxComponent({ manda, writeMode, selectedSubIndex }) {
+function WriteBoxComponent({
+  manda,
+  writeMode,
+  selectedSubIndex,
+  textInputs,
+  setTextInputs,
+  isSaveBtnActive,
+}) {
   const dispatch = useDispatch();
 
   // 유저 인증 토큰
@@ -57,9 +97,6 @@ function WriteBoxComponent({ manda, writeMode, selectedSubIndex }) {
 
   // 작성 중인 필드의 인덱스 상태
   const [focusedIndex, setFocusedIndex] = useState(null);
-
-  // 입력 상태
-  const [textInputs, setTextInputs] = useState(Array(8).fill(null));
 
   // 입력 변경 핸들러
   const handleTextInputChange = (index, value) => {
@@ -146,7 +183,6 @@ function WriteBoxComponent({ manda, writeMode, selectedSubIndex }) {
       });
       // 스토어의 Contents 상태 업데이트
       dispatch(setContents(finalContents));
-
     } catch (error) {
       // 요청 실패
       console.error("mandaContents API 에러 :", error);
@@ -180,14 +216,16 @@ function WriteBoxComponent({ manda, writeMode, selectedSubIndex }) {
         ))}
       </WriteList>
       <StyledButton
-        onClick={
-          () =>
-            writeMode === "SUB"
-              ? handleSubmitSub()
-              : writeMode === "CONTENT"
-              ? handleSubmitContents()
-              : null // "SUB", "CONTENT" 둘 다 아닐 경우
-        }
+        isSaveBtnActive={isSaveBtnActive}
+        onClick={() => {
+          if (isSaveBtnActive) {
+            if (writeMode === "SUB") {
+              handleSubmitSub();
+            } else if (writeMode === "CONTENT") {
+              handleSubmitContents();
+            }
+          }
+        }}
       >
         저장
       </StyledButton>
@@ -275,8 +313,10 @@ let StyledButton = styled.button`
   font-weight: 700;
   line-height: 20px;
   color: white;
-  background-color: ${({ theme }) => theme.color.primary};
-  border: 1px solid ${({ theme }) => theme.color.primary};
+  background: ${({ isSaveBtnActive, theme }) =>
+    isSaveBtnActive ? theme.color.primary : theme.color.font2};
+  border: 1px solid
+    ${({ isSaveBtnActive, theme }) => (isSaveBtnActive ? theme.color.primary : theme.color.font2)};
   border-radius: 8px;
   outline: none;
   cursor: pointer;
