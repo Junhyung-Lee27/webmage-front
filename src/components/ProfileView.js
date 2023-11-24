@@ -87,17 +87,11 @@ function ProfileEdit({ user, setIsEditing }) {
     }
   };
 
-  // 변경된 프로필 정보 저장 요청
+  // 프로필 정보 수정 요청
   const handleEditProfile = async (authToken) => {
-    const axiosConfig = {
-      headers: {
-        Authorization: `Token ${authToken}`, // 헤더에 토큰 추가
-      },
-    };
-
     // 전송 데이터 준비
     let formData = new FormData();
-    formData.append("user_img", selectedImage); // 이미지 추가
+    formData.append("user_img", selectedImage);
     formData.append("user_position", userPosition);
     formData.append("user_info", userInfo);
     formData.append("user_hash", userHash);
@@ -106,59 +100,27 @@ function ProfileEdit({ user, setIsEditing }) {
     formData.append("username", username !== null ? username : user.username);
     formData.append("success_count", user.successCount);
 
-    // 프로필 생성 요청
     try {
-      const response = await axios.post(`${BASE_URL}/user/profile/write`, formData, axiosConfig);
+      const response = await axios.patch(`${BASE_URL}/user/profile/edit`, formData, {
+        headers: {
+          Authorization: `Token ${authToken}`,
+        },
+      });
 
-      // 프로필정보 생성 성공했을 경우
-      if (response.status === 201) {
-        dispatch(
-          setUser({
-            username: username,
-            userImg: selectedImage,
-            position: userPosition,
-            info: userInfo,
-            hash: userHash,
-          })
-        );
-        setIsEditing(false);
-        alert("수정 완료");
-      } else if (response.error) {
-        alert(response.error);
-      }
+      // 프로필정보 수정 성공했을 경우
+      dispatch(
+        setUser({
+          username: username,
+          userImg: response.data.user_image,
+          position: response.data.user_position,
+          info: response.data.user_info,
+          hash: response.data.user_hash,
+        })
+      );
+      setIsEditing(false);
+      alert("수정 완료");
     } catch (error) {
       console.log(error.response);
-
-      // 이미 프로필이 있을 경우 편집 요청
-      if (error.response && error.response.status === 400) {
-        try {
-          const editResponse = await axios.patch(
-            `${BASE_URL}/user/profile/edit`,
-            formData,
-            axiosConfig
-          );
-
-          if (editResponse.status === 200) {
-            dispatch(
-              setUser({
-                username: username,
-                userImg: selectedImage,
-                position: userPosition,
-                info: userInfo,
-                hash: userHash,
-              })
-            );
-            setIsEditing(false);
-            alert("프로필 수정 완료");
-          } else {
-            alert("프로필 수정 실패: " + (editResponse.data.error || "알 수 없는 오류"));
-          }
-        } catch (editError) {
-          alert("프로필 수정 오류: " + (editError.response.data.error || "알 수 없는 오류"));
-        }
-      } else {
-        alert("프로필 생성 오류: " + (error.response.data.error || "알 수 없는 오류"));
-      }
     }
   };
 
