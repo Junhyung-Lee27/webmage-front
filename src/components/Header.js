@@ -102,7 +102,7 @@ function Header() {
               <StyledLink to="/feed" activeclassname="active">
                 피드
               </StyledLink>
-              <StyledLink
+              {/* <StyledLink
                 to="/search"
                 activeclassname="active"
                 onClick={(e) => {
@@ -112,7 +112,7 @@ function Header() {
                 }}
               >
                 탐색
-              </StyledLink>
+              </StyledLink> */}
               <StyledLink to="/chat" activeclassname="active">
                 채팅
               </StyledLink>
