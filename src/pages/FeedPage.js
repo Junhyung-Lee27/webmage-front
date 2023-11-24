@@ -21,81 +21,120 @@ function FeedPage() {
     component: componentTheme,
   };
 
-  // 로딩 상태
-  const [loading, setLoading] = useState(true);
+  // 상태 관리
+  const feeds = useSelector((state) => state.feed.feeds); // 피드 상태
+  const [currentPage, setCurrentPage] = useState(1); // 피드 페이지네이션 번호
+  const [isFeedLoaded, setIsFeedLoaded] = useState(false); // 피드 로드 상태
+  const [hasMoreFeeds, setHasMoreFeeds] = useState(true); // 더 불러올 피드가 있는지
 
-  // 활성화된 탭을 추적하는 상태
-  const [activeTab, setActiveTab] = useState("마이");
+  const [activeTab, setActiveTab] = useState("마이"); // 활성화된 탭 (마이, 전체)
 
-  // 피드 상태
-  const feeds = useSelector((state) => state.feed.feeds);
+  const user = useSelector((state) => state.user); // 유저 상태
 
-  const user = useSelector((state) => state.user);
-  const userId = user.userId;
-  const authToken = user.authToken;
-  const userHash = user.hash;
-
-  // 추천 유저 상태
-  const [recommUsers, setRecommUsers] = useState([]);
+  const [recommUsers, setRecommUsers] = useState([]); // 추천 유저 상태
   let users = recommUsers;
 
   // 피드 정보 불러오기
   useEffect(() => {
-    async function fetchFeedData() {
-      const response = await axios.get(`${BASE_URL}/feed/${userId}`, {
-        headers: {
-          Authorization: `Token ${authToken}`, // 헤더에 토큰 추가
-        },
-      });
-      dispatch(setFeeds(response.data));
+    // 내 피드
+    async function fetchMyFeeds(user, currentPage) {
+      if (hasMoreFeeds) {
+        const response = await axios.get(
+          `${BASE_URL}/feed/${user.userId}/?query=${user.userId}&page=${currentPage}`,
+          {
+            headers: {
+              Authorization: `Token ${user.authToken}`,
+            },
+          }
+        );
+        if (response.data.message === "No more pages") {
+          setHasMoreFeeds(false); // 더 이상 페이지가 없음
+          return;
+        }
+
+        if (currentPage > 1) {
+          dispatch(setFeeds([...feeds, ...response.data])); // 기존 피드에 추가
+          console.log("my feeds loaded");
+        } else {
+          dispatch(setFeeds(response.data)); // 피드 초기화
+        }
+      }
     }
 
-    async function fetchRecentFeeds() {
-      const response = await axios.get(`${BASE_URL}/search/feeds`, {
-        headers: {
-          Authorization: `Token ${authToken}`, // 헤더에 토큰 추가
-        },
-        params: {
-          query: "", // 공백으로 보내면 최근 생성된 피드 보내주도록 백엔드 구현되어 있음
-        },
-      });
-      dispatch(setFeeds(response.data));
+    // 추천 피드
+    async function fetchRecommendedFeeds(user, currentPage) {
+      if (hasMoreFeeds) {
+        const response = await axios.get(`${BASE_URL}/feed/recommend/?page=${currentPage}`, {
+          headers: {
+            Authorization: `Token ${user.authToken}`,
+          },
+        });
+        if (response.data.message === "No more pages") {
+          setHasMoreFeeds(false); // 더 이상 페이지가 없음
+          return;
+        }
+
+        if (currentPage > 1) {
+          dispatch(setFeeds([...feeds, ...response.data])); // 기존 피드에 추가
+          console.log("recommended feeds loaded");
+        } else {
+          dispatch(setFeeds(response.data)); // 피드 초기화
+        }
+      }
     }
 
     if (activeTab === "마이") {
-      Promise.all([fetchFeedData()]).then(() => {
-        setLoading(false); // 데이터가 모두 로드되면 로딩 상태를 false로 설정
+      fetchMyFeeds(user, currentPage).then(() => {
+        setIsFeedLoaded(true);
       });
     }
     if (activeTab === "전체") {
-      Promise.all([fetchRecentFeeds()]).then(() => {
-        setLoading(false);
+      fetchRecommendedFeeds(user, currentPage).then(() => {
+        setIsFeedLoaded(true);
       });
     }
-  }, [activeTab]); // activeTab 값이 변경될 때마다 useEffect 실행
+  }, [activeTab, currentPage]);
 
-  // 유저 데이터 불러오기
+  // Intersection Observer 설정 (스크롤이 하단에 도달했을 때 감지)
   useEffect(() => {
-    async function fetchUserData() {
-      const response = await axios.get(`${BASE_URL}/search/users/`, {
-        headers: {
-          Authorization: `Token ${authToken}`, // 헤더에 토큰 추가
-        },
-        params: {
-          query: userHash,
-        },
-      });
-      setRecommUsers(response.data);
-    }
-    Promise.all([fetchUserData()]).then(() => {
-      setLoading(false); // 데이터가 모두 로드되면 로딩 상태를 false로 설정
-    });
-  }, []); // 빈 의존성 배열로 처음 마운트될 때 실행
+    if (!isFeedLoaded) return;
 
-  // 로딩 중 표시
-  if (loading) {
-    return <div>Loading...</div>;
-  }
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) {
+          setCurrentPage((prevPage) => prevPage + 1); // 페이지 번호 증가
+          setIsFeedLoaded(false);
+        }
+      },
+      { threshold: 1.0 }
+    );
+
+    // 관찰할 대상 요소 지정
+    const target = document.getElementById("feedEnd");
+    if (target) observer.observe(target);
+
+    return () => {
+      if (target) observer.unobserve(target); // 정리 작업
+    };
+  }, [isFeedLoaded === true]);
+
+  // // 유저 데이터 불러오기
+  // useEffect(() => {
+  //   async function fetchUserData() {
+  //     const response = await axios.get(`${BASE_URL}/search/users/`, {
+  //       headers: {
+  //         Authorization: `Token ${authToken}`, // 헤더에 토큰 추가
+  //       },
+  //       params: {
+  //         query: userHash,
+  //       },
+  //     });
+  //     setRecommUsers(response.data);
+  //   }
+  //   Promise.all([fetchUserData()]).then(() => {
+  //     setLoading(false); // 데이터가 모두 로드되면 로딩 상태를 false로 설정
+  //   });
+  // }, []); // 빈 의존성 배열로 처음 마운트될 때 실행
 
   return (
     <ThemeProvider theme={theme}>
@@ -107,29 +146,33 @@ function FeedPage() {
               <Nav>
                 <StyledText
                   color={activeTab === "마이" ? theme.color.font1 : theme.color.border}
-                  onClick={() => setActiveTab("마이")}
+                  onClick={() => {
+                    setCurrentPage(1);
+                    setActiveTab("마이");
+                  }}
                 >
                   마이
                 </StyledText>
                 <StyledText
                   color={activeTab === "전체" ? theme.color.font1 : theme.color.border}
-                  onClick={() => setActiveTab("전체")}
+                  onClick={() => {
+                    setCurrentPage(1);
+                    setActiveTab("전체");
+                  }}
                 >
                   전체
                 </StyledText>
               </Nav>
               <Feeds>
                 {feeds.map((feed) => (
-                  <Feed
-                    key={feed.contentInfo.id}
-                    userInfo={feed.userInfo}
-                    contentInfo={feed.contentInfo}
-                  />
+                  <Feed key={feed.feedInfo.id} userInfo={feed.userInfo} feedInfo={feed.feedInfo} />
                 ))}
+                {!hasMoreFeeds && <span>더 이상 불러올 게시물이 없습니다.</span>}
+                <div id="feedEnd" /> {/* 스크롤 감지를 위한 요소 */}
               </Feeds>
             </FeedsNav>
             <Aside>
-              <FeedWriteModal userId={userId} authToken={authToken} />
+              <FeedWriteModal userId={user.userId} authToken={user.authToken} />
               <StyledText color={theme.color.font1} cursor="default">
                 추천
               </StyledText>
@@ -180,7 +223,7 @@ let FeedsNav = styled.div`
 
 let Nav = styled.div`
   display: flex;
-  gap: 1.5rem;
+  gap: 1rem;
   /* margin-left: 3rem; */
 `;
 
