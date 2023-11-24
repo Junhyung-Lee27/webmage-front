@@ -1,12 +1,19 @@
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import styled, { ThemeProvider } from "styled-components";
-import theme from "./theme";
+import componentTheme from "./theme";
 import FallowButton from "./FallowButton";
 
-function Feed({ userInfo, contentInfo }) {
-  const currentTheme = useSelector((state) => state.theme.themes[state.theme.currentTheme]);
-  const currentFilter = useSelector((state) => state.theme.filters[state.theme.currentTheme]);
+function Feed({ userInfo, feedInfo }) {
+  // 테마
+  const colorTheme = useSelector((state) => state.theme.themes[state.theme.currentTheme]);
+  const filterTheme = useSelector((state) => state.theme.filters[state.theme.currentTheme]);
+  const theme = {
+    color: colorTheme,
+    filter: filterTheme,
+    component: componentTheme,
+  };
+
   const userName = "오르미";
   const [emojiInfo, setEmojiInfo] = useState({}); //피드 최다 이모지 및 총 이모지 갯수 표시를 위한 변수
   const [isEmojiModalOpen, setIsEmojiModalOpen] = useState(false);
@@ -69,41 +76,41 @@ function Feed({ userInfo, contentInfo }) {
   const openEmojiModal = () => {};
 
   useEffect(() => {
-    setEmojiInfo(getEmojiInfo(contentInfo.emoji_count));
-  }, [contentInfo]);
+    setEmojiInfo(getEmojiInfo(feedInfo.emoji_count));
+  }, [feedInfo]);
 
   const imgUrl = "";
 
   return (
     <ThemeProvider theme={theme}>
-      <FeedBox bgcolor={currentTheme.bg}>
+      <FeedBox bgcolor={theme.color.bg}>
         {/*유저정보 및 팔로우버튼/메뉴버튼 */}
         <FeedHeader>
           <UserInfo>
             <ProfileImgWrapper>
-              <ProfileImg src={process.env.PUBLIC_URL + "/logo/Manda_logo2.svg"} />
+              <ProfileImg src={process.env.PUBLIC_URL + "/testImg/profile2.jpg"} />
             </ProfileImgWrapper>
             <TextBox>
-              <StyledText size="0.875rem" weight="600" color={currentTheme.font1}>
+              <StyledText size="0.875rem" weight="600" color={theme.color.font1}>
                 {userInfo.userName}
               </StyledText>
               <StyledText
                 size="0.75rem"
                 weight="500"
-                color={currentTheme.font2}
+                color={theme.color.font2}
                 margin="0 0 0.25rem 0"
               >
                 {userInfo.userPosition}
               </StyledText>
-              <StyledText size="0.75rem" weight="500" color={currentTheme.font2}>
-                {formatDateAgo(contentInfo.created_at)}
+              <StyledText size="0.75rem" weight="500" color={theme.color.font2}>
+                {formatDateAgo(feedInfo.created_at)}
               </StyledText>
             </TextBox>
           </UserInfo>
           {userInfo.userName == userName ? (
             <MediumIcon
               src={process.env.PUBLIC_URL + "/icon/menu-horizontal.svg"}
-              filter={currentFilter.font1}
+              filter={theme.filter.font1}
             />
           ) : (
             // <FallowButton isFallowing={userInfo.isFallowing} /> Follow API 아직 미구현
@@ -113,12 +120,12 @@ function Feed({ userInfo, contentInfo }) {
         {/*주요목표, 세부목표, 하위목표*/}
         <FeedTitle>
           <FlexBox>
-            <StyledText size="1rem" weight="700" color={currentTheme.font1}>
-              {contentInfo.content}
+            <StyledText size="1rem" weight="700" color={theme.color.font1}>
+              {feedInfo.content}
             </StyledText>
-            <AchieveCount color={currentTheme.font1}>
-              <StyledText size="0.625rem" color={currentTheme.font1}>
-                {userInfo.success}회 실천
+            <AchieveCount color={theme.color.font1}>
+              <StyledText size="0.625rem" color={theme.color.font1}>
+                {feedInfo.success_count}회 실천
               </StyledText>
             </AchieveCount>
           </FlexBox>
@@ -127,26 +134,26 @@ function Feed({ userInfo, contentInfo }) {
               <StyledText
                 size="0.75rem"
                 weight="500"
-                color={currentTheme.font2}
+                color={theme.color.font2}
                 margin="0 0 0.25rem 0"
               >
                 핵심 목표
               </StyledText>
-              <StyledText size="0.875rem" weight="500" color={currentTheme.font1}>
-                {contentInfo.main_title}
+              <StyledText size="0.875rem" weight="500" color={theme.color.font1}>
+                {feedInfo.main_title}
               </StyledText>
             </TitleBox>
             <TitleBox>
               <StyledText
                 size="0.75rem"
                 weight="500"
-                color={currentTheme.font2}
+                color={theme.color.font2}
                 margin="0 0 0.25rem 0"
               >
                 세부 목표
               </StyledText>
-              <StyledText size="0.875rem" weight="500" color={currentTheme.font1}>
-                {contentInfo.sub_title}
+              <StyledText size="0.875rem" weight="500" color={theme.color.font1}>
+                {feedInfo.sub_title}
               </StyledText>
             </TitleBox>
           </FlexBox>
@@ -156,13 +163,13 @@ function Feed({ userInfo, contentInfo }) {
           <PictureWrap>
             <Picture src={process.env.PUBLIC_URL + "/testImg/feedImg1.jpg"} />
           </PictureWrap>
-          <StyledText size="1rem" weight="500" color={currentTheme.font1}>
-            {contentInfo.post}
+          <StyledText size="1rem" weight="500" color={theme.color.font1}>
+            {feedInfo.post}
           </StyledText>
           <div>
-            {parseTagsString(contentInfo.tags).map((tag) => {
+            {parseTagsString(feedInfo.tags).map((tag) => {
               return (
-                <StyledText size="1rem" weight="500" color={currentTheme.primary} key={tag}>
+                <StyledText size="1rem" weight="500" color={theme.color.primary} key={tag}>
                   {"#" + tag + " "}
                 </StyledText>
               );
@@ -176,33 +183,33 @@ function Feed({ userInfo, contentInfo }) {
               <IconBox>
                 <SmallIcon src={process.env.PUBLIC_URL + `/icon/${emojiInfo.maxKey}.svg`} />
                 <SmallIcon src={process.env.PUBLIC_URL + `/icon/${emojiInfo.nextMaxKey}.svg`} />
-                <StyledText size="1rem" weight="500" color={currentTheme.font1}>
+                <StyledText size="1rem" weight="500" color={theme.color.font1}>
                   {emojiInfo.total_count}
                 </StyledText>
               </IconBox>
             ) : null}
-            {contentInfo.comment_info == [] ? null : (
+            {feedInfo.comment_info == [] ? null : (
               <IconBox>
                 <SmallIcon src={process.env.PUBLIC_URL + "/icon/comment-fill.svg"} />
-                <StyledText size="1rem" weight="500" color={currentTheme.font1}>
-                  {contentInfo.comment_info.length}
+                <StyledText size="1rem" weight="500" color={theme.color.font1}>
+                  {feedInfo.comment_info.length}
                 </StyledText>
               </IconBox>
             )}
             <IconBox>
               <SmallIcon
                 src={process.env.PUBLIC_URL + "/icon/addEmoji.svg"}
-                filter={currentFilter.font1}
+                filter={theme.filter.font1}
               />
               <SmallIcon
                 src={process.env.PUBLIC_URL + "/icon/addComment.svg"}
-                filter={currentFilter.font1}
+                filter={theme.filter.font1}
               />
             </IconBox>
           </CommunicationBox>
           <SmallIcon
             src={process.env.PUBLIC_URL + "/icon/report.svg"}
-            filter={currentFilter.font1}
+            filter={theme.filter.font1}
           />
         </FeedFooter>
       </FeedBox>
@@ -211,7 +218,7 @@ function Feed({ userInfo, contentInfo }) {
 }
 
 let FlexBox = styled.div`
-  ${({ theme }) => theme.flexBox.rowLeftCenter};
+  ${({ theme }) => theme.component.flexBox.rowLeftCenter};
   gap: 1rem;
   width: 100%;
 `;
@@ -223,8 +230,8 @@ let StyledText = styled.span`
   margin: ${({ margin }) => margin};
 `;
 let FeedBox = styled.div`
-  ${({ theme }) => theme.flexBox.rowCenter};
-  ${({ theme }) => theme.font.importPretendard};
+  ${({ theme }) => theme.component.flexBox.rowCenter};
+  ${({ theme }) => theme.component.font.importPretendard};
   font-family: Pretendard-Regular;
   background-color: ${({ bgcolor }) => bgcolor};
   flex-direction: column;
@@ -238,15 +245,15 @@ let FeedBox = styled.div`
   cursor: default;
 `;
 let FeedHeader = styled.div`
-  ${({ theme }) => theme.flexBox.rowSpaceBetween};
+  ${({ theme }) => theme.component.flexBox.rowSpaceBetween};
   width: 100%;
 `;  
 let UserInfo = styled.div`
-  ${({ theme }) => theme.flexBox.rowCenter};
+  ${({ theme }) => theme.component.flexBox.rowCenter};
   gap: 0.75rem;
 `;
 let TextBox = styled.div`
-  ${({ theme }) => theme.flexBox.columnLeftCenter};
+  ${({ theme }) => theme.component.flexBox.columnLeftCenter};
   width: calc(100% - 4rem);
   gap: 0.25rem;
   flex-shrink: 1;
@@ -258,37 +265,37 @@ let ProfileImgWrapper = styled.div`
   flex-shrink: 0;
 `;
 let ProfileImg = styled.img`
-  ${({ theme }) => theme.common.circleImg};
-  object-fit: contain;
+  ${({ theme }) => theme.component.common.circleImg};
+  object-fit: cover;
   border: 1px solid ${({ theme }) => theme.color.border};
 `;
 let MediumIcon = styled.img`
-  ${({ theme }) => theme.iconSize.medium};
+  ${({ theme }) => theme.component.iconSize.medium};
   filter: ${({ filter }) => filter};
 `;
 let SmallIcon = styled.img`
-  ${({ theme }) => theme.iconSize.small};
+  ${({ theme }) => theme.component.iconSize.small};
   filter: ${({ filter }) => filter};
 `;
 let FeedTitle = styled.div`
-  ${({ theme }) => theme.flexBox.columnLeftCenter};
+  ${({ theme }) => theme.component.flexBox.columnLeftCenter};
   width: 100%;
   margin: 1.5rem 0 1rem 0;
 `;
 let AchieveCount = styled.span`
-  ${({ theme }) => theme.flexBox.rowCenter};
+  ${({ theme }) => theme.component.flexBox.rowCenter};
   border: 1px solid ${({ color }) => color};
   width: 3rem;
   height: 1rem;
   border-radius: 0.5rem;
 `;
 let TitleBox = styled.div`
-  ${({ theme }) => theme.flexBox.columnLeftCenter};
+  ${({ theme }) => theme.component.flexBox.columnLeftCenter};
   width: 50%;
   margin: 1rem 0;
 `;
 let FeedArticle = styled.div`
-  ${({ theme }) => theme.flexBox.columnLeftCenter};
+  ${({ theme }) => theme.component.flexBox.columnLeftCenter};
   width: 100%;
   gap: 1rem;
 `;
@@ -307,16 +314,16 @@ let Picture = styled.img`
   border-radius: 0.25rem;
 `;
 let FeedFooter = styled.div`
-  ${({ theme }) => theme.flexBox.rowSpaceBetween};
+  ${({ theme }) => theme.component.flexBox.rowSpaceBetween};
   width: 100%;
 `;
 let CommunicationBox = styled.div`
-  ${({ theme }) => theme.flexBox.rowLeftCenter};
+  ${({ theme }) => theme.component.flexBox.rowLeftCenter};
   gap: 1rem;
   margin: 1rem 0;
 `;
 let IconBox = styled.div`
-  ${({ theme }) => theme.flexBox.rowLeftCenter};
+  ${({ theme }) => theme.component.flexBox.rowLeftCenter};
   gap: 0.5rem;
 `;
 
