@@ -106,20 +106,17 @@ function MainPage() {
         <Body>
           <Stadardized>
             <TopGroup>
-              <MyManda>
-                <MandaTitle />
-                <Manda currPage={currPage} setCurrPage={setCurrPage} />
-              </MyManda>
-
               <ProfileLog>
                 <Profile>프로필</Profile>
                 <MandaLog>만다로그</MandaLog>
               </ProfileLog>
+              <MyManda>
+                <MandaTitle />
+                <Manda currPage={currPage} setCurrPage={setCurrPage} />
+              </MyManda>
             </TopGroup>
-
-            <Line />
-
-            <TodoGroup>
+            {/* <Line /> */}
+            {/* <TodoGroup>
               <TodoList date="Today" todos={todoInfo}>
                 오늘
               </TodoList>
@@ -129,7 +126,7 @@ function MainPage() {
               <TodoList date="This Week" todos={todoInfo}>
                 이번 주
               </TodoList>
-            </TodoGroup>
+            </TodoGroup> */}
           </Stadardized>
         </Body>
       </PageLayout>
@@ -142,7 +139,7 @@ const PageLayout = styled.div`
   font-family: Pretendard-Regular;
   display: flex;
   flex-direction: column;
-  background-color: ${({ theme }) => theme.color.bg};
+  background-color: ${({ theme }) => theme.color.bg2};
 `;
 
 let Body = styled.div`
@@ -158,7 +155,7 @@ let Stadardized = styled.div`
   width: 1080px;
   gap: 32px;
   margin-top: 40px;
-  margin-bottom: 80px;
+  /* margin-bottom: 80px; */
 `;
 
 const TopGroup = styled.div`
@@ -180,7 +177,7 @@ const ProfileLog = styled.div`
 
 const Profile = styled.div`
   display: inline-flex;
-  width: 250px;
+  width: 222px;
   height: 230px;
   background: grey;
   color: white;
@@ -189,7 +186,7 @@ const Profile = styled.div`
 `
 const MandaLog = styled.div`
   display: inline-flex;
-  width: 250px;
+  width: 222px;
   height: 376px;
   flex-direction: column;
   align-items: center;
