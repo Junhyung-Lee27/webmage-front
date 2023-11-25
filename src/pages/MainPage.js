@@ -140,6 +140,7 @@ const PageLayout = styled.div`
   display: flex;
   flex-direction: column;
   background-color: ${({ theme }) => theme.color.bg2};
+  height: 100vh;
 `;
 
 let Body = styled.div`
@@ -147,6 +148,7 @@ let Body = styled.div`
   align-content: space-between;
   justify-content: center;
   width: 100%;
+  margin-top: 56px;
 `;
 
 let Stadardized = styled.div`
@@ -154,8 +156,8 @@ let Stadardized = styled.div`
   flex-direction: column;
   width: 1080px;
   gap: 32px;
-  margin-top: 40px;
-  /* margin-bottom: 80px; */
+  margin-top: 16px;
+  margin-bottom: 80px;
 `;
 
 const TopGroup = styled.div`
