@@ -89,20 +89,24 @@ function Header() {
 
   return (
     <ThemeProvider theme={combinedTheme}>
-      <HeaderLayout position="relative">
-        <Stadardized>
-          <Row gap="48px">
-            <NavLink to="/manda">
-              <MandaIcon src={process.env.PUBLIC_URL + "/logo/Manda_logo2.svg"} alt="Manda Logo" />
-            </NavLink>
-            <Row gap="16px">
-              <StyledLink to="/manda" activeclassname="active">
-                만다라트
-              </StyledLink>
-              <StyledLink to="/feed" activeclassname="active">
-                피드
-              </StyledLink>
-              {/* <StyledLink
+      <FixedHeader>
+        <HeaderLayout>
+          <Stadardized>
+            <Row gap="48px">
+              <NavLink to="/manda">
+                <MandaIcon
+                  src={process.env.PUBLIC_URL + "/logo/Manda_logo2.svg"}
+                  alt="Manda Logo"
+                />
+              </NavLink>
+              <Row gap="16px">
+                <StyledLink to="/manda" activeclassname="active">
+                  만다라트
+                </StyledLink>
+                <StyledLink to="/feed" activeclassname="active">
+                  피드
+                </StyledLink>
+                {/* <StyledLink
                 to="/search"
                 activeclassname="active"
                 onClick={(e) => {
@@ -113,57 +117,63 @@ function Header() {
               >
                 탐색
               </StyledLink> */}
-              <StyledLink to="/chat" activeclassname="active">
-                채팅
-              </StyledLink>
+                <StyledLink to="/chat" activeclassname="active">
+                  채팅
+                </StyledLink>
+              </Row>
             </Row>
-          </Row>
-          <Row gap="20px">
-            <SearchBox
-              type="text"
-              placeholder="검색"
-              id="search-box"
-              value={searchTerm}
-              onChange={handleInputChange}
-              onKeyDown={handleSearch}
-            />
-            <Row gap="16px">
-              <NotiIconWrapper>
-                <LargeIcon
-                  $active={isNotiVisible}
-                  onClick={() => {
-                    setIsNotiVisible((prevState) => !prevState);
-                  }}
-                  src={process.env.PUBLIC_URL + "/icon/header/Notifications.svg"}
-                />
-                {isNotiVisible && <Notification>...</Notification>}
-              </NotiIconWrapper>
-              <IconLink to="/setting" activeclassname="active">
-                <LargeIcon src={process.env.PUBLIC_URL + "/icon/header/AccountCircle.svg"} />
-              </IconLink>
-              <LogoutBtn onClick={handleLogoutClick}>로그아웃</LogoutBtn>
+            <Row gap="20px">
+              <SearchBox
+                type="text"
+                placeholder="검색"
+                id="search-box"
+                value={searchTerm}
+                onChange={handleInputChange}
+                onKeyDown={handleSearch}
+              />
+              <Row gap="16px">
+                <NotiIconWrapper>
+                  <LargeIcon
+                    $active={isNotiVisible}
+                    onClick={() => {
+                      setIsNotiVisible((prevState) => !prevState);
+                    }}
+                    src={process.env.PUBLIC_URL + "/icon/header/Notifications.svg"}
+                  />
+                  {isNotiVisible && <Notification>...</Notification>}
+                </NotiIconWrapper>
+                <IconLink to="/setting" activeclassname="active">
+                  <LargeIcon src={process.env.PUBLIC_URL + "/icon/header/AccountCircle.svg"} />
+                </IconLink>
+                <LogoutBtn onClick={handleLogoutClick}>로그아웃</LogoutBtn>
+              </Row>
+              <ThemeSwitch />
             </Row>
-            <ThemeSwitch />
-          </Row>
-        </Stadardized>
-      </HeaderLayout>
+          </Stadardized>
+        </HeaderLayout>
+      </FixedHeader>
     </ThemeProvider>
   );
 }
 
-let HeaderLayout = styled.div`
+let FixedHeader = styled.div`
+  position: fixed;
+  z-index: 10;
   ${({ theme }) => theme.component.font.importPretendard};
   font-family: Pretendard-Regular;
-  position: ${({ position }) => position};
-  z-index: 1;
   height: 56px;
+  width: 100%;
   box-sizing: border-box;
+  background-color: ${({ theme }) => theme.color.bg};
+`;
+
+let HeaderLayout = styled.div`
+  position: relative;
   gap: ${({ gap = "16px" }) => gap};
   display: flex;
   flex-direction: row;
   align-items: center;
   justify-content: ${({ justifycontent = "center" }) => justifycontent};
-  background-color: ${({ theme }) => theme.color.bg};
   border-bottom: 1px solid ${({ theme }) => theme.color.border};
 `;
 
