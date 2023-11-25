@@ -194,8 +194,8 @@ let PageLayout = styled.div`
   font-family: Pretendard-Regular;
   display: flex;
   flex-direction: column;
-  height: 100vh;
-  background-color: ${({ theme }) => theme.color.bg};
+  height: 100%;
+  background-color: ${({ theme }) => theme.color.bg2};
 `;
 
 let Body = styled.div`
@@ -203,6 +203,7 @@ let Body = styled.div`
   align-content: space-between;
   justify-content: center;
   width: 100%;
+  margin-top: 56px;
 `;
 
 let Stadardized = styled.div`
@@ -210,7 +211,7 @@ let Stadardized = styled.div`
   justify-content: space-between;
   width: 1080px;
   gap: 32px;
-  margin-top: 40px;
+  margin-top: 16px;
   margin-bottom: 80px;
 `;
 

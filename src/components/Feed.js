@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import styled, { ThemeProvider } from "styled-components";
 import componentTheme from "./theme";
-import FallowButton from "./FallowButton";
+import FollowButton from "./FollowButton";
 
 function Feed({ userInfo, feedInfo }) {
   // 테마
@@ -14,7 +14,9 @@ function Feed({ userInfo, feedInfo }) {
     component: componentTheme,
   };
 
-  const userName = "오르미";
+  // 상태관리
+  const user = useSelector((state) => state.user);
+
   const [emojiInfo, setEmojiInfo] = useState({}); //피드 최다 이모지 및 총 이모지 갯수 표시를 위한 변수
   const [isEmojiModalOpen, setIsEmojiModalOpen] = useState(false);
 
@@ -84,98 +86,78 @@ function Feed({ userInfo, feedInfo }) {
   return (
     <ThemeProvider theme={theme}>
       <FeedBox bgcolor={theme.color.bg}>
-        {/*유저정보 및 팔로우버튼/메뉴버튼 */}
-        <FeedHeader>
-          <UserInfo>
-            <ProfileImgWrapper>
-              <ProfileImg src={process.env.PUBLIC_URL + "/testImg/profile2.jpg"} />
-            </ProfileImgWrapper>
-            <TextBox>
-              <StyledText size="0.875rem" weight="600" color={theme.color.font1}>
-                {userInfo.userName}
-              </StyledText>
-              <StyledText
-                size="0.75rem"
-                weight="500"
-                color={theme.color.font2}
-                margin="0 0 0.25rem 0"
-              >
-                {userInfo.userPosition}
-              </StyledText>
-              <StyledText size="0.75rem" weight="500" color={theme.color.font2}>
-                {formatDateAgo(feedInfo.created_at)}
-              </StyledText>
-            </TextBox>
-          </UserInfo>
-          {userInfo.userName == userName ? (
-            <MediumIcon
-              src={process.env.PUBLIC_URL + "/icon/menu-horizontal.svg"}
-              filter={theme.filter.font1}
-            />
-          ) : (
-            // <FallowButton isFallowing={userInfo.isFallowing} /> Follow API 아직 미구현
-            <FallowButton />
-          )}
-        </FeedHeader>
-        {/*주요목표, 세부목표, 하위목표*/}
-        <FeedTitle>
-          <FlexBox>
-            <StyledText size="1rem" weight="700" color={theme.color.font1}>
-              {feedInfo.content}
-            </StyledText>
-            <AchieveCount color={theme.color.font1}>
-              <StyledText size="0.625rem" color={theme.color.font1}>
-                {feedInfo.success_count}회 실천
-              </StyledText>
-            </AchieveCount>
-          </FlexBox>
-          <FlexBox>
-            <TitleBox>
-              <StyledText
-                size="0.75rem"
-                weight="500"
-                color={theme.color.font2}
-                margin="0 0 0.25rem 0"
-              >
-                핵심 목표
-              </StyledText>
-              <StyledText size="0.875rem" weight="500" color={theme.color.font1}>
-                {feedInfo.main_title}
-              </StyledText>
-            </TitleBox>
-            <TitleBox>
-              <StyledText
-                size="0.75rem"
-                weight="500"
-                color={theme.color.font2}
-                margin="0 0 0.25rem 0"
-              >
-                세부 목표
-              </StyledText>
-              <StyledText size="0.875rem" weight="500" color={theme.color.font1}>
-                {feedInfo.sub_title}
-              </StyledText>
-            </TitleBox>
-          </FlexBox>
-        </FeedTitle>
-        {/*피드 본문*/}
-        <FeedArticle>
-          <PictureWrap>
-            <Picture src={process.env.PUBLIC_URL + "/testImg/feedImg1.jpg"} />
-          </PictureWrap>
-          <StyledText size="1rem" weight="500" color={theme.color.font1}>
-            {feedInfo.post}
-          </StyledText>
-          <div>
-            {parseTagsString(feedInfo.tags).map((tag) => {
-              return (
-                <StyledText size="1rem" weight="500" color={theme.color.primary} key={tag}>
-                  {"#" + tag + " "}
+        <FeedBody>
+          {/*유저정보 및 팔로우버튼/메뉴버튼 */}
+          <FeedHeader>
+            <UserInfo>
+              <ProfileImgWrapper>
+                <ProfileImg src={process.env.PUBLIC_URL + "/testImg/profile2.jpg"} />
+              </ProfileImgWrapper>
+              <TextBox>
+                <StyledText
+                  size="14px"
+                  weight="600"
+                  color={theme.color.font1}
+                  margin="0 0 2px 0"
+                  lineHeight="18px"
+                >
+                  {userInfo.userName}
                 </StyledText>
-              );
-            })}
-          </div>
-        </FeedArticle>
+                <StyledText
+                  size="13px"
+                  weight="500"
+                  color={theme.color.font2}
+                  margin="0 0 8px 0"
+                  lineHeight="16px"
+                >
+                  {userInfo.userPosition}
+                </StyledText>
+                <StyledText size="13px" weight="500" color={theme.color.font2} lineHeight="16px">
+                  {formatDateAgo(feedInfo.created_at)}
+                </StyledText>
+              </TextBox>
+            </UserInfo>
+            {/* {userInfo.userName !== user.username && <FollowButton />} */}
+            <OptionButtons>
+              <FollowButton />
+              <FeedOptionIcon src={process.env.PUBLIC_URL + "/icon/menu-horizontal.svg"} />
+            </OptionButtons>
+          </FeedHeader>
+          {/* 경계선 */}
+          <HorizontalLine />
+          {/* 만다라트, 이미지 + 피드 */}
+          <FeedContents>
+            {/*피드 본문*/}
+            <FeedArticle>
+              <StyledText
+                size="14px"
+                weight="400"
+                color={theme.color.font1}
+                lineHeight="140%"
+                // margin="16px 0px 0px 0px"
+              >
+                {feedInfo.post}
+              </StyledText>
+              <FeedTags>
+                {parseTagsString(feedInfo.tags).map((tag) => {
+                  return (
+                    <StyledText size="14px" weight="500" color={theme.color.primary} key={tag}>
+                      {"#" + tag + " "}
+                    </StyledText>
+                  );
+                })}
+              </FeedTags>
+            </FeedArticle>
+            {/* 만다라트, 이미지 영역 */}
+            <PictureWrap>
+              <PrevBtn src={process.env.PUBLIC_URL + "/icon/prev-image-btn.svg"}></PrevBtn>
+              <NextBtn src={process.env.PUBLIC_URL + "/icon/next-image-btn.svg"}></NextBtn>
+              <Picture src={process.env.PUBLIC_URL + "/testImg/feedImg1.jpg"} />
+            </PictureWrap>
+          </FeedContents>
+        </FeedBody>
+        {/* 경계선 */}
+        <HorizontalLine />
         {/*이모지, 댓글 등 커뮤니케이션 영역*/}
         <FeedFooter>
           <CommunicationBox>
@@ -207,10 +189,6 @@ function Feed({ userInfo, feedInfo }) {
               />
             </IconBox>
           </CommunicationBox>
-          <SmallIcon
-            src={process.env.PUBLIC_URL + "/icon/report.svg"}
-            filter={theme.filter.font1}
-          />
         </FeedFooter>
       </FeedBox>
     </ThemeProvider>
@@ -219,20 +197,21 @@ function Feed({ userInfo, feedInfo }) {
 
 let FlexBox = styled.div`
   ${({ theme }) => theme.component.flexBox.rowLeftCenter};
-  gap: 1rem;
   width: 100%;
+  gap: 8px;
 `;
+
 let StyledText = styled.span`
   font-size: ${({ size }) => size};
   font-weight: ${({ weight }) => weight};
   color: ${({ color }) => color};
   text-align: ${({ align }) => align};
   margin: ${({ margin }) => margin};
+  line-height: ${({ lineHeight }) => lineHeight};
 `;
+
 let FeedBox = styled.div`
   ${({ theme }) => theme.component.flexBox.rowCenter};
-  ${({ theme }) => theme.component.font.importPretendard};
-  font-family: Pretendard-Regular;
   background-color: ${({ bgcolor }) => bgcolor};
   flex-direction: column;
   box-shadow: 0px 0.5rem 1.5rem 0px rgba(0, 0, 0, 0.15);
@@ -244,84 +223,158 @@ let FeedBox = styled.div`
   border-radius: 0.5rem;
   cursor: default;
 `;
+
 let FeedHeader = styled.div`
-  ${({ theme }) => theme.component.flexBox.rowSpaceBetween};
-  width: 100%;
-`;  
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+`;
+
+let OptionButtons = styled.div`
+  display: flex;
+  gap: 8px;
+  align-items: center;
+`
+
 let UserInfo = styled.div`
   ${({ theme }) => theme.component.flexBox.rowCenter};
   gap: 0.75rem;
 `;
+
 let TextBox = styled.div`
-  ${({ theme }) => theme.component.flexBox.columnLeftCenter};
   width: calc(100% - 4rem);
-  gap: 0.25rem;
+  height: 60px;
   flex-shrink: 1;
   flex-grow: 1;
+
+  display: flex;
+  flex-direction: column;
 `;
+
 let ProfileImgWrapper = styled.div`
-  width: 4rem;
-  height: 4rem;
+  width: 60px;
+  height: 60px;
   flex-shrink: 0;
 `;
+
 let ProfileImg = styled.img`
   ${({ theme }) => theme.component.common.circleImg};
   object-fit: cover;
   border: 1px solid ${({ theme }) => theme.color.border};
 `;
+
 let MediumIcon = styled.img`
-  ${({ theme }) => theme.component.iconSize.medium};
-  filter: ${({ filter }) => filter};
+  ${({ theme }) => theme.component.iconSize.small};
 `;
+
 let SmallIcon = styled.img`
   ${({ theme }) => theme.component.iconSize.small};
   filter: ${({ filter }) => filter};
 `;
-let FeedTitle = styled.div`
-  ${({ theme }) => theme.component.flexBox.columnLeftCenter};
+
+let FeedOptionIcon = styled(MediumIcon)`
+  box-sizing: content-box;
+  padding: 2px;
+  /* margin: -4px -4px 0px 0px; */
+  border-radius: 50%;
+  border: none;
+  cursor: pointer;
+  &:hover {
+    transition: 0.3s;
+    background-color: ${({ theme }) => theme.color.bg3};
+  }
+`;
+
+let FeedContents = styled.div`
+  display: flex;
+  gap: 24px;
+`
+
+let FeedBody = styled.div`
+  display: flex;
+  flex-direction: column;
   width: 100%;
-  margin: 1.5rem 0 1rem 0;
 `;
-let AchieveCount = styled.span`
-  ${({ theme }) => theme.component.flexBox.rowCenter};
-  border: 1px solid ${({ color }) => color};
-  width: 3rem;
-  height: 1rem;
-  border-radius: 0.5rem;
-`;
-let TitleBox = styled.div`
-  ${({ theme }) => theme.component.flexBox.columnLeftCenter};
-  width: 50%;
-  margin: 1rem 0;
-`;
+
 let FeedArticle = styled.div`
-  ${({ theme }) => theme.component.flexBox.columnLeftCenter};
-  width: 100%;
-  gap: 1rem;
+  display: flex;
+  flex-direction: column;
+  width: 292px;
 `;
-let PictureWrap = styled.div`
-  padding-top: 65%;
-  position: relative;
-  width: 100%;
+
+let FeedTags = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-top: 8px;
 `;
-let Picture = styled.img`
-  height: 100%;
+
+let PrevBtn = styled.img`
   position: absolute;
-  width: 100%;
-  object-fit: cover;
+  width: 56px;
+  height: 100%;
+  background-color: ${({ theme }) => theme.color.font1};
   left: 0;
-  top: 0;
-  border-radius: 0.25rem;
+  border-radius: 4px 0px 0px 4px;
+
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+
+  cursor: pointer;
 `;
+
+let NextBtn = styled.img`
+  position: absolute;
+  width: 56px;
+  height: 100%;
+  background-color: ${({ theme }) => theme.color.font1};
+  right: 0;
+  border-radius: 0px 4px 4px 0px;
+
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+
+  cursor: pointer;
+`;
+
+let PictureWrap = styled.div`
+  width: 370px;
+  height: 208px;
+  position: relative;
+
+  &:hover ${PrevBtn}, &:hover ${NextBtn} {
+    opacity: 0.6;
+    pointer-events: all;
+  }
+`;
+
+let Picture = styled.img`
+  width: 100%;
+  height: 208px;
+  object-fit: cover;
+  border-radius: 4px;
+`;
+
+let HorizontalLine = styled.hr`
+  border: none;
+  border-top: 1px solid ${({ theme }) => theme.color.border};
+  width: 100%;
+  margin: 16px 0px;
+`
+
 let FeedFooter = styled.div`
   ${({ theme }) => theme.component.flexBox.rowSpaceBetween};
   width: 100%;
 `;
+
 let CommunicationBox = styled.div`
   ${({ theme }) => theme.component.flexBox.rowLeftCenter};
   gap: 1rem;
   margin: 1rem 0;
 `;
+
 let IconBox = styled.div`
   ${({ theme }) => theme.component.flexBox.rowLeftCenter};
   gap: 0.5rem;
