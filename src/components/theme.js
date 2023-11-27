@@ -88,11 +88,18 @@ const iconSize = {
     `,
 }
 
+const shadow = {
+  default: `
+    box-shadow: 0 8px 24px 0px rgba(0, 0, 0, 0.15);
+  `,
+};
+
 const theme = {
     font,
     flexBox,
     common,
     iconSize,
+    shadow
 };
 
 export default theme;
