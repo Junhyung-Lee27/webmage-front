@@ -4,7 +4,7 @@ import styled, { ThemeProvider } from "styled-components";
 import componentTheme from "./theme";
 import FollowButton from "./FollowButton";
 
-function Feed({ userInfo, feedInfo, isFollowing, updateFollowingStatus}) {
+function Feed({ userInfo, feedInfo, isFollowing, updateFollowingStatus }) {
   // 테마
   const colorTheme = useSelector((state) => state.theme.themes[state.theme.currentTheme]);
   const filterTheme = useSelector((state) => state.theme.filters[state.theme.currentTheme]);
@@ -16,6 +16,7 @@ function Feed({ userInfo, feedInfo, isFollowing, updateFollowingStatus}) {
 
   // 상태관리
   const user = useSelector((state) => state.user);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const [emojiInfo, setEmojiInfo] = useState({}); //피드 최다 이모지 및 총 이모지 갯수 표시를 위한 변수
   const [isEmojiModalOpen, setIsEmojiModalOpen] = useState(false);
@@ -119,14 +120,24 @@ function Feed({ userInfo, feedInfo, isFollowing, updateFollowingStatus}) {
                 </StyledText>
               </TextBox>
             </UserInfo>
-            {/* {userInfo.userName !== user.username && <FollowButton />} */}
+
             <OptionButtons>
-              <FollowButton
-                userInfo={userInfo}
-                isFollowing={isFollowing}
-                updateFollowingStatus={updateFollowingStatus}
-              />
-              <FeedOptionIcon src={process.env.PUBLIC_URL + "/icon/menu-horizontal.svg"} />
+              {userInfo.userName !== user.username && (
+                <FollowButton
+                  userInfo={userInfo}
+                  isFollowing={isFollowing}
+                  updateFollowingStatus={updateFollowingStatus}
+                />
+              )}
+              <OptionWrapper>
+                <FeedOptionIcon
+                  src={process.env.PUBLIC_URL + "/icon/menu-horizontal.svg"}
+                  onClick={() => {
+                    setIsMenuOpen((prevState) => !prevState);
+                  }}
+                ></FeedOptionIcon>
+                {isMenuOpen && <OptionMenu user={user} userInfo={userInfo}></OptionMenu>}
+              </OptionWrapper>
             </OptionButtons>
           </FeedHeader>
           {/* 경계선 */}
@@ -201,6 +212,18 @@ function Feed({ userInfo, feedInfo, isFollowing, updateFollowingStatus}) {
   );
 }
 
+function OptionMenu({ user, userInfo }) {
+  return (
+    <OptionLayout>
+      <OptionContainer>
+        <OptionList>
+          {user.userId === userInfo.id ? <Option>게시물 수정</Option> : <Option>차단</Option>}
+        </OptionList>
+      </OptionContainer>
+    </OptionLayout>
+  );
+}
+
 let FlexBox = styled.div`
   ${({ theme }) => theme.component.flexBox.rowLeftCenter};
   width: 100%;
@@ -250,7 +273,15 @@ let OptionButtons = styled.div`
   display: flex;
   gap: 8px;
   align-items: center;
-`
+`;
+
+let OptionWrapper = styled.div`
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 50%;
+`;
 
 let UserInfo = styled.div`
   ${({ theme }) => theme.component.flexBox.rowCenter};
@@ -303,10 +334,43 @@ let FeedOptionIcon = styled(MediumIcon)`
   }
 `;
 
+
+let OptionLayout = styled.div`
+  ${({ theme }) => theme.component.shadow.default};
+  position: absolute;
+  z-index: 5;
+  top: 100%;
+  right: calc(100% - 1.4rem);
+  width: 240px;
+  height: fit-content;
+  background-color: ${({ theme }) => theme.color.bg};
+  border-radius: 4px;
+`;
+
+let OptionContainer = styled.div`
+  position: relative;
+`;
+
+let OptionList = styled.ul`
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+`;
+
+let Option = styled.li`
+  padding: 16px 24px;
+  text-align: center;
+  cursor: pointer;
+
+  &:hover {
+    background-color: ${({ theme }) => theme.color.bg3};
+  }
+`;
+
 let FeedContents = styled.div`
   display: flex;
   gap: 24px;
-`
+`;
 
 let FeedBody = styled.div`
   display: flex;
@@ -380,7 +444,7 @@ let HorizontalLine = styled.hr`
   border-top: 1px solid ${({ theme }) => theme.color.border};
   width: 100%;
   margin: 16px 0px;
-`
+`;
 
 let FeedFooter = styled.div`
   ${({ theme }) => theme.component.flexBox.rowSpaceBetween};
