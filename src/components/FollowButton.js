@@ -30,7 +30,6 @@ function FollowButton({ userInfo, isFollowing, updateFollowingStatus }) {
             Authorization: `Token ${authToken}`,
           },
         });
-        console.log(response.data);
       } catch (error) {
         console.error(error.response);
       }
