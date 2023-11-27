@@ -73,7 +73,7 @@ function Notification() {
 }
 
 let NotiLayout = styled.div`
-  // 아이콘 하단, 좌측 정렬
+  // 아이콘 하단, 가운데 정렬
   position: absolute;
   top: calc(100% + 24px);
 
