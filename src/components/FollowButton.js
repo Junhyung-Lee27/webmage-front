@@ -1,9 +1,13 @@
 import styled, { ThemeProvider } from "styled-components";
 import { useSelector } from "react-redux";
 import componentTheme from "../components/theme";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { BASE_URL } from "./../config";
+import axios from "axios";
 
-function FollowButton() {
+function FollowButton({ userInfo, isFollowing, updateFollowingStatus }) {
+
+  // 테마
   const colorTheme = useSelector((state) => state.theme.themes[state.theme.currentTheme]);
   const filterTheme = useSelector((state) => state.theme.filters[state.theme.currentTheme]);
   const theme = {
@@ -12,19 +16,74 @@ function FollowButton() {
     component: componentTheme,
   };
 
-  const [isFollowing, setIsFollowing] = useState(false);
+  // 상태 관리
+  const user = useSelector((state) => state.user);
 
+  // 팔로우 상태 확인
+  useEffect(() => {
+    // 팔로우 상태 확인 함수
+    const checkFollowStatus = async (authToken) => {
+      try {
+        const response = await axios.get(`${BASE_URL}/user/follow/${userInfo.id}`, {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Token ${authToken}`,
+          },
+        });
+        console.log(response.data);
+      } catch (error) {
+        console.error(error.response);
+      }
+    };
+
+    checkFollowStatus(user.authToken);
+  }, []);
+
+  const followButtonClick = async (followingId, authToken) => {
+    try {
+      const response = await axios.post(
+        `${BASE_URL}/user/follow/`,
+        {
+          following_id: followingId,
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Token ${authToken}`,
+          },
+        }
+      );
+      updateFollowingStatus(userInfo.id, true);
+    } catch (error) {
+      console.error(error.response); // 오류 처리
+    }
+  };
+
+  const unfollowButtonClick = async (followingId, authToken) => {
+    try {
+      const response = await axios.delete(`${BASE_URL}/user/unfollow/`, {
+        data: { following_id: followingId }, // 요청 본문
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Token ${authToken}`,
+        },
+      });
+      updateFollowingStatus(userInfo.id, false);
+    } catch (error) {
+      console.error(error.response.data); // 오류 처리
+    }
+  };
   return (
     <ThemeProvider theme={theme}>
-      {isFollowing ? ( 
-        <Following color={theme.color.primary} colorhover={theme.color.secondary}>
-          팔로잉
+      {isFollowing ? (
+        <Following
+          onClick={() => unfollowButtonClick(userInfo.id, user.authToken)}
+        >
+          v 팔로우중 
         </Following>
       ) : (
         <Follow
-          // bgcolor={theme.color.bg3}
-          color={theme.color.font2}
-          colorhover={theme.color.primary}
+          onClick={() => followButtonClick(userInfo.id, user.authToken)}
         >
           + 팔로우
         </Follow>
@@ -38,7 +97,7 @@ let Follow = styled.button`
   background: none;
   color: ${({ theme }) => theme.color.primary};
   border-radius: 0.25rem;
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 600;
   padding: 0.25rem 0.5rem;
   flex-shrink: 0;
@@ -49,20 +108,19 @@ let Follow = styled.button`
   }
 `;
 let Following = styled.button`
-  border: 2px solid ${({ color }) => color};
-  background-color: ${({ color }) => color};
-  color: #fff;
-  border-radius: 1rem;
-  width: 6rem;
-  height: 2rem;
-  font-size: 1rem;
-  font-weight: 600;
-  padding: 0.25rem 1rem;
+  border: none;
+  background: none;
+  color: ${({ theme }) => theme.color.font2 };
+  border-radius: 0.25rem;
+  font-size: 14px;
+  font-weight: 500;
+  padding: 0.25rem 0.5rem;
   flex-shrink: 0;
+
   &:hover {
-    border: 1px solid ${({ colorhover }) => colorhover};
-    background-color: ${({ colorhover }) => colorhover};
-    transition: 0.5s;
+    background-color: ${({ theme }) => theme.color.font2};
+    color: white;
+    transition: 0.3s;
   }
 `;
 

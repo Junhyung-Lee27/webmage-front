@@ -26,19 +26,19 @@ function FeedPage() {
   const [currentPage, setCurrentPage] = useState(1); // 피드 페이지네이션 번호
   const [isFeedLoaded, setIsFeedLoaded] = useState(false); // 피드 로드 상태
   const [hasMoreFeeds, setHasMoreFeeds] = useState(true); // 더 불러올 피드가 있는지
-
   const [activeTab, setActiveTab] = useState("마이"); // 활성화된 탭 (마이, 전체)
-
   const user = useSelector((state) => state.user); // 유저 상태
-
   const [recommUsers, setRecommUsers] = useState([]); // 추천 유저 상태
+  const [followingStatus, setFollowingStatus] = useState({});
   let users = recommUsers;
 
   // 피드 정보 불러오기
   useEffect(() => {
     // 내 피드
     async function fetchMyFeeds(user, currentPage) {
-      if (hasMoreFeeds) {
+      if (hasMoreFeeds === false) {
+        return;
+      } else if (hasMoreFeeds) {
         const response = await axios.get(
           `${BASE_URL}/feed/${user.userId}/?query=${user.userId}&page=${currentPage}`,
           {
@@ -63,7 +63,9 @@ function FeedPage() {
 
     // 추천 피드
     async function fetchRecommendedFeeds(user, currentPage) {
-      if (hasMoreFeeds) {
+      if (hasMoreFeeds === false) {
+        return;
+      } else if (hasMoreFeeds) {
         const response = await axios.get(`${BASE_URL}/feed/recommend/?page=${currentPage}`, {
           headers: {
             Authorization: `Token ${user.authToken}`,
@@ -97,7 +99,7 @@ function FeedPage() {
 
   // Intersection Observer 설정 (스크롤이 하단에 도달했을 때 감지)
   useEffect(() => {
-    if (!isFeedLoaded) return;
+    if (!isFeedLoaded || !hasMoreFeeds) return;
 
     const observer = new IntersectionObserver(
       (entries) => {
@@ -117,6 +119,11 @@ function FeedPage() {
       if (target) observer.unobserve(target); // 정리 작업
     };
   }, [isFeedLoaded === true]);
+
+  // 팔로잉
+  const updateFollowingStatus = (userId, isFollowing) => {
+    setFollowingStatus((prevStatus) => ({ ...prevStatus, [userId]: isFollowing }));
+  };
 
   // // 유저 데이터 불러오기
   // useEffect(() => {
@@ -148,6 +155,7 @@ function FeedPage() {
                   color={activeTab === "마이" ? theme.color.font1 : theme.color.border}
                   onClick={() => {
                     setCurrentPage(1);
+                    setHasMoreFeeds(true);
                     setActiveTab("마이");
                   }}
                 >
@@ -157,6 +165,7 @@ function FeedPage() {
                   color={activeTab === "전체" ? theme.color.font1 : theme.color.border}
                   onClick={() => {
                     setCurrentPage(1);
+                    setHasMoreFeeds(true);
                     setActiveTab("전체");
                   }}
                 >
@@ -165,7 +174,13 @@ function FeedPage() {
               </Nav>
               <Feeds>
                 {feeds.map((feed) => (
-                  <Feed key={feed.feedInfo.id} userInfo={feed.userInfo} feedInfo={feed.feedInfo} />
+                  <Feed
+                    key={feed.feedInfo.id}
+                    userInfo={feed.userInfo}
+                    feedInfo={feed.feedInfo}
+                    isFollowing={followingStatus[feed.userInfo.id]}
+                    updateFollowingStatus={updateFollowingStatus}
+                  />
                 ))}
                 {!hasMoreFeeds && <span>더 이상 불러올 게시물이 없습니다.</span>}
                 <div id="feedEnd" /> {/* 스크롤 감지를 위한 요소 */}

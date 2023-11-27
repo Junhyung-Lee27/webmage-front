@@ -4,7 +4,7 @@ import styled, { ThemeProvider } from "styled-components";
 import componentTheme from "./theme";
 import FollowButton from "./FollowButton";
 
-function Feed({ userInfo, feedInfo }) {
+function Feed({ userInfo, feedInfo, isFollowing, updateFollowingStatus}) {
   // 테마
   const colorTheme = useSelector((state) => state.theme.themes[state.theme.currentTheme]);
   const filterTheme = useSelector((state) => state.theme.filters[state.theme.currentTheme]);
@@ -94,21 +94,23 @@ function Feed({ userInfo, feedInfo }) {
                 <ProfileImg src={process.env.PUBLIC_URL + "/testImg/profile2.jpg"} />
               </ProfileImgWrapper>
               <TextBox>
-                <StyledText
+                <UserName
                   size="14px"
                   weight="600"
                   color={theme.color.font1}
                   margin="0 0 2px 0"
                   lineHeight="18px"
+                  cursor="pointer"
                 >
                   {userInfo.userName}
-                </StyledText>
+                </UserName>
                 <StyledText
                   size="13px"
                   weight="500"
                   color={theme.color.font2}
                   margin="0 0 8px 0"
                   lineHeight="16px"
+                  cursor="pointer"
                 >
                   {userInfo.userPosition}
                 </StyledText>
@@ -119,7 +121,11 @@ function Feed({ userInfo, feedInfo }) {
             </UserInfo>
             {/* {userInfo.userName !== user.username && <FollowButton />} */}
             <OptionButtons>
-              <FollowButton />
+              <FollowButton
+                userInfo={userInfo}
+                isFollowing={isFollowing}
+                updateFollowingStatus={updateFollowingStatus}
+              />
               <FeedOptionIcon src={process.env.PUBLIC_URL + "/icon/menu-horizontal.svg"} />
             </OptionButtons>
           </FeedHeader>
@@ -208,6 +214,16 @@ let StyledText = styled.span`
   text-align: ${({ align }) => align};
   margin: ${({ margin }) => margin};
   line-height: ${({ lineHeight }) => lineHeight};
+
+  cursor: ${({ cursor }) => cursor};
+`;
+
+let UserName = styled(StyledText)`
+  width: fit-content;
+  &:hover {
+    text-decoration: underline;
+    text-decoration-color: ${({ theme }) => theme.color.font1};
+  }
 `;
 
 let FeedBox = styled.div`
@@ -255,6 +271,8 @@ let ProfileImgWrapper = styled.div`
   width: 60px;
   height: 60px;
   flex-shrink: 0;
+
+  cursor: pointer;
 `;
 
 let ProfileImg = styled.img`
