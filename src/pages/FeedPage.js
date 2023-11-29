@@ -9,6 +9,7 @@ import { setFeeds, clearFeeds } from "../store/feedSlice";
 import axios from "axios";
 import { BASE_URL } from "./../config";
 import FeedWriteModal from "../components/FeedWriteModal";
+import FeedWriteButton from "../components/FeedWriteButton";
 
 function FeedPage() {
   let dispatch = useDispatch();
@@ -29,62 +30,13 @@ function FeedPage() {
   const [activeTab, setActiveTab] = useState("마이"); // 활성화된 탭 (마이, 전체)
   const user = useSelector((state) => state.user); // 유저 상태
   const [recommUsers, setRecommUsers] = useState([]); // 추천 유저 상태
-  const [followingStatus, setFollowingStatus] = useState({});
+  const [followingStatus, setFollowingStatus] = useState({}); // 각 사용자에 대한 팔로우 상태
+  const [show, setShow] = useState(false); // 피드 작성, 편집 모달 노출 상태
+  const [feedMode, setFeedMode] = useState(""); // 피드 작성, 편집 모드 구분
   let users = recommUsers;
 
   // 피드 정보 불러오기
   useEffect(() => {
-    // 내 피드
-    async function fetchMyFeeds(user, currentPage) {
-      if (hasMoreFeeds === false) {
-        return;
-      } else if (hasMoreFeeds) {
-        const response = await axios.get(
-          `${BASE_URL}/feed/${user.userId}/?query=${user.userId}&page=${currentPage}`,
-          {
-            headers: {
-              Authorization: `Token ${user.authToken}`,
-            },
-          }
-        );
-        if (response.data.message === "No more pages") {
-          setHasMoreFeeds(false); // 더 이상 페이지가 없음
-          return;
-        }
-
-        if (currentPage > 1) {
-          dispatch(setFeeds([...feeds, ...response.data])); // 기존 피드에 추가
-          console.log("my feeds loaded");
-        } else {
-          dispatch(setFeeds(response.data)); // 피드 초기화
-        }
-      }
-    }
-
-    // 추천 피드
-    async function fetchRecommendedFeeds(user, currentPage) {
-      if (hasMoreFeeds === false) {
-        return;
-      } else if (hasMoreFeeds) {
-        const response = await axios.get(`${BASE_URL}/feed/recommend/?page=${currentPage}`, {
-          headers: {
-            Authorization: `Token ${user.authToken}`,
-          },
-        });
-        if (response.data.message === "No more pages") {
-          setHasMoreFeeds(false); // 더 이상 페이지가 없음
-          return;
-        }
-
-        if (currentPage > 1) {
-          dispatch(setFeeds([...feeds, ...response.data])); // 기존 피드에 추가
-          console.log("recommended feeds loaded");
-        } else {
-          dispatch(setFeeds(response.data)); // 피드 초기화
-        }
-      }
-    }
-
     if (activeTab === "마이") {
       fetchMyFeeds(user, currentPage).then(() => {
         setIsFeedLoaded(true);
@@ -97,9 +49,60 @@ function FeedPage() {
     }
   }, [activeTab, currentPage]);
 
+  // 내 피드
+  async function fetchMyFeeds(user, currentPage) {
+    if (hasMoreFeeds === false) {
+      return;
+    } else if (hasMoreFeeds) {
+      const response = await axios.get(
+        `${BASE_URL}/feed/${user.userId}/?query=${user.userId}&page=${currentPage}`,
+        {
+          headers: {
+            Authorization: `Token ${user.authToken}`,
+          },
+        }
+      );
+      if (response.data.message === "No more pages") {
+        setHasMoreFeeds(false); // 더 이상 페이지가 없음
+        return;
+      }
+
+      if (currentPage > 1) {
+        dispatch(setFeeds([...feeds, ...response.data])); // 기존 피드에 추가
+        console.log("my feeds loaded");
+      } else {
+        dispatch(setFeeds(response.data)); // 피드 초기화
+      }
+    }
+  }
+
+  // 추천 피드
+  async function fetchRecommendedFeeds(user, currentPage) {
+    if (hasMoreFeeds === false) {
+      return;
+    } else if (hasMoreFeeds) {
+      const response = await axios.get(`${BASE_URL}/feed/recommend/?page=${currentPage}`, {
+        headers: {
+          Authorization: `Token ${user.authToken}`,
+        },
+      });
+      if (response.data.message === "No more pages") {
+        setHasMoreFeeds(false); // 더 이상 페이지가 없음
+        return;
+      }
+
+      if (currentPage > 1) {
+        dispatch(setFeeds([...feeds, ...response.data])); // 기존 피드에 추가
+        console.log("recommended feeds loaded");
+      } else {
+        dispatch(setFeeds(response.data)); // 피드 초기화
+      }
+    }
+  }
+
   // Intersection Observer 설정 (스크롤이 하단에 도달했을 때 감지)
   useEffect(() => {
-    if (!isFeedLoaded || !hasMoreFeeds) return;
+    if (!isFeedLoaded) return;
 
     const observer = new IntersectionObserver(
       (entries) => {
@@ -120,28 +123,27 @@ function FeedPage() {
     };
   }, [isFeedLoaded === true]);
 
-  // 팔로잉
-  const updateFollowingStatus = (userId, isFollowing) => {
-    setFollowingStatus((prevStatus) => ({ ...prevStatus, [userId]: isFollowing }));
-  };
+  // 팔로잉 (feeds 상태가 업데이트될 때마다 followingStatus 상태 업데이트)
+  useEffect(() => {
+    const newFollowingStatus = {};
+    feeds.forEach((feed) => {
+      const userId = feed.userInfo.id;
+      const isFollowing = feed.userInfo.is_following;
+      newFollowingStatus[userId] = isFollowing;
+    });
+    setFollowingStatus(newFollowingStatus);
+  }, [feeds]);
 
-  // // 유저 데이터 불러오기
-  // useEffect(() => {
-  //   async function fetchUserData() {
-  //     const response = await axios.get(`${BASE_URL}/search/users/`, {
-  //       headers: {
-  //         Authorization: `Token ${authToken}`, // 헤더에 토큰 추가
-  //       },
-  //       params: {
-  //         query: userHash,
-  //       },
-  //     });
-  //     setRecommUsers(response.data);
-  //   }
-  //   Promise.all([fetchUserData()]).then(() => {
-  //     setLoading(false); // 데이터가 모두 로드되면 로딩 상태를 false로 설정
-  //   });
-  // }, []); // 빈 의존성 배열로 처음 마운트될 때 실행
+  // 피드 게시물 생성, 편집 모달
+  const handleShow = () => setShow(true);
+
+  useEffect(() => {
+    console.log("hasMoreFeeds : ", hasMoreFeeds);
+  }, [hasMoreFeeds]);
+
+  useEffect(() => {
+    console.log("currentPage : ", currentPage);
+  }, [currentPage]);
 
   return (
     <ThemeProvider theme={theme}>
@@ -153,9 +155,9 @@ function FeedPage() {
               <Nav>
                 <StyledText
                   color={activeTab === "마이" ? theme.color.font1 : theme.color.border}
-                  onClick={() => {
-                    setCurrentPage(1);
+                  onClick={async () => {
                     setHasMoreFeeds(true);
+                    setCurrentPage(1);
                     setActiveTab("마이");
                   }}
                 >
@@ -164,8 +166,8 @@ function FeedPage() {
                 <StyledText
                   color={activeTab === "전체" ? theme.color.font1 : theme.color.border}
                   onClick={() => {
-                    setCurrentPage(1);
                     setHasMoreFeeds(true);
+                    setCurrentPage(1);
                     setActiveTab("전체");
                   }}
                 >
@@ -178,8 +180,14 @@ function FeedPage() {
                     key={feed.feedInfo.id}
                     userInfo={feed.userInfo}
                     feedInfo={feed.feedInfo}
-                    isFollowing={followingStatus[feed.userInfo.id]}
-                    updateFollowingStatus={updateFollowingStatus}
+                    show={show}
+                    setShow={setShow}
+                    handleShow={handleShow}
+                    feedMode={feedMode}
+                    setFeedMode={setFeedMode}
+                    user={user}
+                    currentPage={currentPage}
+                    fetchFeeds={activeTab === "마이" ? fetchMyFeeds : fetchRecommendedFeeds}
                   />
                 ))}
                 {!hasMoreFeeds && <span>더 이상 불러올 게시물이 없습니다.</span>}
@@ -187,7 +195,19 @@ function FeedPage() {
               </Feeds>
             </FeedsNav>
             <Aside>
-              <FeedWriteModal userId={user.userId} authToken={user.authToken} />
+              <FeedWriteButton handleShow={handleShow} setFeedMode={setFeedMode} />
+              {feedMode === "WRITE" && show === true && (
+                <FeedWriteModal
+                  show={show}
+                  setShow={setShow}
+                  userId={user.userId}
+                  authToken={user.authToken}
+                  feedMode={feedMode}
+                  user={user}
+                  currentPage={currentPage}
+                  fetchFeeds={activeTab === "마이" ? fetchMyFeeds : fetchRecommendedFeeds}
+                ></FeedWriteModal>
+              )}
               <StyledText color={theme.color.font1} cursor="default">
                 추천
               </StyledText>
@@ -219,6 +239,7 @@ let Body = styled.div`
   justify-content: center;
   width: 100%;
   margin-top: 56px;
+  /* flex-grow: 1; */
 `;
 
 let Stadardized = styled.div`

@@ -3,8 +3,22 @@ import { useSelector } from "react-redux";
 import styled, { ThemeProvider } from "styled-components";
 import componentTheme from "./theme";
 import FollowButton from "./FollowButton";
+import FeedWriteModal from "./FeedWriteModal";
+import { BASE_URL } from "./../config";
+import axios from "axios";
 
-function Feed({ userInfo, feedInfo, isFollowing, updateFollowingStatus }) {
+function Feed({
+  userInfo,
+  feedInfo,
+  show,
+  setShow,
+  handleShow,
+  feedMode,
+  setFeedMode,
+  fetchFeeds,
+  user,
+  currentPage,
+}) {
   // 테마
   const colorTheme = useSelector((state) => state.theme.themes[state.theme.currentTheme]);
   const filterTheme = useSelector((state) => state.theme.filters[state.theme.currentTheme]);
@@ -15,8 +29,7 @@ function Feed({ userInfo, feedInfo, isFollowing, updateFollowingStatus }) {
   };
 
   // 상태관리
-  const user = useSelector((state) => state.user);
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false); // 옵션 메뉴
 
   const [emojiInfo, setEmojiInfo] = useState({}); //피드 최다 이모지 및 총 이모지 갯수 표시를 위한 변수
   const [isEmojiModalOpen, setIsEmojiModalOpen] = useState(false);
@@ -122,13 +135,7 @@ function Feed({ userInfo, feedInfo, isFollowing, updateFollowingStatus }) {
             </UserInfo>
 
             <OptionButtons>
-              {userInfo.userName !== user.username && (
-                <FollowButton
-                  userInfo={userInfo}
-                  isFollowing={isFollowing}
-                  updateFollowingStatus={updateFollowingStatus}
-                />
-              )}
+              {userInfo.userName !== user.username && <FollowButton userInfo={userInfo} />}
               <OptionWrapper>
                 <FeedOptionIcon
                   src={process.env.PUBLIC_URL + "/icon/menu-horizontal.svg"}
@@ -136,7 +143,21 @@ function Feed({ userInfo, feedInfo, isFollowing, updateFollowingStatus }) {
                     setIsMenuOpen((prevState) => !prevState);
                   }}
                 ></FeedOptionIcon>
-                {isMenuOpen && <OptionMenu user={user} userInfo={userInfo}></OptionMenu>}
+                {isMenuOpen && (
+                  <OptionMenu
+                    user={user}
+                    userInfo={userInfo}
+                    feedInfo={feedInfo}
+                    show={show}
+                    setShow={setShow}
+                    handleShow={handleShow}
+                    feedMode={feedMode}
+                    setFeedMode={setFeedMode}
+                    fetchFeeds={fetchFeeds}
+                    currentPage={currentPage}
+                    theme={theme}
+                  ></OptionMenu>
+                )}
               </OptionWrapper>
             </OptionButtons>
           </FeedHeader>
@@ -212,15 +233,302 @@ function Feed({ userInfo, feedInfo, isFollowing, updateFollowingStatus }) {
   );
 }
 
-function OptionMenu({ user, userInfo }) {
+function OptionMenu({
+  userInfo,
+  feedInfo,
+  show,
+  setShow,
+  handleShow,
+  feedMode,
+  setFeedMode,
+  user,
+  fetchFeeds,
+  currentPage,
+  theme,
+}) {
+  // 상태 관리
+  const [isOpenReportFeedModal, setIsOpenReportFeedModal] = useState(false); // 피드 차단 모달
+  const [isOpenDeleteFeedModal, setIsOpenDeleteFeedModal] = useState(false); // 피드 삭제 모달
+  const [isOpenBlockUserModal, setIsOpenBlockUserModal] = useState(false); // 유저 차단 모달
+  const [isReportFeedSuccess, setIsReportFeedSuccess] = useState(false); // 피드 신고 상태
+
+  // 사용자 차단 결정 후 피드 재로드
+  const onBlockUserCompleted = () => {
+    fetchFeeds(user, currentPage);
+  };
+
   return (
     <OptionLayout>
       <OptionContainer>
         <OptionList>
-          {user.userId === userInfo.id ? <Option>게시물 수정</Option> : <Option>차단</Option>}
+          {user.userId === userInfo.id ? (
+            <>
+              <Option
+                onClick={() => {
+                  setFeedMode("EDIT");
+                  handleShow();
+                }}
+              >
+                게시물 수정
+              </Option>
+              {feedMode === "EDIT" && show === true && (
+                <FeedWriteModal
+                  show={show}
+                  setShow={setShow}
+                  userId={user.userId}
+                  authToken={user.authToken}
+                  feedMode={feedMode}
+                  feedInfo={feedInfo}
+                  user={user}
+                  currentPage={currentPage}
+                  fetchFeeds={fetchFeeds}
+                ></FeedWriteModal>
+              )}
+              <Option onClick={() => setIsOpenDeleteFeedModal(true)}>게시물 삭제</Option>
+              {isOpenDeleteFeedModal === true && (
+                <DeleteFeedModal
+                  theme={theme}
+                  setIsOpenDeleteFeedModal={setIsOpenDeleteFeedModal}
+                  feedId={feedInfo.id}
+                  user={user}
+                  currentPage={currentPage}
+                  fetchFeeds={fetchFeeds}
+                />
+              )}
+            </>
+          ) : (
+            <>
+              <Option onClick={() => setIsOpenReportFeedModal(true)}>게시물 신고</Option>
+              {isOpenReportFeedModal === true && (
+                <ReportFeedModal
+                  theme={theme}
+                  setIsOpenReportFeedModal={setIsOpenReportFeedModal}
+                  setIsOpenBlockUserModal={setIsOpenBlockUserModal}
+                  user={user}
+                  feedInfo={feedInfo}
+                  currentPage={currentPage}
+                  fetchFeeds={fetchFeeds}
+                  setIsReportFeedSuccess={setIsReportFeedSuccess}
+                />
+              )}
+              <Option onClick={() => setIsOpenBlockUserModal(true)}>유저 차단</Option>
+              {isOpenBlockUserModal === true && (
+                <BlockUserModal
+                  theme={theme}
+                  setIsOpenBlockUserModal={setIsOpenBlockUserModal}
+                  user={user}
+                  userInfo={userInfo}
+                  currentPage={currentPage}
+                  fetchFeeds={fetchFeeds}
+                  isReportFeedSuccess={isReportFeedSuccess}
+                />
+              )}
+            </>
+          )}
         </OptionList>
       </OptionContainer>
     </OptionLayout>
+  );
+}
+
+function DeleteFeedModal({
+  theme,
+  setIsOpenDeleteFeedModal,
+  feedId,
+  user,
+  currentPage,
+  fetchFeeds,
+}) {
+  const handleDeleteFeed = async (user, feedId) => {
+    try {
+      const response = await axios.post(
+        `${BASE_URL}/feed/delete/${feedId}/`,
+        {},
+        {
+          headers: {
+            Authorization: `Token ${user.authToken}`,
+          },
+        }
+      );
+      alert("게시물이 성공적으로 삭제되었습니다");
+      fetchFeeds(user, currentPage);
+      setIsOpenDeleteFeedModal(false);
+    } catch (error) {
+      console.error("Failed to delete:", error);
+      alert("게시물 삭제 중 오류가 발생했습니다.");
+    }
+  };
+
+  return (
+    <ModalOverlay>
+      <ModalContent>
+        <ModalTitle>
+          게시물을 <Highlight>삭제</Highlight>하시겠습니까?
+        </ModalTitle>
+        <Buttons>
+          <StyledButton
+            onClick={() => setIsOpenDeleteFeedModal(false)}
+            color={theme.color.font1}
+            backgroundcolor={theme.color.bg3}
+            border="none"
+          >
+            돌아가기
+          </StyledButton>
+          <StyledButton
+            onClick={() => handleDeleteFeed(user, feedId)}
+            color="white"
+            backgroundcolor={theme.color.primary}
+          >
+            삭제
+          </StyledButton>
+        </Buttons>
+      </ModalContent>
+    </ModalOverlay>
+  );
+}
+
+function BlockUserModal({
+  theme,
+  setIsOpenBlockUserModal,
+  user,
+  userInfo,
+  currentPage,
+  fetchFeeds,
+  isReportFeedSuccess
+}) {
+  const handleBlockUser = async (user, targetUser) => {
+    try {
+      const response = await axios.post(
+        `${BASE_URL}/user/block/`,
+        { blocked_id: targetUser },
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Token ${user.authToken}`,
+          },
+        }
+      );
+      alert("유저가 차단되었습니다");
+      setIsOpenBlockUserModal(false);
+      fetchFeeds(user, currentPage);
+    } catch (error) {
+      console.error("Failed to block:", error);
+      alert("유저 차단 중 오류가 발생했습니다.");
+    }
+  };
+
+  return (
+    <ModalOverlay>
+      <ModalContent>
+        <ModalTitle>
+          {userInfo.userName} 유저를 <Highlight>차단</Highlight>하시겠습니까?
+        </ModalTitle>
+        <Buttons>
+          <StyledButton
+            onClick={() => {
+              setIsOpenBlockUserModal(false);
+              if (isReportFeedSuccess) {
+                fetchFeeds(user, currentPage);
+              }
+            }}
+            color={theme.color.font1}
+            backgroundcolor={theme.color.bg3}
+            border="none"
+          >
+            돌아가기
+          </StyledButton>
+          <StyledButton
+            onClick={() => handleBlockUser(user, userInfo.id)}
+            color="white"
+            backgroundcolor={theme.color.primary}
+          >
+            차단
+          </StyledButton>
+        </Buttons>
+      </ModalContent>
+    </ModalOverlay>
+  );
+}
+
+function ReportFeedModal({
+  theme,
+  setIsOpenReportFeedModal,
+  setIsOpenBlockUserModal,
+  user,
+  feedInfo,
+  setIsReportFeedSuccess,
+}) {
+  // 상태 관리
+  const [reportReason, setReportReason] = useState("");
+  const [otherReason, setOtherReason] = useState("");
+
+  // 게시물 신고 처리
+  const handleReportFeed = async (user, targetFeed, reason, otherReason) => {
+    if (!reason) {
+      alert("신고 사유를 선택해주세요.");
+      return;
+    }
+
+    let finalReason = reason === "기타" ? otherReason : reason;
+
+    try {
+      const response = await axios.post(
+        `${BASE_URL}/feed/report/`,
+        { reported_id: targetFeed, reason: finalReason },
+        {
+          headers: { "Content-Type": "application/json", Authorization: `Token ${user.authToken}` },
+        }
+      );
+      alert("해당 게시물이 신고되었습니다");
+      setIsReportFeedSuccess(true); // 신고 상태 -> true
+      setIsOpenReportFeedModal(false); // 신고 모달 -> off
+      setIsOpenBlockUserModal(true); // 유저 차단 모달 -> on
+    } catch (error) {
+      console.error("Failed to Report:", error);
+      alert("피드 게시물 신고 중 오류가 발생했습니다.");
+    }
+  };
+
+  return (
+    <ModalOverlay>
+      <ModalContent>
+        <ModalTitle>
+          게시물을 <Highlight>신고</Highlight>하시겠습니까?
+        </ModalTitle>
+        <DropdownMenu value={reportReason} onChange={(e) => setReportReason(e.target.value)}>
+          <option value="">신고 사유 선택...</option>
+          <option value="스팸 또는 광고">스팸 또는 광고</option>
+          <option value="혐오 발언 또는 괴롭힘">혐오 발언 또는 괴롭힘</option>
+          <option value="부적절한 내용">부적절한 내용</option>
+          <option value="저작권 침해">저작권 침해</option>
+          <option value="기타">기타</option>
+        </DropdownMenu>
+        {reportReason === "기타" && (
+          <TextField
+            value={otherReason}
+            onChange={(e) => setOtherReason(e.target.value)}
+            placeholder="신고 사유 입력"
+          />
+        )}
+        <Buttons>
+          <StyledButton
+            onClick={() => setIsOpenReportFeedModal(false)}
+            color={theme.color.font1}
+            backgroundcolor={theme.color.bg3}
+            border="none"
+          >
+            돌아가기
+          </StyledButton>
+          <StyledButton
+            onClick={() => handleReportFeed(user, feedInfo.id, reportReason, otherReason)}
+            color="white"
+            backgroundcolor={theme.color.primary}
+          >
+            신고
+          </StyledButton>
+        </Buttons>
+      </ModalContent>
+    </ModalOverlay>
   );
 }
 
@@ -334,17 +642,18 @@ let FeedOptionIcon = styled(MediumIcon)`
   }
 `;
 
-
 let OptionLayout = styled.div`
   ${({ theme }) => theme.component.shadow.default};
   position: absolute;
   z-index: 5;
   top: 100%;
   right: calc(100% - 1.4rem);
-  width: 240px;
+  width: 160px;
   height: fit-content;
   background-color: ${({ theme }) => theme.color.bg};
-  border-radius: 4px;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid ${({ theme }) => theme.color.border};
 `;
 
 let OptionContainer = styled.div`
@@ -355,6 +664,8 @@ let OptionList = styled.ul`
   display: flex;
   flex-direction: column;
   width: 100%;
+  margin: initial;
+  padding: initial;
 `;
 
 let Option = styled.li`
@@ -460,6 +771,85 @@ let CommunicationBox = styled.div`
 let IconBox = styled.div`
   ${({ theme }) => theme.component.flexBox.rowLeftCenter};
   gap: 0.5rem;
+`;
+
+let ModalOverlay = styled.div`
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.7); /* 검정색 배경에 70% 투명도 */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+`;
+
+let ModalContent = styled.div`
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  background-color: ${({ theme }) => theme.color.bg};
+  padding: 40px 80px;
+  border-radius: 8px;
+  width: 500px;
+  max-height: 100%;
+`;
+
+let ModalTitle = styled.span`
+  font-size: 18px;
+  font-weight: 700;
+  color: ${({ theme }) => theme.color.font1};
+  margin-bottom: 32px;
+  text-align: center;
+  width: 100%;
+`;
+let Highlight = styled.span`
+  color: ${({ theme }) => theme.color.primary};
+`;
+
+const DropdownMenu = styled.select`
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 20px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+`;
+
+const TextField = styled.input`
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 20px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+`;
+
+let Buttons = styled.div`
+  box-sizing: border-box;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  gap: 8px;
+  /* margin-top: 32px; */
+  padding: 8px 0px;
+`;
+
+let StyledButton = styled.button`
+  height: 42px;
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 20px;
+  width: 50%;
+  padding: 12px 24px;
+  color: ${({ color }) => color};
+  background-color: ${({ backgroundcolor }) => backgroundcolor};
+  border: none;
+  border-radius: 8px;
+  outline: none;
+  cursor: pointer;
 `;
 
 export default Feed;

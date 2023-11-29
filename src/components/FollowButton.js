@@ -1,12 +1,14 @@
 import styled, { ThemeProvider } from "styled-components";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import componentTheme from "../components/theme";
 import { useEffect, useState } from "react";
 import { BASE_URL } from "./../config";
 import axios from "axios";
+import { setFeeds } from "../store/feedSlice";
 
-function FollowButton({ userInfo, isFollowing, updateFollowingStatus }) {
-
+function FollowButton({ userInfo }) {
+  const dispatch = useDispatch();
+  
   // 테마
   const colorTheme = useSelector((state) => state.theme.themes[state.theme.currentTheme]);
   const filterTheme = useSelector((state) => state.theme.filters[state.theme.currentTheme]);
@@ -18,74 +20,71 @@ function FollowButton({ userInfo, isFollowing, updateFollowingStatus }) {
 
   // 상태 관리
   const user = useSelector((state) => state.user);
-
-  // 팔로우 상태 확인
-  useEffect(() => {
-    // 팔로우 상태 확인 함수
-    const checkFollowStatus = async (authToken) => {
-      try {
-        const response = await axios.get(`${BASE_URL}/user/follow/${userInfo.id}`, {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Token ${authToken}`,
-          },
-        });
-      } catch (error) {
-        console.error(error.response);
-      }
-    };
-
-    checkFollowStatus(user.authToken);
-  }, []);
+  const feeds = useSelector((state) => state.feed.feeds);
 
   const followButtonClick = async (followingId, authToken) => {
     try {
       const response = await axios.post(
         `${BASE_URL}/user/follow/`,
-        {
-          following_id: followingId,
-        },
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Token ${authToken}`,
-          },
-        }
+        { following_id: followingId },
+        { headers: { "Content-Type": "application/json", Authorization: `Token ${authToken}` } }
       );
-      updateFollowingStatus(userInfo.id, true);
+
+      // feeds 배열에서 is_following 업데이트
+      const updatedFeeds = feeds.map((feed) => {
+        if (feed.userInfo.id === followingId) {
+          return {
+            ...feed,
+            userInfo: {
+              ...feed.userInfo,
+              is_following: true, // 팔로우 상태 업데이트
+            },
+          };
+        }
+        return feed;
+      });
+
+      dispatch(setFeeds(updatedFeeds)); // 업데이트된 feeds 배열로 상태 업데이트
     } catch (error) {
       console.error(error.response); // 오류 처리
     }
   };
 
-  const unfollowButtonClick = async (followingId, authToken) => {
-    try {
-      const response = await axios.delete(`${BASE_URL}/user/unfollow/`, {
-        data: { following_id: followingId }, // 요청 본문
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Token ${authToken}`,
-        },
-      });
-      updateFollowingStatus(userInfo.id, false);
-    } catch (error) {
-      console.error(error.response.data); // 오류 처리
-    }
-  };
+    const unfollowButtonClick = async (followingId, authToken) => {
+      try {
+        const response = await axios.delete(`${BASE_URL}/user/unfollow/`, {
+          data: { following_id: followingId },
+          headers: { "Content-Type": "application/json", Authorization: `Token ${authToken}` },
+        });
+
+        // feeds 배열에서 is_following 업데이트
+        const updatedFeeds = feeds.map((feed) => {
+          if (feed.userInfo.id === followingId) {
+            return {
+              ...feed,
+              userInfo: {
+                ...feed.userInfo,
+                is_following: false, // 언팔로우 상태 업데이트
+              },
+            };
+          }
+          return feed;
+        });
+
+        dispatch(setFeeds(updatedFeeds)); // 업데이트된 feeds 배열로 상태 업데이트
+      } catch (error) {
+        console.error(error.response); // 오류 처리
+      }
+    };
+
   return (
     <ThemeProvider theme={theme}>
-      {isFollowing ? (
-        <Following
-          onClick={() => unfollowButtonClick(userInfo.id, user.authToken)}
-        >
-          v 팔로우중 
+      {userInfo.is_following ? (
+        <Following onClick={() => unfollowButtonClick(userInfo.id, user.authToken)}>
+          v 팔로우중
         </Following>
       ) : (
-        <Follow
-          onClick={() => followButtonClick(userInfo.id, user.authToken)}
-        >
-          + 팔로우
-        </Follow>
+        <Follow onClick={() => followButtonClick(userInfo.id, user.authToken)}>+ 팔로우</Follow>
       )}
     </ThemeProvider>
   );
@@ -102,7 +101,8 @@ let Follow = styled.button`
   flex-shrink: 0;
 
   &:hover {
-    background-color: ${({ theme }) => theme.color.bg3};
+    background-color: ${({ theme }) => theme.color.primary};
+    color: white;
     transition: 0.3s;
   }
 `;

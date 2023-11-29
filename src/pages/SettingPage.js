@@ -1,14 +1,17 @@
 import styled, { ThemeProvider } from "styled-components";
 import { useSelector, useDispatch } from "react-redux";
-import { showProfileView, showAccountView, showBlockedUsers } from "./../store/settingpageSlice";
+import {
+  showProfileView,
+  showAccountView,
+  showBlockedAndReported,
+} from "./../store/settingpageSlice";
 import componentTheme from "./../components/theme";
 
 import Header from "../components/Header";
 import ProfileView from "../components/ProfileView";
 import AccountView from "../components/AccountView";
-import BlockedUsers from "../components/BlockedUsers";
+import BlockedAndReported from "../components/BlockedAndReported";
 import DeleteAccount from "../components/DeleteAccount";
-
 
 function SettingPage() {
   const dispatch = useDispatch();
@@ -53,19 +56,19 @@ function SettingPage() {
             </MenuContainer>
             <MenuContainer
               bordercolor={theme.color.border}
-              onClick={() => dispatch(showBlockedUsers())}
-              $isActive={activeItem === "BlockedUsers"}
+              onClick={() => dispatch(showBlockedAndReported())}
+              $isActive={activeItem === "BlockedAndReported"}
             >
               <SmallIcon
                 src={process.env.PUBLIC_URL + "/icon/blocked-users.svg"}
                 filter={theme.filter.font1}
               />
-              <MenuText>차단/신고 리스트</MenuText>
+              <MenuText>차단 관리</MenuText>
             </MenuContainer>
           </MenuLayout>
           {activeItem === "ProfileView" && <ProfileView />}
           {activeItem === "AccountView" && <AccountView />}
-          {activeItem === "BlockedUsers" && <BlockedUsers />}
+          {activeItem === "BlockedAndReported" && <BlockedAndReported />}
           {activeItem === "DeleteAccount" && <DeleteAccount />}
         </Body>
       </PageLayout>
@@ -84,11 +87,11 @@ let PageLayout = styled.div`
 
 let Body = styled.div`
   display: flex;
-  flex-direction: row;
-  width: 1080px;
+  flex-grow: 1;
   margin-left: auto;
   margin-right: auto;
-  flex-grow: 1;
+  width: 1080px;
+  margin-top: 56px;
   background-color: ${({ theme }) => theme.color.bg};
 `;
 

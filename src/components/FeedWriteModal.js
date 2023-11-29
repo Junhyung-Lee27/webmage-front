@@ -1,21 +1,39 @@
 import React, { useState, useRef, useCallback, useEffect } from "react";
 import styled, { ThemeProvider } from "styled-components";
 import { useSelector } from "react-redux";
+import componentTheme from "./theme";
 
 import Button from "react-bootstrap/Button";
 import Modal from "react-bootstrap/Modal";
 
 import "bootstrap/dist/css/bootstrap.min.css";
 
-import theme from "./theme";
-
 import axios from "axios";
 import { BASE_URL } from "./../config";
+import { current } from "@reduxjs/toolkit";
 
-function FeedWriteModal({ userId, authToken }) {
-  const currentTheme = useSelector((state) => state.theme.themes[state.theme.currentTheme]);
+export default function FeedWriteModal({
+  userId,
+  authToken,
+  feedInfo,
+  closeModal,
+  show,
+  setShow,
+  handleShow,
+  feedMode,
+  fetchFeeds,
+  user,
+  currentPage,
+}) {
+  // 테마
+  const colorTheme = useSelector((state) => state.theme.themes[state.theme.currentTheme]);
+  const filterTheme = useSelector((state) => state.theme.filters[state.theme.currentTheme]);
+  const theme = {
+    color: colorTheme,
+    filter: filterTheme,
+    component: componentTheme,
+  };
 
-  const [show, setShow] = useState(false);
   const [imgFile, setImgFile] = useState("");
   const [isDragging, setIsDragging] = useState(false);
   const [files, setFiles] = useState([]);
@@ -32,6 +50,24 @@ function FeedWriteModal({ userId, authToken }) {
   const imgRef = useRef();
   const dragRef = useRef(null);
   const fileId = useRef(0);
+
+  // 게시물 내용 초기화 (수정 : 기존 내용 불러오기 / 생성 : 공백)
+  useEffect(() => {
+    if (feedInfo) {
+      setFeedContent(feedInfo.post); // 내용
+      setFeedHash(feedInfo.tags); // 해시태그
+      setImgFile(feedInfo.content_img); //
+
+      // 핵심목표, 서브목표, 실천방법 설정
+      const mainOption = mainOptions.find((option) => option.main_title === feedInfo.main_title);
+      const subOption = subsOptions.find((sub) => sub.sub_title === feedInfo.sub_title);
+      const contentOption = contentsOptions.find((content) => content.content === feedInfo.content);
+
+      setSelectedMainOption(mainOption);
+      setSelectedSub(subOption);
+      setSelectedContent(contentOption);
+    }
+  }, [feedInfo, mainOptions, subsOptions, contentsOptions]);
 
   // 로딩 상태
   const [loading, setLoading] = useState(true);
@@ -98,6 +134,7 @@ function FeedWriteModal({ userId, authToken }) {
   }, [selectedMainOption, authToken]); // 핵심목표 선택하면 나머지 가져옴
 
   const [filteredContentsOptions, setFilteredContentsOptions] = useState([]);
+
   useEffect(() => {
     if (selectedSub) {
       const matchedContents = contentsOptions.filter(
@@ -108,43 +145,84 @@ function FeedWriteModal({ userId, authToken }) {
   }, [selectedSub, contentsOptions]);
 
   // 실천 기록 작성
-  const handleSubmit = async () => {
-    // FormData 객체 생성
-    const formData = new FormData();
+  const handleSubmit = async (e) => {
+    e.preventDefault();
 
-    formData.append("user", userId);
-    formData.append("feed_contents", feedContent);
-    formData.append("feed_hash", feedHash);
-    if (imgFile) {
-      formData.append("feed_image", imgRef.current.files[0]);
-    }
-    formData.append("main_id", selectedMainOption?.id || "");
-    formData.append("sub_id", selectedSub?.id || "");
-    formData.append("cont_id", selectedContent?.id || "");
+    if (feedMode === "WRITE") {
+      // FormData 객체 생성
+      const formData = new FormData();
 
-    try {
-      const response = await axios.post(`${BASE_URL}/feed/write/`, formData, {
-        headers: {
-          Authorization: `Token ${authToken}`,
-          "Content-Type": "multipart/form-data",
-        },
-      });
-      if (response.status === 201) {
-        alert("피드가 성공적으로 작성되었습니다.");
-        handleClose();
-      } else {
-        alert("피드 작성에 실패했습니다.");
+      formData.append("user", userId);
+      formData.append("feed_contents", feedContent);
+      formData.append("feed_hash", feedHash);
+      if (imgFile) {
+        formData.append("feed_image", imgRef.current.files[0]);
       }
-    } catch (error) {
-      console.error("Failed to submit:", error);
-      alert("피드 작성 중 오류가 발생했습니다.");
+      formData.append("main_id", selectedMainOption?.id || "");
+      formData.append("sub_id", selectedSub?.id || "");
+      formData.append("cont_id", selectedContent?.id || "");
+
+      try {
+        const response = await axios.post(`${BASE_URL}/feed/write/`, formData, {
+          headers: {
+            Authorization: `Token ${authToken}`,
+            "Content-Type": "multipart/form-data",
+          },
+        });
+        if (response.status === 201) {
+          alert("게시물이 성공적으로 작성되었습니다.");
+          fetchFeeds(user, currentPage);
+          handleClose();
+        } else {
+          alert("게시물 작성에 실패했습니다.");
+        }
+      } catch (error) {
+        console.error("Failed to submit:", error);
+        alert("게시물 작성 중 오류가 발생했습니다.");
+      }
+    } else if (feedMode === "EDIT") {
+      const formData = new FormData();
+      if (feedContent !== feedInfo.post) {
+        formData.append("feed_contents", feedContent);
+      }
+      if (feedHash !== feedInfo.tags) {
+        formData.append("feed_hash", feedHash);
+      }
+      if (imgFile && imgFile !== feedInfo.content_img) {
+        formData.append("feed_image", imgFile);
+      }
+      if (selectedMainOption && selectedMainOption.id !== feedInfo.main_id) {
+        formData.append("main_id", selectedMainOption.id);
+      }
+      if (selectedSub && selectedSub.id !== feedInfo.sub_id) {
+        formData.append("sub_id", selectedSub.id);
+      }
+      if (selectedContent && selectedContent.id !== feedInfo.cont_id) {
+        formData.append("cont_id", selectedContent.id);
+      }
+      try {
+        const response = await axios.patch(`${BASE_URL}/feed/edit/${feedInfo.id}/`, formData, {
+          headers: {
+            Authorization: `Token ${authToken}`,
+            "Content-Type": "multipart/form-data",
+          },
+        });
+        alert("게시물이 성공적으로 수정되었습니다.");
+        fetchFeeds(user, currentPage);
+        handleClose(); // 모달 닫기
+      } catch (error) {
+        // 오류 처리
+        console.error(error);
+        alert("게시물 수정 중 오류가 발생했습니다.");
+      }
     }
   };
+
   const handleClose = () => {
     setShow(false);
     setImgFile("");
   };
-  const handleShow = () => setShow(true);
+
   const saveImgFile = () => {
     const file = imgRef.current.files[0];
     const reader = new FileReader();
@@ -153,6 +231,7 @@ function FeedWriteModal({ userId, authToken }) {
       setImgFile(reader.result);
     };
   };
+
   const onChangeFiles = useCallback(
     (event) => {
       let selectFiles = [];
@@ -173,11 +252,11 @@ function FeedWriteModal({ userId, authToken }) {
           },
         ];
       }
-
       setFiles(tempFiles);
     },
     [files]
   );
+
   const handleFilterFile = useCallback(
     (id) => {
       setFiles(files.filter((file) => file.id !== id));
@@ -248,46 +327,39 @@ function FeedWriteModal({ userId, authToken }) {
 
   return (
     <ThemeProvider theme={theme}>
-      <WriteFeed bgcolor={currentTheme.primary} onClick={handleShow}>
-        <StyledText size="1rem" weight="700" color={currentTheme.bg} align="center">
-          피드 작성
-        </StyledText>
-      </WriteFeed>
-
       <Modal show={show} onHide={handleClose} backdrop="static">
-        <Modal.Header className="border-0" style={{ background: `${currentTheme.bg}` }}>
-          <Modal.Title>
-            <StyledText size="1.25rem" weight="700" color={currentTheme.font1}>
-              실천 기록 작성하기
+        <Modal.Header className="border-1" style={{ background: `${theme.color.bg}` }}>
+          <Modal.Title style={{ width: "100%", textAlign: "center" }}>
+            <StyledText size="1.25rem" weight="700" color={theme.color.font1}>
+              {feedMode === "WRITE" ? "게시물 작성" : "게시물 수정"}
             </StyledText>
           </Modal.Title>
         </Modal.Header>
-        <Modal.Body style={{ background: `${currentTheme.bg}` }}>
+        <Modal.Body style={{ background: `${theme.color.bg}` }}>
           <FeedInput
-            placeholdertextcolor="red"
             placeholder="내용을 입력해주세요..."
-            bgcolor={currentTheme.bg2}
-            color={currentTheme.font1}
-            rows={8}
+            bgcolor={theme.color.bg2}
+            color={theme.color.font1}
+            rows={6}
             value={feedContent}
             onChange={(e) => setFeedContent(e.target.value)}
           />
           <FeedInput
             placeholder="해시태그를 입력해주세요..."
-            bgcolor={currentTheme.bg2}
-            color={currentTheme.font1}
+            bgcolor={theme.color.bg2}
+            color={theme.color.font1}
             rows={1}
             value={feedHash}
             onChange={(e) => setFeedHash(e.target.value)}
           />
           {imgFile == "" ? (
-            <PictureWrap bgcolor={currentTheme.bg2}>
+            <PictureWrap bgcolor={theme.color.bg2}>
               <ImageInput
                 src={imgFile == "" ? process.env.PUBLIC_URL + "/input_image.svg" : imgFile}
               />
             </PictureWrap>
           ) : (
-            <PictureWrap bgcolor={currentTheme.bg2}>
+            <PictureWrap bgcolor={theme.color.bg2}>
               <Picture
                 src={imgFile == "" ? process.env.PUBLIC_URL + "/input_image.svg" : imgFile}
               />
@@ -295,14 +367,14 @@ function FeedWriteModal({ userId, authToken }) {
           )}
           <input type="file" accept="image/*" id="addImg" onChange={saveImgFile} ref={imgRef} />
           <Dropdown>
-            <StyledText size="1rem" weight="500" color={currentTheme.font1}>
+            <StyledText size="1rem" weight="500" color={theme.color.font1}>
               핵심목표
             </StyledText>
             <StyledSelect
               value={selectedMainOption ? selectedMainOption.id : ""}
               onChange={handleMainChange}
-              bgcolor={currentTheme.bg2}
-              color={currentTheme.font1}
+              bgcolor={theme.color.bg2}
+              color={theme.color.font1}
             >
               <option value="" disabled>
                 선택하세요
@@ -315,14 +387,14 @@ function FeedWriteModal({ userId, authToken }) {
             </StyledSelect>
           </Dropdown>
           <Dropdown>
-            <StyledText size="1rem" weight="500" color={currentTheme.font1}>
+            <StyledText size="1rem" weight="500" color={theme.color.font1}>
               세부목표
             </StyledText>
             <StyledSelect
               value={selectedSub ? selectedSub.id : ""}
               onChange={handleSubChange}
-              bgcolor={currentTheme.bg2}
-              color={currentTheme.font1}
+              bgcolor={theme.color.bg2}
+              color={theme.color.font1}
             >
               <option value="" disabled>
                 선택하세요
@@ -335,14 +407,14 @@ function FeedWriteModal({ userId, authToken }) {
             </StyledSelect>
           </Dropdown>
           <Dropdown>
-            <StyledText size="1rem" weight="500" color={currentTheme.font1}>
+            <StyledText size="1rem" weight="500" color={theme.color.font1}>
               실천방법
             </StyledText>
             <StyledSelect
               value={selectedContent ? selectedContent.id : ""}
               onChange={handleContentChange}
-              bgcolor={currentTheme.bg2}
-              color={currentTheme.font1}
+              bgcolor={theme.color.bg2}
+              color={theme.color.font1}
             >
               <option value="" disabled>
                 선택하세요
@@ -355,9 +427,9 @@ function FeedWriteModal({ userId, authToken }) {
             </StyledSelect>
           </Dropdown>
         </Modal.Body>
-        <Modal.Footer className="border-0" style={{ background: `${currentTheme.bg}` }}>
+        <Modal.Footer className="border-0" style={{ background: `${theme.color.bg}` }}>
           <Button className="btn_close" variant="secondary" onClick={handleSubmit}>
-            작성완료
+            {feedMode === "WRITE" ? "작성 완료" : "수정 완료"}
           </Button>
           <Button className="btn_close" variant="secondary" onClick={handleClose}>
             닫기
@@ -375,20 +447,7 @@ let StyledText = styled.span`
   text-align: ${({ align }) => align};
   margin: ${({ margin }) => margin};
 `;
-let WriteFeed = styled.button`
-  width: 100%;
-  height: 42px;
-  margin: 42px auto 32px auto;
-  font-size: 16px;
-  font-weight: 700;
-  line-height: 20px;
-  color: white;
-  border: none;
-  border-radius: 8px;
-  ${({ theme }) => theme.flexBox.rowCenter};
-  background-color: ${({ bgcolor }) => bgcolor};
-  cursor: pointer;
-`;
+
 let FeedInput = styled.textarea`
   width: 100%;
   height: ${({ height }) => height};
@@ -431,7 +490,7 @@ let ImageInput = styled.img`
   border-radius: 0.25rem;
 `;
 let Dropdown = styled.div`
-  ${({ theme }) => theme.flexBox.columnLeftCenter};
+  ${({ theme }) => theme.component.flexBox.columnLeftCenter};
   gap: 0.5rem;
   margin: 1rem 0;
 `;
@@ -442,4 +501,3 @@ let StyledSelect = styled.select`
   background-color: ${({ bgcolor }) => bgcolor};
   color: ${({ color }) => color};
 `;
-export default FeedWriteModal;

@@ -12,8 +12,8 @@ const settingpageSlice = createSlice({
     showAccountView: (state) => {
       state.activeItem = "AccountView";
     },
-    showBlockedUsers: (state) => {
-      state.activeItem = "BlockedUsers";
+    showBlockedAndReported: (state) => {
+      state.activeItem = "BlockedAndReported";
     },
     showDeleteAccount: (state) => {
       state.activeItem = "DeleteAccount";
@@ -21,5 +21,5 @@ const settingpageSlice = createSlice({
   },
 });
 
-export const { showProfileView, showAccountView, showBlockedUsers, showDeleteAccount } = settingpageSlice.actions;
+export const { showProfileView, showAccountView, showBlockedAndReported, showDeleteAccount } = settingpageSlice.actions;
 export default settingpageSlice.reducer;
