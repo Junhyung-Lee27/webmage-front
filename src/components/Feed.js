@@ -6,6 +6,7 @@ import FollowButton from "./FollowButton";
 import FeedWriteModal from "./FeedWriteModal";
 import { BASE_URL } from "./../config";
 import axios from "axios";
+import FeedFooter from "./FeedFooter";
 
 function Feed({
   userInfo,
@@ -31,11 +32,9 @@ function Feed({
   // 상태관리
   const [isMenuOpen, setIsMenuOpen] = useState(false); // 옵션 메뉴
 
-  const [emojiInfo, setEmojiInfo] = useState({}); //피드 최다 이모지 및 총 이모지 갯수 표시를 위한 변수
-  const [isEmojiModalOpen, setIsEmojiModalOpen] = useState(false);
-
+  // 날짜 형식 변환
   const formatDateAgo = (dateString) => {
-    const date = new Date(dateString); // 문자열 -> Date 객체로 변환
+    const date = new Date(dateString);
     const now = new Date();
     const diff = now.getTime() - date.getTime();
     const seconds = Math.floor(diff / 1000);
@@ -62,38 +61,10 @@ function Feed({
     }
   };
 
-  const getEmojiInfo = (emoji_count) => {
-    let maxKey = null;
-    let nextMaxKey = null;
-    let maxVal = -Infinity;
-    let nextMaxVal = -Infinity;
-    let total_count = 0;
-
-    for (let key in emoji_count) {
-      total_count += emoji_count[key];
-      if (emoji_count[key] > maxVal) {
-        nextMaxKey = maxKey;
-        nextMaxVal = maxVal;
-        maxKey = key;
-        maxVal = emoji_count[key];
-      } else if (emoji_count[key] > nextMaxVal) {
-        nextMaxKey = key;
-        nextMaxVal = emoji_count[key];
-      }
-    }
-
-    return { total_count, maxKey, nextMaxKey };
-  };
-
+  // 태그 형태 변환
   const parseTagsString = (tagsString) => {
     return tagsString.split(",").map((tag) => tag.trim().replace(/"/g, ""));
   };
-
-  const openEmojiModal = () => {};
-
-  useEffect(() => {
-    setEmojiInfo(getEmojiInfo(feedInfo.emoji_count));
-  }, [feedInfo]);
 
   const imgUrl = "";
 
@@ -197,37 +168,7 @@ function Feed({
         {/* 경계선 */}
         <HorizontalLine />
         {/*이모지, 댓글 등 커뮤니케이션 영역*/}
-        <FeedFooter>
-          <CommunicationBox>
-            {emojiInfo.total_count != 0 ? (
-              <IconBox>
-                <SmallIcon src={process.env.PUBLIC_URL + `/icon/${emojiInfo.maxKey}.svg`} />
-                <SmallIcon src={process.env.PUBLIC_URL + `/icon/${emojiInfo.nextMaxKey}.svg`} />
-                <StyledText size="1rem" weight="500" color={theme.color.font1}>
-                  {emojiInfo.total_count}
-                </StyledText>
-              </IconBox>
-            ) : null}
-            {feedInfo.comment_info == [] ? null : (
-              <IconBox>
-                <SmallIcon src={process.env.PUBLIC_URL + "/icon/comment-fill.svg"} />
-                <StyledText size="1rem" weight="500" color={theme.color.font1}>
-                  {feedInfo.comment_info.length}
-                </StyledText>
-              </IconBox>
-            )}
-            <IconBox>
-              <SmallIcon
-                src={process.env.PUBLIC_URL + "/icon/addEmoji.svg"}
-                filter={theme.filter.font1}
-              />
-              <SmallIcon
-                src={process.env.PUBLIC_URL + "/icon/addComment.svg"}
-                filter={theme.filter.font1}
-              />
-            </IconBox>
-          </CommunicationBox>
-        </FeedFooter>
+        <FeedFooter feedInfo={feedInfo}></FeedFooter>
       </FeedBox>
     </ThemeProvider>
   );
@@ -528,15 +469,9 @@ function ReportFeedModal({
           </StyledButton>
         </Buttons>
       </ModalContent>
-    </ModalOverlay>
+    </ModalOverlay> 
   );
 }
-
-let FlexBox = styled.div`
-  ${({ theme }) => theme.component.flexBox.rowLeftCenter};
-  width: 100%;
-  gap: 8px;
-`;
 
 let StyledText = styled.span`
   font-size: ${({ size }) => size};
@@ -624,10 +559,6 @@ let MediumIcon = styled.img`
   ${({ theme }) => theme.component.iconSize.small};
 `;
 
-let SmallIcon = styled.img`
-  ${({ theme }) => theme.component.iconSize.small};
-  filter: ${({ filter }) => filter};
-`;
 
 let FeedOptionIcon = styled(MediumIcon)`
   box-sizing: content-box;
@@ -755,22 +686,6 @@ let HorizontalLine = styled.hr`
   border-top: 1px solid ${({ theme }) => theme.color.border};
   width: 100%;
   margin: 16px 0px;
-`;
-
-let FeedFooter = styled.div`
-  ${({ theme }) => theme.component.flexBox.rowSpaceBetween};
-  width: 100%;
-`;
-
-let CommunicationBox = styled.div`
-  ${({ theme }) => theme.component.flexBox.rowLeftCenter};
-  gap: 1rem;
-  margin: 1rem 0;
-`;
-
-let IconBox = styled.div`
-  ${({ theme }) => theme.component.flexBox.rowLeftCenter};
-  gap: 0.5rem;
 `;
 
 let ModalOverlay = styled.div`

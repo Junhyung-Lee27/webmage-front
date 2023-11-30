@@ -137,14 +137,6 @@ function FeedPage() {
   // 피드 게시물 생성, 편집 모달
   const handleShow = () => setShow(true);
 
-  useEffect(() => {
-    console.log("hasMoreFeeds : ", hasMoreFeeds);
-  }, [hasMoreFeeds]);
-
-  useEffect(() => {
-    console.log("currentPage : ", currentPage);
-  }, [currentPage]);
-
   return (
     <ThemeProvider theme={theme}>
       <PageLayout>
