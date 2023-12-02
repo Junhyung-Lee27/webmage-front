@@ -166,7 +166,7 @@ export default function FeedFooter(props) {
               onMouseEnter={() => {
                 const timerId = setTimeout(() => {
                   openEmojiModal();
-                }, 300);
+                }, 500);
                 setModalTimerId(timerId);
               }}
               onMouseLeave={() => {
@@ -187,13 +187,18 @@ export default function FeedFooter(props) {
             </IconBox>
           ) : (
             <IconBox
-              onMouseEnter={openEmojiModal}
-              onMouseLeave={() => {
-                const newModalTimerId = setTimeout(() => {
-                  closeEmojiModal();
-                }, 1000);
-                setModalTimerId(newModalTimerId);
-              }}
+            onMouseEnter={() => {
+              const timerId = setTimeout(() => {
+                openEmojiModal();
+              }, 500);
+              setModalTimerId(timerId);
+            }}
+            onMouseLeave={() => {
+              const newModalTimerId = setTimeout(() => {
+                closeEmojiModal();
+              }, 1000);
+              setModalTimerId(newModalTimerId);
+            }}
             >
               <AddEmoji src={process.env.PUBLIC_URL + `/icon/addEmoji.svg`} />
               <EmojiCommentText>좋아요</EmojiCommentText>
@@ -223,7 +228,7 @@ export default function FeedFooter(props) {
             myReactions={myReactions}
           />
         )}
-        {isCommentOpen && <CommentComponent />}
+        {isCommentOpen && <CommentComponent feedInfo={feedInfo} />}
       </FeedFooterContainer>
     </ThemeProvider>
   );
@@ -300,11 +305,136 @@ function EmojiModal(props) {
   );
 }
 
-function CommentComponent () {
+function CommentComponent (props) {
+  // 상태 관리
+  const user = useSelector((state) => state.user);
+  const [commentInput, setCommentInput] = useState(""); // 댓글 입력 상태
+  const [commentsInfo, setCommentsInfo] = useState([]); // 댓글 저장하기 위한 상태
+
+  // 댓글 조회 요청
+  async function getComments(feedId, authToken) {
+    try {
+      const response = await axios.get(`${BASE_URL}/feed/${feedId}/comment`, {
+        headers: {
+          Authorization: `Token ${authToken}`,
+        },
+      });
+      console.log(response.data);
+    } catch (error) {
+      console.log("댓글 조회 중 오류 발생: ", error)
+    }
+  }
+
+  // 댓글 조회 요청 시점
+  useEffect(() => {
+    getComments(props.feedInfo.id, user.authToken);
+  }, [])
+
+  // 댓글 입력 요청
+  async function submitAddComment(e, feedId, authToken, commentInput) {
+    if (e.key === 'Enter' && !e.shiftKey && commentInput) {
+      e.preventDefault(); // Enter 키 기본 동작 방지
+      try {
+        const response = await axios.post(
+          `${BASE_URL}/feed/${feedId}/comment/add/`, // URL 경로 수정
+          { comment: commentInput }, // 데이터 전송 방식 수정
+          {
+            headers: {
+              Authorization: `Token ${authToken}`,
+            },
+          }
+        );
+        // 성공적으로 댓글이 추가된 후의 로직 (예: 상태 업데이트, 사용자에게 알림 등)
+      } catch (error) {
+        console.log("댓글 작성 중 오류 발생 : ", error)
+      }
+    }
+  }
+
+  // 댓글 필드에 입력된 값
+  const handleCommentInput = (e) => {
+    // 입력 창 높이 조절
+    e.target.style.height = 'inherit'; 
+    e.target.style.height = `${e.target.scrollHeight}px`;
+
+    // 댓글 입력 상태 업데이트
+    setCommentInput(e.target.value);
+  };
+
+
   return (
-    <div><div>댓글 남기기 & 댓글 목록</div></div>
+    <CommentLayout>
+      <AddCommentArea>
+        <CommentProfile src={process.env.PUBLIC_URL + "/testImg/profile2.jpg"}></CommentProfile>
+        <CommentTextArea onInput={handleCommentInput} onKeyDown={(e) => submitAddComment(e, props.feedInfo.id, user.authToken, commentInput)} placeholder="댓글 남기기" rows="1"></CommentTextArea>
+      </AddCommentArea>
+      <CommentListArea>
+        <CommentList>댓글 목록</CommentList>
+        <CommentList>댓글 목록</CommentList>
+      </CommentListArea>
+    </CommentLayout>
   )
 }
+
+const CommentList = styled.div``
+
+const CommentTextArea = styled.textarea`
+  flex: 1; // 프로필 사진 제외한 나머지 너비 채움
+
+  padding: 8px;
+  
+  resize: none; // 사용자가 크기 조절 불가
+  max-height: 96px; // 최대 높이 설정
+  overflow-y: auto; // 내용이 최대 높이를 초과할 경우 스크롤 표시
+
+  outline: none;
+  border: none;
+  border-bottom: 1px solid ${({ theme }) => theme.color.secondary};
+
+  font-size: 14px;
+  color: ${({ theme }) => theme.color.font1 };
+  &::placeholder {
+    color: ${({ theme }) => theme.color.font2};
+    opacity: 0.5;
+  }
+
+  /* 스크롤바 스타일링 */
+  &::-webkit-scrollbar {
+    width: 8px;
+  }
+  &::-webkit-scrollbar-thumb {
+    background: ${({ theme }) => theme.color.secondary};
+    border-radius: 4px;
+  }
+  &::-webkit-scrollbar-track {
+    background: ${({ theme }) => theme.color.bg3};
+    border-radius: 4px;
+  }
+`;
+
+const CommentProfile = styled.img`
+  width: 48px;
+  height: 48px;
+  border-radius: 100%;
+  object-fit: cover;
+`
+
+const CommentLayout = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+  width: 100%;
+`
+const AddCommentArea = styled.div`
+  display: flex;
+  gap: 16px;
+`
+const CommentListArea = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  border: 1px solid black;
+`
 
 const shakeAnimation = keyframes`
   0%, 100% { transform: rotate(0deg) scale(1.2); }
@@ -322,7 +452,9 @@ const bounceAnimation = keyframes`
 let EmojiContainer = styled.div`
   ${({ theme }) => theme.component.shadow.default};
   position: absolute;
-  top: 80%;
+  z-index: 1; 
+  left: 0px;
+  top: 52px;
   display: flex;
   flex-wrap: wrap; /* 여러 줄로 감싸기 위해 추가 */
   align-items: center;
