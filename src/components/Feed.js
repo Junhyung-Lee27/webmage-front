@@ -106,7 +106,7 @@ function Feed({
             </UserInfo>
 
             <OptionButtons>
-              {userInfo.userName !== user.username && <FollowButton userInfo={userInfo} />}
+              {userInfo.id !== user.userId && <FollowButton userInfo={userInfo} />}
               <OptionWrapper>
                 <FeedOptionIcon
                   src={process.env.PUBLIC_URL + "/icon/menu-horizontal.svg"}
@@ -148,9 +148,9 @@ function Feed({
                 {feedInfo.post}
               </StyledText>
               <FeedTags>
-                {parseTagsString(feedInfo.tags).map((tag) => {
+                {parseTagsString(feedInfo.tags).map((tag, index) => {
                   return (
-                    <StyledText size="14px" weight="500" color={theme.color.primary} key={tag}>
+                    <StyledText size="14px" weight="500" color={theme.color.primary} key={tag + index}>
                       {"#" + tag + " "}
                     </StyledText>
                   );
@@ -200,7 +200,6 @@ function OptionMenu({
 
   return (
     <OptionLayout>
-      <OptionContainer>
         <OptionList>
           {user.userId === userInfo.id ? (
             <>
@@ -267,7 +266,6 @@ function OptionMenu({
             </>
           )}
         </OptionList>
-      </OptionContainer>
     </OptionLayout>
   );
 }

@@ -17,11 +17,13 @@ function BlockedAndReported() {
   const user = useSelector((state) => state.user);
   const [blockedUsers, setBlockedUsers] = useState([]); // 차단 유저
   const [reportedFeeds, setReportedFeeds] = useState([]); // 신고 게시물
+  const [reportedComments, setReportedComments] = useState([]); // 신고 댓글
 
   // 차단 유저, 게시물 불러오기
   useEffect(() => {
     getBlockedUsers(user);
     getReportedFeeds(user);
+    getReportedComments(user);
   }, [user]);
 
   async function getBlockedUsers(user) {
@@ -50,6 +52,19 @@ function BlockedAndReported() {
     }
   }
 
+  async function getReportedComments(user) {
+    try {
+      const response = await axios.get(`${BASE_URL}/feed/reported_comments/`, {
+        headers: {
+          Authorization: `Token ${user.authToken}`,
+        },
+      });
+      setReportedComments(response.data);
+    } catch (error) {
+      console.error("신고된 댓글 불러오기 에러 : ", error);
+    }
+  }
+
   // 유저 차단 해제
   async function unblockUser(blockedId, authToken) {
     try {
@@ -70,6 +85,20 @@ function BlockedAndReported() {
     try {
       await axios.delete(`${BASE_URL}/feed/unreport/`, {
         data: { reported_id: reportedId },
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Token ${authToken}`,
+        },
+      });
+    } catch (error) {
+      console.error(error.response.data);
+    }
+  }
+
+  // 댓글 신고 취소
+  async function unReportComment(commentId, authToken) {
+    try {
+      await axios.delete(`${BASE_URL}/feed/comment/${commentId}/unreport/`, {
         headers: {
           "Content-Type": "application/json",
           Authorization: `Token ${authToken}`,
@@ -119,11 +148,11 @@ function BlockedAndReported() {
             )}
           </tbody>
         </BlockedTable>
-        <ReportedTable>
+        <ReportedFeedTable>
           <TableHead>
             <tr>
               <FeedTableHeaderCell>유저명</FeedTableHeaderCell>
-              <FeedTableHeaderCell>게시물 내용</FeedTableHeaderCell>
+              <FeedTableHeaderCell>댓글 내용</FeedTableHeaderCell>
               <FeedTableHeaderCell>신고 사유</FeedTableHeaderCell>
               <FeedTableHeaderCell>신고 일시</FeedTableHeaderCell>
               <FeedTableHeaderCell></FeedTableHeaderCell>
@@ -135,7 +164,7 @@ function BlockedAndReported() {
               reportedFeeds.map((reported_feed) => (
                 <FeedContainer key={reported_feed.id}>
                   <FeedTableCell>{reported_feed.username}</FeedTableCell>
-                  <FeedTableCell>{reported_feed.feed_contents}</FeedTableCell>
+                  <FeedTableCell>{reported_feed.comment}</FeedTableCell>
                   <FeedTableCell>{reported_feed.reason}</FeedTableCell>
                   <FeedTableCell>{reported_feed.reported_at}</FeedTableCell>
                   <UnblockBtnBox>
@@ -158,7 +187,47 @@ function BlockedAndReported() {
               </tr>
             )}
           </tbody>
-        </ReportedTable>
+        </ReportedFeedTable>
+        <ReportedCommentTable>
+          <TableHead>
+            <tr>
+              <FeedTableHeaderCell>유저명</FeedTableHeaderCell>
+              <FeedTableHeaderCell>게시물 내용</FeedTableHeaderCell>
+              <FeedTableHeaderCell>신고 사유</FeedTableHeaderCell>
+              <FeedTableHeaderCell>신고 일시</FeedTableHeaderCell>
+              <FeedTableHeaderCell></FeedTableHeaderCell>
+            </tr>
+          </TableHead>
+
+          <tbody>
+            {reportedComments.length > 0 ? (
+              reportedComments.map((reportedComment) => (
+                <FeedContainer key={reportedComment.id}>
+                  <FeedTableCell>{reportedComment.username}</FeedTableCell>
+                  <FeedTableCell>{reportedComment.feed_contents}</FeedTableCell>
+                  <FeedTableCell>{reportedComment.reason}</FeedTableCell>
+                  <FeedTableCell>{reportedComment.reported_at}</FeedTableCell>
+                  <UnblockBtnBox>
+                    <UnblockBtn
+                      onClick={() => {
+                        unReportComment(reportedComment.id, user.authToken);
+                        getReportedComments(user);
+                      }}
+                    >
+                      신고 취소
+                    </UnblockBtn>
+                  </UnblockBtnBox>
+                </FeedContainer>
+              ))
+            ) : (
+              <tr>
+                <CenteredText colSpan="5" height="80px">
+                  신고한 댓글이 없습니다.
+                </CenteredText>
+              </tr>
+            )}
+          </tbody>
+        </ReportedCommentTable>
       </TablesContainer>
     </ThemeProvider>
   );
@@ -178,7 +247,14 @@ let BlockedTable = styled.table`
   margin-right: auto;
 `;
 
-const ReportedTable = styled.table`
+const ReportedFeedTable = styled.table`
+  height: fit-content;
+  width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+`;
+
+const ReportedCommentTable = styled.table`
   height: fit-content;
   width: 100%;
   margin-left: auto;

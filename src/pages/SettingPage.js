@@ -63,7 +63,7 @@ function SettingPage() {
                 src={process.env.PUBLIC_URL + "/icon/blocked-users.svg"}
                 filter={theme.filter.font1}
               />
-              <MenuText>차단 관리</MenuText>
+              <MenuText>신고·차단</MenuText>
             </MenuContainer>
           </MenuLayout>
           {activeItem === "ProfileView" && <ProfileView />}
