@@ -1184,14 +1184,16 @@ let IconBox = styled.div`
   gap: 4px;
   padding: 12px;
   border: ${({ theme, myReactions }) =>
-    myReactions ? `1px solid ${theme.color.primary}` : `1px solid ${theme.color.border}`};
+    myReactions && myReactions.length != 0
+      ? `1px solid ${theme.color.primary}`
+      : `1px solid ${theme.color.border}`};
   border-radius: 8px;
   background-color: #f5f5f5;
   cursor: pointer;
 
   &:hover {
     background-color: ${({ theme, myReactions }) =>
-      myReactions ? `${theme.color.primary}40` : theme.color.bg3};
+      myReactions && myReactions.length != 0 ? `${theme.color.primary}40` : theme.color.bg3};
   }
 `;
 
@@ -1232,8 +1234,8 @@ let AddComment = styled.img`
 
 let EmojiCommentText = styled.span`
   font-size: 14px;
-  font-weight: ${({ myReactions }) => (myReactions ? "500" : "400")};
-  color: ${({ theme, myReactions }) => (myReactions ? theme.color.primary : theme.color.font2)};
+  font-weight: ${({ myReactions }) => (myReactions && myReactions.length != 0 ? "500" : "400")};
+  color: ${({ theme, myReactions }) => (myReactions && myReactions.length != 0 ? theme.color.primary : theme.color.font2)};
   text-align: center;
   margin-left: 8px;
 `;
@@ -1250,10 +1252,6 @@ let OptionLayout = styled.div`
   border-radius: 8px;
   overflow: hidden;
   border: 1px solid ${({ theme }) => theme.color.border};
-`;
-
-let OptionContainer = styled.div`
-  position: relative;
 `;
 
 let Option = styled.li`
