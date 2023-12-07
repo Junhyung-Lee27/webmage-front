@@ -9,6 +9,7 @@ import componentTheme from "../components/theme";
 import axios from "axios";
 import { BASE_URL } from "./../config";
 import { setUser } from "../store/userSlice";
+import UserProfile from "../components/UserProfile";
 
 function MainPage() {
   const dispatch = useDispatch();
@@ -47,6 +48,8 @@ function MainPage() {
             info: response.data.user_info,
             hash: response.data.user_hash,
             email: response.data.user_email,
+            followerCount: response.data.follower_count,
+            successCount: response.data.total_success_count,
           })
         );
       } catch (error) {
@@ -107,7 +110,7 @@ function MainPage() {
           <Stadardized>
             <TopGroup>
               <ProfileLog>
-                <Profile>프로필</Profile>
+                <UserProfile />
                 <MandaLog>만다로그</MandaLog>
               </ProfileLog>
               <MyManda>
@@ -174,7 +177,7 @@ const ProfileLog = styled.div`
   display: flex;
   flex-direction: column;
   gap: 10px;
-  margin-top: 66px;
+  margin-top: 46px;
 `
 
 const Profile = styled.div`

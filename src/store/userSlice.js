@@ -10,6 +10,7 @@ const userSlice = createSlice({
     info: "",
     hash: "",
     email: "",
+    followerCount: 0,
     successCount: 0,
     authToken: "",
     csrfToken: "",
@@ -39,7 +40,10 @@ const userSlice = createSlice({
       if (action.payload.email) {
         state.email = action.payload.email;
       }
-      if (action.payload.successCount) {
+      if (action.payload.followerCount != null) {
+        state.followerCount = action.payload.followerCount;
+      }
+      if (action.payload.successCount != null) {
         state.successCount = action.payload.successCount;
       }
     },
