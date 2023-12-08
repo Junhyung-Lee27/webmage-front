@@ -1,6 +1,8 @@
 import { useSelector } from "react-redux";
 import styled, { ThemeProvider } from "styled-components";
 import componentTheme from "./theme";
+import FollowButton from "./FollowButton";
+import { useState } from "react";
 
 export default function UserProfile() {
   // 테마
@@ -14,30 +16,43 @@ export default function UserProfile() {
 
   // 상태관리
   const user = useSelector((state) => state.user);
-  console.log(user);
+  const selectedUser = useSelector((state) => state.selectedUser);
+  let userInfo = {
+    id: selectedUser.userId,
+    is_following: selectedUser.is_following,
+  };
 
   return (
     <ThemeProvider theme={theme}>
       <ProfileBox>
         <ProfileImageBox>
           <ProfileImage src={process.env.PUBLIC_URL + "/testImg/profile2.jpg"}></ProfileImage>
-          <Username>{user.username}</Username>
+          <Username>{selectedUser.username}</Username>
         </ProfileImageBox>
         <NumericInfos>
           <CountWrapper>
             <CountLabel>팔로워</CountLabel>
-            <Count>{user.followerCount}</Count>
+            <Count>{selectedUser.followerCount}</Count>
           </CountWrapper>
           <CountWrapper>
             <CountLabel>실천</CountLabel>
-            <Count>{user.successCount}</Count>
+            <Count>{selectedUser.successCount}</Count>
           </CountWrapper>
         </NumericInfos>
-        <UserDetails>
-          <UserPosition>{user.position}</UserPosition>
-          <UserIntroduce>{user.info}</UserIntroduce>
-          <UserHash>{user.hash}</UserHash>
-        </UserDetails>
+        {selectedUser.userPosition != "" &&
+        selectedUser.userInfo != "" &&
+        selectedUser.userHash != "" ? (
+          <UserDetails>
+            <UserPosition>{selectedUser.userPosition}</UserPosition>
+            <UserIntroduce>{selectedUser.userInfo}</UserIntroduce>
+            <UserHash>{selectedUser.userHash}</UserHash>
+          </UserDetails>
+        ) : null}
+        {user.userId !== selectedUser.userId && (
+          <FollowButtonWrapper>
+            <FollowButton userInfo={userInfo} />
+          </FollowButtonWrapper>
+        )}
       </ProfileBox>
     </ThemeProvider>
   );
@@ -50,17 +65,18 @@ const ProfileBox = styled.div`
   align-items: center;
   width: 250px;
   height: fit-content;
-  padding: 24px 24px 32px 24px;
+  padding: 24px 24px 40px 24px;
   position: relative;
 `;
 
 const ProfileImageBox = styled.div`
   display: flex;
   flex-direction: column;
+  align-items: center;
   gap: 16px;
   position: absolute;
-  top: -36px;
-`
+  top: -40px;
+`;
 
 const ProfileImage = styled.img`
   ${({ theme }) => theme.component.shadow.default};
@@ -81,7 +97,7 @@ const Username = styled.span`
 const NumericInfos = styled.div`
   display: flex;
   width: 100%;
-  margin-top: 96px;
+  margin-top: 90px;
 `;
 
 const CountWrapper = styled.div`
@@ -111,14 +127,14 @@ const UserDetails = styled.div`
   display: flex;
   flex-direction: column;
   margin-top: 40px;
-`
+`;
 
 const UserPosition = styled.span`
-  color: ${({theme }) => theme.color.font1};
+  color: ${({ theme }) => theme.color.font1};
   font-size: 14px;
   font-weight: 700;
   margin-bottom: 16px;
-`
+`;
 
 const UserIntroduce = styled.span`
   color: ${({ theme }) => theme.color.font1};
@@ -132,3 +148,9 @@ const UserHash = styled.span`
   font-size: 14px;
   font-weight: 400;
 `;
+
+const FollowButtonWrapper = styled.div`
+  position: absolute;
+  right: 8px;
+  top: 18px;
+`

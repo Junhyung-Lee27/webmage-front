@@ -11,6 +11,7 @@ import userReducer from "./userSlice";
 import searchReducer from './searchSlice'
 import feedReducer from './feedSlice'
 import mandaReducer from './mandaSlice'
+import selectedUserReducer from './selectedUserSlice'
 
 const rootReducer = combineReducers({
   user: userReducer,
@@ -20,12 +21,13 @@ const rootReducer = combineReducers({
   search: searchReducer,
   feed: feedReducer,
   manda: mandaReducer,
+  selectedUser: selectedUserReducer,
 });
 
 const persistConfig = {
   key: "root",
   storage,
-  whitelist: ["user", "theme"], // 영속성 유지 O
+  whitelist: ["user", "theme", "selectedUser"], // 영속성 유지 O
   blacklist: ["authpage", "settingpage"], // 영속성 유지 X
 };
 

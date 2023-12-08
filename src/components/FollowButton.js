@@ -45,6 +45,9 @@ function FollowButton({ userInfo }) {
       });
 
       dispatch(setFeeds(updatedFeeds)); // 업데이트된 feeds 배열로 상태 업데이트
+
+      // UserProfile 컴포넌트에서 userInfo를 받았을 경우
+      userInfo.is_following = true;
     } catch (error) {
       console.error(error.response); // 오류 처리
     }
@@ -72,6 +75,9 @@ function FollowButton({ userInfo }) {
         });
 
         dispatch(setFeeds(updatedFeeds)); // 업데이트된 feeds 배열로 상태 업데이트
+
+        // UserProfile 컴포넌트에서 userInfo를 받았을 경우
+        userInfo.is_following = false;
       } catch (error) {
         console.error(error.response); // 오류 처리
       }

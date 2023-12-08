@@ -10,6 +10,7 @@ import axios from "axios";
 import { BASE_URL } from "./../config";
 import { setUser } from "../store/userSlice";
 import UserProfile from "../components/UserProfile";
+import { setSelectedUser } from "../store/selectedUserSlice";
 
 function MainPage() {
   const dispatch = useDispatch();
@@ -25,6 +26,7 @@ function MainPage() {
 
   // 유저 상태
   const user = useSelector((state) => state.user);
+  let selectedUser = useSelector((state) => state.selectedUser);
 
   // 만다라트 작성 상태
   const [currPage, setCurrPage] = useState("");
@@ -42,14 +44,16 @@ function MainPage() {
         });
         dispatch(
           setUser({
+            userId: response.data.userId,
             username: response.data.username,
-            userImg: response.data.user_image,
-            position: response.data.user_position,
-            info: response.data.user_info,
-            hash: response.data.user_hash,
-            email: response.data.user_email,
-            followerCount: response.data.follower_count,
-            successCount: response.data.total_success_count,
+            userImg: response.data.userImg,
+            userPosition: response.data.userPosition,
+            userInfo: response.data.userInfo,
+            userHash: response.data.userHash,
+            userEmail: response.data.userEmail,
+            userProvider: response.data.userProvider,
+            followerCount: response.data.followerCount,
+            successCount: response.data.successCount,
           })
         );
       } catch (error) {
@@ -58,9 +62,19 @@ function MainPage() {
     };
     fetchData(user.userId, user.authToken);
 
-    // currPage -> false로 상태 변환
+    // currPage 상태 변환
     setCurrPage("MAIN");
   }, [user.userId]);
+
+  useEffect(() => {
+    // 만약 selectedUser가 비어 있고 user에 정보가 있다면, user로 selectedUser 설정
+    if (
+      !selectedUser ||
+      (Object.keys(selectedUser).length === 0 && user.username !== "")
+    ) {
+      dispatch(setSelectedUser(user));
+    }
+  }, [user.username]);
 
   // 투두리스트 샘플 데이터
   const todoInfo = [
@@ -111,7 +125,7 @@ function MainPage() {
             <TopGroup>
               <ProfileLog>
                 <UserProfile />
-                <MandaLog>만다로그</MandaLog>
+                {/* <MandaLog>만다로그</MandaLog> */}
               </ProfileLog>
               <MyManda>
                 <MandaTitle />
@@ -177,7 +191,7 @@ const ProfileLog = styled.div`
   display: flex;
   flex-direction: column;
   gap: 10px;
-  margin-top: 46px;
+  margin-top: 48px;
 `
 
 const Profile = styled.div`

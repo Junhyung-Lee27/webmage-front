@@ -30,6 +30,7 @@ function MandaTitle() {
   const [isOpenMandaMainModal, setIsOpenMandaMainModal] = useState(false); // 만다라트 작성 모달 상태
   const [isOpenDeleteMandaModal, setIsOpenDeleteMandaModal] = useState(false); // 만다라트 삭제 모달 상태
   const user = useSelector((state) => state.user); // 현재 사용자
+  const selectedUser = useSelector((state) => state.selectedUser);
 
   //// 드롭다운 ////
   // 드롭다운 동작
@@ -84,30 +85,32 @@ function MandaTitle() {
     <ThemeProvider theme={theme}>
       <Container>
         <Title>{selectedTitle ? selectedTitle : ""}</Title>
-        {manda.main === undefined ? (
-          <AddManda
-            onClick={() => {
-              setIsOpenMandaMainModal(true);
-            }}
-          >
-            + 만다라트 만들기
-          </AddManda>
-        ) : (
-          <ButtonGroup>
-            <IconTextButton onClick={() => navigate("/manda/write")}>
-              <EditIcon src={process.env.PUBLIC_URL + "/manda/edit-btn.svg"} />
-              <ButtonText>수정</ButtonText>
-            </IconTextButton>
-            <IconTextButton
+        {user.userId === selectedUser.userId ? (
+          manda.main === undefined ? (
+            <AddManda
               onClick={() => {
-                setIsOpenDeleteMandaModal(true);
+                setIsOpenMandaMainModal(true);
               }}
             >
-              <DeleteIcon src={process.env.PUBLIC_URL + "/manda/delete-btn.svg"} />
-              <ButtonText>삭제</ButtonText>
-            </IconTextButton>
-          </ButtonGroup>
-        )}
+              + 만다라트 만들기
+            </AddManda>
+          ) : (
+            <ButtonGroup>
+              <IconTextButton onClick={() => navigate("/manda/write")}>
+                <EditIcon src={process.env.PUBLIC_URL + "/manda/edit-btn.svg"} />
+                <ButtonText>수정</ButtonText>
+              </IconTextButton>
+              <IconTextButton
+                onClick={() => {
+                  setIsOpenDeleteMandaModal(true);
+                }}
+              >
+                <DeleteIcon src={process.env.PUBLIC_URL + "/manda/delete-btn.svg"} />
+                <ButtonText>삭제</ButtonText>
+              </IconTextButton>
+            </ButtonGroup>
+          )
+        ) : null}
         {/* <DropdownButton> */}
         {/* 만다라트를 여러 개 만드는 기능은 추후에 버그 해결 후 업데이트 예정 */}
         {/* <DropdownIcon
@@ -298,6 +301,7 @@ function DeleteMandaModal({ theme, manda, user, setIsOpenDeleteMandaModal, setSe
 const Container = styled.div`
   width: 100%;
   position: relative;
+  height: 36px;
 
   display: flex;
   justify-content: flex-end;

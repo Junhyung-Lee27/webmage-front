@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import styled, { ThemeProvider } from "styled-components";
 import componentTheme from "./theme";
 import FollowButton from "./FollowButton";
@@ -7,6 +7,8 @@ import FeedWriteModal from "./FeedWriteModal";
 import { BASE_URL } from "./../config";
 import axios from "axios";
 import FeedFooter from "./FeedFooter";
+import { setSelectedUser } from "../store/selectedUserSlice";
+import { useNavigate } from "react-router-dom";
 
 function Feed({
   userInfo,
@@ -17,9 +19,11 @@ function Feed({
   feedMode,
   setFeedMode,
   fetchFeeds,
-  user,
   currentPage,
 }) {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  
   // 테마
   const colorTheme = useSelector((state) => state.theme.themes[state.theme.currentTheme]);
   const filterTheme = useSelector((state) => state.theme.filters[state.theme.currentTheme]);
@@ -30,7 +34,29 @@ function Feed({
   };
 
   // 상태관리
+  const user = useSelector((state) => state.user);
   const [isMenuOpen, setIsMenuOpen] = useState(false); // 옵션 메뉴
+  const selectedUser = useSelector((state) => state.selectedUser);
+
+  // 특정 유저 프로필 화면
+  const handleSelectedUser = async (userId, authToken) => {
+    try {
+      const response = await axios.get(`${BASE_URL}/user/profile/${userId}`, {
+        headers: {
+          accept: "application/json",
+          Authorization: `Token ${authToken}`,
+        },
+      });
+      const updatedData = {
+        ...response.data,
+        is_following: userInfo.is_following,
+      };
+      
+      dispatch(setSelectedUser(updatedData));
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   // 날짜 형식 변환
   const formatDateAgo = (dateString) => {
@@ -75,11 +101,20 @@ function Feed({
           {/*유저정보 및 팔로우버튼/메뉴버튼 */}
           <FeedHeader>
             <UserInfo>
-              <ProfileImgWrapper>
+              <ProfileImgWrapper
+                onClick={() => {
+                  handleSelectedUser(userInfo.id, user.authToken);
+                  navigate(`/manda/${selectedUser.username}`);
+                }}
+              >
                 <ProfileImg src={process.env.PUBLIC_URL + "/testImg/profile2.jpg"} />
               </ProfileImgWrapper>
               <TextBox>
                 <UserName
+                  onClick={() => {
+                    handleSelectedUser(userInfo.id, user.authToken);
+                    navigate(`/manda/${selectedUser.username}`);
+                  }}
                   size="14px"
                   weight="600"
                   color={theme.color.font1}
@@ -95,7 +130,6 @@ function Feed({
                   color={theme.color.font2}
                   margin="0 0 8px 0"
                   lineHeight="16px"
-                  cursor="pointer"
                 >
                   {userInfo.userPosition}
                 </StyledText>
@@ -150,7 +184,12 @@ function Feed({
               <FeedTags>
                 {parseTagsString(feedInfo.tags).map((tag, index) => {
                   return (
-                    <StyledText size="14px" weight="500" color={theme.color.primary} key={tag + index}>
+                    <StyledText
+                      size="14px"
+                      weight="500"
+                      color={theme.color.primary}
+                      key={tag + index}
+                    >
                       {"#" + tag + " "}
                     </StyledText>
                   );
