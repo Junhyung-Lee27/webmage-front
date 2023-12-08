@@ -67,11 +67,11 @@ function KakaoCallback() {
 
         // 서버에 가입 요청
         const data = userInfoResponse.data;
-        var username = data.properties.nickname + data.id;
+        var username = data.properties.nickname;
         const email = data.kakao_account.email;
         const password = data.id;
         const passwordCheck = data.id;
-        const provider = "KAKAO"+data.id;
+        const provider = "KAKAO" + data.id;
 
         const signupResponse = await signup(username, email, password, passwordCheck, provider);
 

@@ -61,12 +61,10 @@ export const login = async (username, password) => {
     // 응답 처리
     if (response.status === 200) {
         return { success: true, token: response.data.token, userId: response.data.user_id };
-    } else {
-      return { error: "로그인에 실패했습니다. 아이디나 비밀번호를 확인해주세요." };
-    }
+    } 
   } catch (error) {
     console.error("Login API error:", error);
-    return { error: "로그인 중 오류가 발생했습니다. 나중에 다시 시도해주세요." };
+    return { error: "로그인에 실패했습니다. 아이디나 비밀번호를 확인해주세요." };
   }
 };
 
@@ -126,26 +124,60 @@ export const editAccount = async (username, email, password, passwordCheck, auth
 };
 
 // 회원탈퇴
-export const deleteUser = async (authToken, password) => {
-  try {
-    const response = await axios.delete(`${BASE_URL}/user/delete-user/`, {
-      headers: {
-        accept: "application/json",
-        Authorization: `Token ${authToken}`,
-      },
-      data: { password: password },
-    });
+export const deleteUser = async (authToken, password, willDelete) => {
+  // 이메일 회원 탈퇴
+  if (password && willDelete === "") {
+    try {
+      const response = await axios.delete(`${BASE_URL}/user/delete-user/`, {
+        headers: {
+          accept: "application/json",
+          Authorization: `Token ${authToken}`,
+        },
+        data: { password: password },
+      });
 
-    if (response.status === 200) {
-      return { success: true };
-    } else {
-      return { error: "회원탈퇴에 실패했습니다. 나중에 다시 시도해주세요." };
+      if (response.status === 200) {
+        return { success: true };
+      } else {
+        return { error: "회원탈퇴에 실패했습니다. 나중에 다시 시도해주세요." };
+      }
+    } catch (error) {
+      console.error("Delete-user API error:", error);
+      if (error.response && error.response.data.error) {
+        return { error: error.response.data.error };
+      }
+      return { error: "회원탈퇴 중 오류가 발생했습니다. 나중에 다시 시도해주세요." };
     }
-  } catch (error) {
-    console.error("Delete-user API error:", error);
-    if (error.response && error.response.data.error) {
-      return { error: error.response.data.error }; // 서버에서 제공하는 에러 메시지 사용
-    }
-    return { error: "회원탈퇴 중 오류가 발생했습니다. 나중에 다시 시도해주세요." };
   }
+
+  // 소셜 회원 탈퇴
+  if (willDelete && password === "") {
+    if (willDelete !== "탈퇴합니다") {
+      return { error: "'탈퇴합니다'를 정확하게 입력해주세요." };
+    } else {
+      try {
+        const response = await axios.delete(`${BASE_URL}/user/delete-user/`, {
+          headers: {
+            accept: "application/json",
+            Authorization: `Token ${authToken}`,
+          },
+        });
+
+        if (response.status === 200) {
+          return { success: true };
+        } else {
+          return { error: "회원탈퇴에 실패했습니다. 나중에 다시 시도해주세요." };
+        }
+      } catch (error) {
+        console.error("Delete-user API error:", error);
+        if (error.response && error.response.data.error) {
+          return { error: error.response.data.error };
+        }
+        return { error: "회원탈퇴 중 오류가 발생했습니다. 나중에 다시 시도해주세요." };
+      }
+    }
+  }
+
+  // 기타 경우
+  return { error: "정확한 정보를 입력해주세요." };
 };

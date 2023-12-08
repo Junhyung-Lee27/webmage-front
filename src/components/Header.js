@@ -7,13 +7,14 @@ import ThemeSwitch from "../components/ThemeSwitch";
 import Notification from "./Notification";
 
 import { logout } from "../services/authService";
-import { setIsLoggedIn, resetUserState } from "../store/userSlice";
+import { setIsLoggedIn, resetUserState, setUser } from "../store/userSlice";
 import { setSearchResults, clearSearchResults } from "../store/searchSlice";
 import { BASE_URL } from "./../config";
 
 import axios from "axios";
 import { resetMandaState } from "../store/mandaSlice";
 import { persistor } from "../store/store";
+import { setSelectedUser } from "../store/selectedUserSlice";
 
 function Header() {
   let navigate = useNavigate();
@@ -28,6 +29,9 @@ function Header() {
     component: componentTheme,
   };
 
+  // 상태 관리
+  const user = useSelector((state) => state.user);
+
   // 알림 컴포넌트 상태관리
   const [isNotiVisible, setIsNotiVisible] = useState(false);
 
@@ -35,10 +39,22 @@ function Header() {
   const handleLogoutClick = async () => {
     const response = await logout();
     if (response.success) {
+      // 상태 초기화
       await persistor.purge();
-
+      dispatch(
+        setUser({
+          userId: "",
+          username: "",
+          userImg: "",
+          userPosition: "",
+          userInfo: "",
+          userHash: "",
+          followerCount: 0,
+          successCount: 0,
+        })
+      );
+      dispatch(setSelectedUser({})); // 선택된 유저 초기화
       dispatch(setIsLoggedIn(false)); // 로그인 여부 false
-      dispatch(resetUserState()); // 유저 상태 초기화
       dispatch(resetMandaState()); // 만다 상태 초기화
 
       // 로그인 화면 이동
@@ -57,35 +73,35 @@ function Header() {
 
   // get authToken
   const authToken = useSelector((state) => state.user.authToken);
-  
+
   // 서버에 검색 요청
   const handleSearch = async (event, isNavLink = false) => {
     let queryTerm = isNavLink ? "" : searchTerm;
-    
+
     // Enter 키의 keyCode는 13입니다.
     if (event.key === "Enter" || isNavLink) {
       if (queryTerm.trim() || isNavLink) {
-      // '/search' 페이지가 아닌 경우 이동
-      if (window.location.pathname !== "/search") {
-        navigate("/search");
-      }
+        // '/search' 페이지가 아닌 경우 이동
+        if (window.location.pathname !== "/search") {
+          navigate("/search");
+        }
 
-      try {
-        const response = await axios.get(`${BASE_URL}/search`, {
-          headers: {
-            Authorization: `Token ${authToken}`, // 헤더에 토큰 추가
-          },
-          params: {
-            query: queryTerm,
-          },
-        });
-        dispatch(setSearchResults(response.data));
-      } catch (error) {
-        console.error("검색 중 오류 발생:", error);
+        try {
+          const response = await axios.get(`${BASE_URL}/search`, {
+            headers: {
+              Authorization: `Token ${authToken}`, // 헤더에 토큰 추가
+            },
+            params: {
+              query: queryTerm,
+            },
+          });
+          dispatch(setSearchResults(response.data));
+        } catch (error) {
+          console.error("검색 중 오류 발생:", error);
+        }
       }
     }
   };
-}
 
   return (
     <ThemeProvider theme={combinedTheme}>
@@ -93,14 +109,25 @@ function Header() {
         <HeaderLayout>
           <Stadardized>
             <Row gap="48px">
-              <NavLink to="/manda">
+              <NavLink
+                onClick={() => {
+                  dispatch(setSelectedUser(user));
+                }}
+                to="/manda"
+              >
                 <MandaIcon
                   src={process.env.PUBLIC_URL + "/logo/Manda_logo2.svg"}
                   alt="Manda Logo"
                 />
               </NavLink>
               <Row gap="16px">
-                <StyledLink to="/manda" activeclassname="active">
+                <StyledLink
+                  onClick={() => {
+                    dispatch(setSelectedUser(user));
+                  }}
+                  to="/manda"
+                  activeclassname="active"
+                >
                   만다라트
                 </StyledLink>
                 <StyledLink to="/feed" activeclassname="active">
@@ -117,9 +144,9 @@ function Header() {
               >
                 탐색
               </StyledLink> */}
-                <StyledLink to="/chat" activeclassname="active">
+                {/* <StyledLink to="/chat" activeclassname="active">
                   채팅
-                </StyledLink>
+                </StyledLink> */}
               </Row>
             </Row>
             <Row gap="20px">
@@ -198,6 +225,8 @@ let Row = styled.div`
   justify-content: ${({ justifycontent = "center" }) => justifycontent};
 `;
 
+let NavToMain = styled.div``;
+
 let MandaIcon = styled.img`
   height: 48px;
   width: 160px;
@@ -269,7 +298,7 @@ let NotiIconWrapper = styled.div`
   border-radius: 50%;
 
   &:hover {
-    background-color: ${({ theme }) => theme.color.bg3}
+    background-color: ${({ theme }) => theme.color.bg3};
   }
 `;
 
