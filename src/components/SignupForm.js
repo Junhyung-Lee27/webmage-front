@@ -34,20 +34,10 @@ function SignupForm() {
       const loginResponse = await login(username, password);
       
       if (loginResponse.success) {
-        try {
-          const userResponse = await axios.get(`${BASE_URL}/user/profile/${loginResponse.userId}`);
-          dispatch(
-            setUser({
-              userId: userResponse.data.user_id,
-              authToken: userResponse.data.token,
-            })
-          );
-        } catch (error) {
-          console.error(error);
-        }
-
+        dispatch(setUser({ userId: loginResponse.userId }));
         dispatch(setAuthToken(loginResponse.token));
         dispatch(setIsLoggedIn(true));
+        window.location.reload(); // 페이지 리로드
         navigate("/manda");
       } else if (loginResponse.error) {
         alert("로그인에 실패했습니다. 잠시 후 다시 시도해주세요.");
