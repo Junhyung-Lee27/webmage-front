@@ -2,11 +2,13 @@ import styled, { ThemeProvider } from "styled-components";
 import { useSelector, useDispatch } from "react-redux";
 import componentTheme from "./theme";
 import { showAccountView } from "./../store/settingpageSlice";
-import { setIsLoggedIn, resetUserState } from "./../store/userSlice";
+import { setIsLoggedIn, resetUserState, setUser } from "./../store/userSlice";
 import { useNavigate } from "react-router-dom";
 import { deleteUser } from "./../services/authService";
 import { useState } from "react";
 import { persistor } from "../store/store"
+import { setSelectedUser } from "../store/selectedUserSlice";
+import { resetMandaState } from "../store/mandaSlice";
 
 function DeleteAccount() {
   // 테마
@@ -19,28 +21,42 @@ function DeleteAccount() {
   const dispatch = useDispatch(); // 스토어 상태 업데이트
   const navigate = useNavigate(); // 화면 네이게이터
 
-  // get authToken
-  const authToken = useSelector((state) => state.user.authToken);
+  // 상태
+  const user = useSelector((state) => state.user);
+  const authToken = user.authToken;
 
-  // 패스워드 입력 상태
-  const [password, setPassword] = useState("")
+  // 유저 입력 상태
+  const [password, setPassword] = useState("");
+  const [willDelete, setWillDelete] = useState("");
 
   // 회원탈퇴 요청
   const handleDeleteUser = async (authToken) => {
-    const response = await deleteUser(authToken, password);
-    // 회원탈퇴 성공했을 경우
-    if (response.success) {
-      dispatch(setIsLoggedIn(false)); // 로그인 여부 false
-      dispatch(resetUserState()); // 유저 상태 초기화
-
-      navigate("/"); // 로그인 화면으로 이동
-
-      // 로컬스토리지에 저장된 유저 데이터 삭제
-      setTimeout(() => {
-        persistor.purge();
-      }, 2000);
-    } else if (response.error) {
-      alert(response.error);
+    try {
+      const response = await deleteUser(authToken, password, willDelete);
+      // 회원탈퇴 성공했을 경우
+      if (response.success) {
+        // 상태 초기화
+        await persistor.purge();
+        dispatch(
+          setUser({
+            userId: "",
+            username: "",
+            userImg: "",
+            userPosition: "",
+            userInfo: "",
+            userHash: "",
+            followerCount: 0,
+            successCount: 0,
+          })
+        );
+        dispatch(setSelectedUser({})); // 선택된 유저 초기화
+        dispatch(setIsLoggedIn(false)); // 로그인 여부 false
+        dispatch(resetMandaState()); // 만다 상태 초기화
+      } else if (response.error) {
+        alert(response.error);
+      }
+    } catch (error) {
+      alert(error);
     }
   };
 
@@ -57,21 +73,43 @@ function DeleteAccount() {
           >
             정말 탈퇴하시나요? 😢
           </StyledText>
-          <StyledText
-            fontsize="14px"
-            fontweight="500"
-            color={theme.color.font2}
-            margin="0px 0px 12px 0px"
-            align="left"
-          >
-            안전한 탈퇴를 위해 비밀번호를 입력해주세요.
-          </StyledText>
-          <StyledForm
-            type="password"
-            placeholder="비밀번호 입력"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          ></StyledForm>
+          {user.userProvider == "EMAIL" ? (
+            <>
+              <StyledText
+                fontsize="14px"
+                fontweight="500"
+                color={theme.color.font2}
+                margin="0px 0px 12px 0px"
+                align="left"
+              >
+                안전한 탈퇴를 위해 비밀번호를 입력해주세요.
+              </StyledText>
+              <StyledForm
+                type="password"
+                placeholder="비밀번호 입력"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+              ></StyledForm>
+            </>
+          ) : (
+            <>
+              <StyledText
+                fontsize="14px"
+                fontweight="500"
+                color={theme.color.font2}
+                margin="0px 0px 12px 0px"
+                align="left"
+              >
+                안전한 탈퇴를 위해 "탈퇴합니다"를 입력해주세요.
+              </StyledText>
+              <StyledForm
+                type="text"
+                placeholder="입력"
+                value={willDelete}
+                onChange={(e) => setWillDelete(e.target.value)}
+              ></StyledForm>
+            </>
+          )}
           <StyledText
             fontsize="16px"
             fontweight="600"

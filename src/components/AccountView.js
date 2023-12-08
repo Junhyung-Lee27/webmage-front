@@ -38,10 +38,16 @@ function AccountView() {
 function AccountInfo({ user, setIsEditing }) {
   const dispatch = useDispatch();
 
-  return (
+  return user.userProvider != "EMAIL" ? (
+    <FormLayout>
+      <LabelText>간편 가입 방법</LabelText>
+      <StyledBox>{user.userProvider}</StyledBox>
+      <WithdrawText onClick={() => dispatch(showDeleteAccount())}>Manda 탈퇴하기</WithdrawText>
+    </FormLayout>
+  ) : (
     <FormLayout>
       <LabelText>이메일</LabelText>
-      <StyledBox>{user.email}</StyledBox>
+      <StyledBox>{user.userEmail}</StyledBox>
       <StyledButton onClick={() => setIsEditing(true)}>수정하기</StyledButton>
       <WithdrawText onClick={() => dispatch(showDeleteAccount())}>Manda 탈퇴하기</WithdrawText>
     </FormLayout>
