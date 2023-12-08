@@ -52,13 +52,13 @@ function ProfileInfo({ setIsEditing, user }) {
       <StyledBox>{user.username}</StyledBox>
 
       <LabelText>소속</LabelText>
-      <StyledBox>{user.position}</StyledBox>
+      <StyledBox>{user.userPosition}</StyledBox>
 
       <LabelText>자기소개</LabelText>
-      <StyledBox>{user.info}</StyledBox>
+      <StyledBox>{user.userInfo}</StyledBox>
 
       <LabelText>해시태그</LabelText>
-      <StyledBox>{user.hash}</StyledBox>
+      <StyledBox>{user.userHash}</StyledBox>
 
       <StyledButton onClick={() => setIsEditing(true)}>수정하기</StyledButton>
     </FormLayout>
@@ -72,9 +72,9 @@ function ProfileEdit({ user, setIsEditing }) {
 
   // 입력값 상태 관리
   const [username, setUsername] = useState(user.username);
-  const [userPosition, setUserPosition] = useState(user.position);
-  const [userInfo, setUserInfo] = useState(user.info);
-  const [userHash, setUserHash] = useState(user.hash);
+  const [userPosition, setUserPosition] = useState(user.userPosition);
+  const [userInfo, setUserInfo] = useState(user.userInfo);
+  const [userHash, setUserHash] = useState(user.userHash);
   const [selectedImage, setSelectedImage] = useState(user.userImg);
 
   const handleInputChange = (e, setState) => {
@@ -112,9 +112,9 @@ function ProfileEdit({ user, setIsEditing }) {
         setUser({
           username: username,
           userImg: response.data.user_image,
-          position: response.data.user_position,
-          info: response.data.user_info,
-          hash: response.data.user_hash,
+          userPosition: response.data.user_position,
+          userInfo: response.data.user_info,
+          userHash: response.data.user_hash,
         })
       );
       setIsEditing(false);
@@ -160,8 +160,8 @@ function ProfileEdit({ user, setIsEditing }) {
       <StyledForm
         type="text"
         id="position"
-        value={userPosition || user.position || ""}
-        placeholder={!user.position ? "소속을 입력해주세요" : ""}
+        value={userPosition || user.userPosition || ""}
+        placeholder={!user.userPosition ? "소속을 입력해주세요" : ""}
         onChange={(e) => handleInputChange(e, setUserPosition)}
       ></StyledForm>
 
@@ -171,8 +171,8 @@ function ProfileEdit({ user, setIsEditing }) {
       <StyledForm
         type="text"
         id="info"
-        value={userInfo || user.info || ""}
-        placeholder={!user.info ? "다른 분들께 소개할 내용을 입력해주세요" : ""}
+        value={userInfo || user.userInfo || ""}
+        placeholder={!user.userInfo ? "다른 분들께 소개할 내용을 입력해주세요" : ""}
         onChange={(e) => handleInputChange(e, setUserInfo)}
       ></StyledForm>
 
@@ -182,8 +182,8 @@ function ProfileEdit({ user, setIsEditing }) {
       <StyledForm
         type="text"
         id="hash"
-        value={userHash || user.hash || ""}
-        placeholder={!user.hash ? "관심 해시태그를 입력해주세요" : ""}
+        value={userHash || user.userHash || ""}
+        placeholder={!user.userHash ? "관심 해시태그를 입력해주세요" : ""}
         onChange={(e) => handleInputChange(e, setUserHash)}
       ></StyledForm>
 

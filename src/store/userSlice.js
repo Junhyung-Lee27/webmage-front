@@ -6,10 +6,11 @@ const userSlice = createSlice({
     userId: "",
     username: "",
     userImg: "",
-    position: "",
-    info: "",
-    hash: "",
-    email: "",
+    userPosition: "",
+    userInfo: "",
+    userHash: "",
+    userEmail: "",
+    userProvider: "",
     followerCount: 0,
     successCount: 0,
     authToken: "",
@@ -19,26 +20,29 @@ const userSlice = createSlice({
   reducers: {
     // 프로필, 계정 관리
     setUser: (state, action) => {
-      if (action.payload.userId) {
+      if (action.payload.userId != null) {
         state.userId = action.payload.userId;
       }
-      if (action.payload.username) {
+      if (action.payload.username != null) {
         state.username = action.payload.username;
       }
-      if (action.payload.userImg) {
+      if (action.payload.userImg != null) {
         state.userImg = action.payload.userImg;
       }
-      if (action.payload.position) {
-        state.position = action.payload.position;
+      if (action.payload.userPosition != null) {
+        state.userPosition = action.payload.userPosition;
       }
-      if (action.payload.info) {
-        state.info = action.payload.info;
+      if (action.payload.userInfo != null) {
+        state.userInfo = action.payload.userInfo;
       }
-      if (action.payload.hash) {
-        state.hash = action.payload.hash;
+      if (action.payload.userHash != null) {
+        state.userHash = action.payload.userHash;
       }
-      if (action.payload.email) {
-        state.email = action.payload.email;
+      if (action.payload.userEmail != null) {
+        state.userEmail = action.payload.userEmail;
+      }
+      if (action.payload.userProvider != null) {
+        state.userProvider = action.payload.userProvider;
       }
       if (action.payload.followerCount != null) {
         state.followerCount = action.payload.followerCount;
@@ -59,9 +63,7 @@ const userSlice = createSlice({
       state.isLoggedIn = action.payload;
     },
     // 초기화(로그아웃, 탈퇴)
-    resetUserState: (state) => {
-      Object.assign(state, userSlice.initialState);
-    },
+    resetUserState: () => userSlice.initialState,
   },
 });
 

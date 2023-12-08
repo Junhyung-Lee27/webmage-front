@@ -18,8 +18,8 @@ function UserRecommend({user}) {
         <Row>
           <StyledProfile
             src={
-              user.user_image instanceof File
-                ? URL.createObjectURL(user.user_image)
+              user.userImg instanceof File
+                ? URL.createObjectURL(user.userImg)
                 : process.env.PUBLIC_URL + "/testImg/profile2.jpg"
             }
           />
@@ -28,7 +28,7 @@ function UserRecommend({user}) {
               {user.username}
             </StyledText>
             <StyledText size="12" weight="400" color={theme.color.font2}>
-              {user.user_position}
+              {user.userPosition}
             </StyledText>
           </Column>
           <StyledAddBox
@@ -37,7 +37,7 @@ function UserRecommend({user}) {
           ></StyledAddBox>
         </Row>
         <StyledText size="12" weight="300" color={theme.color.font2}>
-          {user.user_hash}
+          {user.userHash}
         </StyledText>
       </RecommendContainer>
     </ThemeProvider>
