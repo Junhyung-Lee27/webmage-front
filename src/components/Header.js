@@ -1,5 +1,5 @@
 import styled, { ThemeProvider } from "styled-components";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { NavLink, useNavigate } from "react-router-dom";
 import componentTheme from "./theme";
@@ -10,6 +10,7 @@ import { logout } from "../services/authService";
 import { setIsLoggedIn, resetUserState, setUser } from "../store/userSlice";
 import { setSearchResults, clearSearchResults } from "../store/searchSlice";
 import { BASE_URL } from "./../config";
+import { WS_BASE_URL } from "./../config";
 
 import axios from "axios";
 import { resetMandaState } from "../store/mandaSlice";
@@ -31,6 +32,62 @@ function Header() {
 
   // 상태 관리
   const user = useSelector((state) => state.user);
+  const [notifications, setNotifications] = useState([]);
+  const [hasUnreadNotifications, setHasUnreadNotifications] = useState(false);
+
+  // 초기 notifications 불러오기
+  useEffect(() => {
+    getNotifications(user.userId);
+  }, [user.userId]);
+
+  async function getNotifications(userId) {
+    try {
+      const response = await axios.get(`${BASE_URL}/noti/get/${userId}`, {
+        headers: {
+          Authorization: `Token ${authToken}`,
+        },
+      });
+      if (response.status === 200) {
+        setNotifications(response.data);
+      }
+    } catch (error) {
+      console.log("알림 조회 중 오류 발생: ", error);
+    }
+  }
+
+  // notification의 is_read 상태 업데이트
+  useEffect(() => {
+    const unread = notifications.some((notification) => notification.is_read === false);
+    setHasUnreadNotifications(unread);
+  }, [notifications]);
+
+  // WebSocket
+  useEffect(() => {
+    const client = new WebSocket(
+      `${WS_BASE_URL}/ws/notifications/${user.userId}/?token=${user.authToken}`
+    );
+
+    client.onopen = () => {
+      console.log("WebSocket Client Connected");
+    };
+
+    client.onmessage = (message) => {
+      const data = JSON.parse(message.data);
+      if (data.type === "follow" || "comment" || "reaction") {
+        setNotifications((prevNotifications) => [data, ...prevNotifications]);
+      }
+    };
+
+    client.onerror = (error) => {
+      console.error(`WebSocket error: ${error.message}`);
+    };
+
+    client.onclose = () => {
+      console.log("WebSocket Client Disconnected");
+    };
+
+    return () => client.close();
+  }, [user.userId, user.authToken]);
 
   // 알림 컴포넌트 상태관리
   const [isNotiVisible, setIsNotiVisible] = useState(false);
@@ -167,7 +224,12 @@ function Header() {
                     }}
                     src={process.env.PUBLIC_URL + "/icon/header/Notifications.svg"}
                   />
-                  {isNotiVisible && <Notification>...</Notification>}
+                  { hasUnreadNotifications && <NewNotificationDot />}
+                  {isNotiVisible && (
+                    <Notification notifications={notifications} setNotifications={setNotifications}>
+                      ...
+                    </Notification>
+                  )}
                 </NotiIconWrapper>
                 <IconLink to="/setting" activeclassname="active">
                   <LargeIcon src={process.env.PUBLIC_URL + "/icon/header/AccountCircle.svg"} />
@@ -300,6 +362,17 @@ let NotiIconWrapper = styled.div`
   &:hover {
     background-color: ${({ theme }) => theme.color.bg3};
   }
+`;
+
+let NewNotificationDot = styled.div`
+  background-color: ${({ theme }) => theme.color.primary};
+  width: 12px;
+  height: 12px;
+  border-radius: 100%;
+  border: 2px solid ${({ theme }) => theme.color.bg};
+  position: absolute;
+  right: 0px;
+  top: 0px;
 `;
 
 let LogoutBtn = styled.button`

@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import styled, { ThemeProvider, keyframes } from "styled-components";
 import { BASE_URL } from "./../config";
+import { WS_BASE_URL } from "./../config";
 import axios from "axios";
 import componentTheme from "./theme";
 import { ToastContainer, toast } from "react-toastify";
@@ -20,6 +21,19 @@ export default function FeedFooter(props) {
   // 상태 관리
   const user = useSelector((state) => state.user);
   const feedInfo = props.feedInfo;
+  const [ws, setWs] = useState(null);
+
+  // 웹소켓 연결 생성
+  useEffect(() => {
+    const newWs = new WebSocket(
+      `${WS_BASE_URL}/ws/notifications/${user.userId}/?token=${user.authToken}`
+    );
+    setWs(newWs);
+
+    return () => {
+      newWs.close();
+    };
+  }, []);
 
   ////////// 이모지 //////////
 
@@ -48,7 +62,7 @@ export default function FeedFooter(props) {
   }
 
   // 이모지 입력
-  async function addEmoji(feedId, authToken, emojiName) {
+  async function addEmoji(feedId, authToken, emojiName, totalCount) {
     if (myReactions.length >= 5) {
       toast.warn("응원 이모티콘은 5개까지만 가능합니다", {
         position: toast.POSITION.BOTTOM_RIGHT,
@@ -71,6 +85,19 @@ export default function FeedFooter(props) {
       );
 
       if (response.status === 200 || response.status === 201) {
+        if (ws) {
+          ws.send(
+            JSON.stringify({
+              type: "reaction_event",
+              feed_id: feedId,
+              user_id: user.userId,
+              username: user.username,
+              user_image: user.userImg,
+              total_count: totalCount + 1,
+            })
+          );
+        }
+        
         let newEmojiInfo = { ...emojiInfoRaw };
         newEmojiInfo[emojiName] = (newEmojiInfo[emojiName] || 0) + 1;
 
@@ -150,11 +177,21 @@ export default function FeedFooter(props) {
   const [isCommentOpen, setIsCommentOpen] = useState(false); // 댓글 컴포넌트 상태
   const [commentsInfo, setCommentsInfo] = useState([]); // 댓글 저장하기 위한 상태
   const [commentsCount, setCommentsCount] = useState(null); // 댓글 개수 상태
+  const selectedFeedId = useSelector((state) => state.selectedFeedId); // 선택된 피드 id
 
   // 댓글 컴포넌트 toggle 함수
   const toggleCommentComponent = () => {
     setIsCommentOpen(!isCommentOpen);
   };
+
+  // 선택된 피드의 댓글 open
+  useEffect(() => {
+    if (feedInfo.id === selectedFeedId) {
+      setIsCommentOpen(true);
+    }
+  }, [feedInfo.id, selectedFeedId]);
+  
+
   return (
     <ThemeProvider theme={theme}>
       <ToastContainer />
@@ -228,10 +265,12 @@ export default function FeedFooter(props) {
             addEmoji={addEmoji}
             removeEmoji={removeEmoji}
             myReactions={myReactions}
+            total_count={emojiInfo.total_count}
           />
         )}
         {isCommentOpen && (
           <CommentComponent
+            ws={ws}
             feedInfo={feedInfo}
             commentsInfo={commentsInfo}
             setCommentsInfo={setCommentsInfo}
@@ -281,7 +320,7 @@ function EmojiModal(props) {
     if (props.myReactions.includes(emojiName)) {
       props.removeEmoji(props.feedInfo.id, user.authToken, emojiName);
     } else {
-      props.addEmoji(props.feedInfo.id, user.authToken, emojiName);
+      props.addEmoji(props.feedInfo.id, user.authToken, emojiName, props.total_count);
     }
     // props.closeEmojiModal();
   };
@@ -328,6 +367,7 @@ function CommentComponent(props) {
   const [editingCommentId, setEditingCommentId] = useState(null); // 수정하는 댓글의 id
   const [editingCommentText, setEditingCommentText] = useState(""); // 수정하는 댓글의 텍스트
   const [editingCommentIndex, setEditingCommentIndex] = useState(null); // 수정하는 댓글의 인덱스
+  const ws = props.ws
 
   // 댓글 조회 요청
   async function getComments(feedId, authToken, page) {
@@ -366,7 +406,7 @@ function CommentComponent(props) {
   }, []);
 
   // 댓글 입력 요청
-  async function submitAddComment(e, feedId, authToken, commentInput) {
+  async function submitAddComment(e, feedId, user, commentInput) {
     const trimmedCommentInput = commentInput.trim();
 
     if (e.key === "Enter" && !e.shiftKey && trimmedCommentInput !== "") {
@@ -377,12 +417,25 @@ function CommentComponent(props) {
           { comment: trimmedCommentInput },
           {
             headers: {
-              Authorization: `Token ${authToken}`,
+              Authorization: `Token ${user.authToken}`,
             },
           }
         );
 
         if (response.status === 201 || response.status === 200) {
+          if (ws) {
+            ws.send(
+              JSON.stringify({
+                type: "comment_event",
+                user_id: user.userId,
+                feed_id: feedId,
+                username: user.username,
+                user_image: user.userImg,
+                comment: trimmedCommentInput,
+              })
+            );
+          }
+          
           const newComment = response.data;
           setCommentsInfo((prevComments) => [newComment, ...prevComments]);
           setCommentInput("");
@@ -526,7 +579,7 @@ function CommentComponent(props) {
         <CommentTextArea
           value={commentInput}
           onInput={handleCommentInput}
-          onKeyDown={(e) => submitAddComment(e, props.feedInfo.id, user.authToken, commentInput)}
+          onKeyDown={(e) => submitAddComment(e, props.feedInfo.id, user, commentInput)}
           placeholder="댓글 남기기"
           rows="1"
         ></CommentTextArea>

@@ -12,6 +12,7 @@ import searchReducer from './searchSlice'
 import feedReducer from './feedSlice'
 import mandaReducer from './mandaSlice'
 import selectedUserReducer from './selectedUserSlice'
+import selectedFeedIdReducer from './selectedFeedIdSlice'
 
 const rootReducer = combineReducers({
   user: userReducer,
@@ -22,6 +23,7 @@ const rootReducer = combineReducers({
   feed: feedReducer,
   manda: mandaReducer,
   selectedUser: selectedUserReducer,
+  selectedFeedId: selectedFeedIdReducer,
 });
 
 const persistConfig = {

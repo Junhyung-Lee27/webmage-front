@@ -11,6 +11,7 @@ import { setSelectedUser } from "../store/selectedUserSlice";
 import { useNavigate } from "react-router-dom";
 
 function Feed({
+  id, // 컴포넌트 고유 id
   userInfo,
   feedInfo,
   show,
@@ -47,12 +48,8 @@ function Feed({
           Authorization: `Token ${authToken}`,
         },
       });
-      const updatedData = {
-        ...response.data,
-        is_following: userInfo.is_following,
-      };
       
-      dispatch(setSelectedUser(updatedData));
+      dispatch(setSelectedUser(response.data));
     } catch (error) {
       console.error(error);
     }
@@ -96,7 +93,7 @@ function Feed({
 
   return (
     <ThemeProvider theme={theme}>
-      <FeedBox bgcolor={theme.color.bg}>
+      <FeedBox bgcolor={theme.color.bg} id={id}>
         <FeedBody>
           {/*유저정보 및 팔로우버튼/메뉴버튼 */}
           <FeedHeader>
