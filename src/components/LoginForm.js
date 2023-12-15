@@ -65,12 +65,12 @@ function LoginForm() {
         </StyledText>
         <StyledForm
           type="username"
-          placeholder="아이디를 입력해주세요"
+          placeholder="사용자 이름 또는 이메일을 입력해주세요"
           id="username"
           value={username}
           onChange={handleUsernameChange}
         ></StyledForm>
-        <StyledText color={theme.color.font1} size="14" weight="600" margin="16px 0px 0px 0px">
+        <StyledText color={theme.color.font1} size="14" weight="600" margin="8px 0px 0px 0px">
           <label htmlFor="password">비밀번호</label>
         </StyledText>
         <StyledForm

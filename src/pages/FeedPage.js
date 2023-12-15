@@ -40,12 +40,6 @@ function FeedPage() {
   const selectedFeedId = useSelector((state) => state.selectedFeedId); // 선택된 피드 상태
   let users = recommUsers;
 
-  console.log("feeds : ", feeds);
-  console.log("selectedFeedId : ", selectedFeedId);
-  console.log("currentPage : ", currentPage);
-  console.log("hasMoreFeeds : ", hasMoreFeeds);
-  console.log("isFeedLoaded : ", isFeedLoaded);
-
   // 추천 피드 로드
   useEffect(() => {
     async function fetchFeeds() {

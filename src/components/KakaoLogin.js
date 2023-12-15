@@ -67,11 +67,11 @@ function KakaoCallback() {
 
         // 서버에 가입 요청
         const data = userInfoResponse.data;
-        var username = data.properties.nickname;
+        var username = `${data.properties.nickname}_${new Date().getTime()}`
         const email = data.kakao_account.email;
-        const password = data.id;
-        const passwordCheck = data.id;
-        const provider = "KAKAO" + data.id;
+        const password = generateRandomPassword(); // 이 함수는 아래에 정의
+        const passwordCheck = password; // 동일한 비밀번호 확인 값
+        const provider = "KAKAO";
 
         const signupResponse = await signup(username, email, password, passwordCheck, provider);
 
@@ -99,6 +99,34 @@ function KakaoCallback() {
         }
       }
     }
+  }
+
+  function generateRandomPassword() {
+    const letters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    const numbers = "0123456789";
+    const symbols = "!@#$%^&*()";
+    let password = "";
+
+    // 각 카테고리에서 최소 한 글자씩 선택
+    password += letters.charAt(Math.floor(Math.random() * letters.length));
+    password += numbers.charAt(Math.floor(Math.random() * numbers.length));
+    password += symbols.charAt(Math.floor(Math.random() * symbols.length));
+
+    // 나머지 길이를 채우기 위해 모든 문자들을 혼합
+    const allChars = letters + numbers + symbols;
+
+    // 최소 길이 8을 만족하기 위해 나머지 길이만큼 추가 선택
+    for (let i = password.length; i < 8; i++) {
+      password += allChars.charAt(Math.floor(Math.random() * allChars.length));
+    }
+
+    // 생성된 비밀번호의 문자 위치를 무작위로 섞기
+    password = password
+      .split("")
+      .sort(() => 0.5 - Math.random())
+      .join("");
+
+    return password;
   }
 
 

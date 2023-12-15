@@ -58,11 +58,11 @@ function SignupForm() {
       <Column>
         <Column>
           <StyledText color={theme.font1}>
-            <label htmlFor="username">아이디</label>
+            <label htmlFor="username">사용자 이름</label>
           </StyledText>
           <StyledForm
             type="text"
-            placeholder="아이디를 입력해주세요"
+            placeholder="6-12자의 한글, 영문, 숫자, -, _만 가능합니다."
             id="username"
             value={username}
             onChange={(e) => handleInputChange(e, setUsername)}
@@ -73,7 +73,7 @@ function SignupForm() {
           </StyledText>
           <StyledForm
             type="email"
-            placeholder="이메일을 입력해주세요"
+            placeholder="example@example.com"
             id="email"
             value={email}
             onChange={(e) => handleInputChange(e, setEmail)}
@@ -84,7 +84,7 @@ function SignupForm() {
           </StyledText>
           <StyledForm
             type="password"
-            placeholder="비밀번호를 입력해주세요"
+            placeholder="8자 이상, 문자/숫자/기호 중 2종류 이상 조합"
             id="password"
             value={password}
             onChange={(e) => handleInputChange(e, setPassword)}
@@ -95,7 +95,7 @@ function SignupForm() {
           </StyledText>
           <StyledForm
             type="password"
-            placeholder="비밀번호를 다시 입력해주세요"
+            placeholder="8자 이상, 문자/숫자/기호 중 2종류 이상 조합"
             id="password-check"
             value={passwordCheck}
             onChange={(e) => handleInputChange(e, setPasswordCheck)}

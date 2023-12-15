@@ -63,6 +63,7 @@ let MandaIcon = styled.img`
 let Column = styled.div`
   display: flex;
   flex-direction: column;
+  width: 360px;
   height: 500px;
 `;
 
