@@ -33,7 +33,9 @@ function Header() {
   // 상태 관리
   const user = useSelector((state) => state.user);
   const [notifications, setNotifications] = useState([]);
+  const [isNotiVisible, setIsNotiVisible] = useState(false);
   const [hasUnreadNotifications, setHasUnreadNotifications] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
 
   // 초기 notifications 불러오기
   useEffect(() => {
@@ -89,9 +91,6 @@ function Header() {
     return () => client.close();
   }, [user.userId, user.authToken]);
 
-  // 알림 컴포넌트 상태관리
-  const [isNotiVisible, setIsNotiVisible] = useState(false);
-
   // 로그아웃 요청
   const handleLogoutClick = async () => {
     const response = await logout();
@@ -121,9 +120,6 @@ function Header() {
     }
   };
 
-  // 검색어 상태
-  const [searchTerm, setSearchTerm] = useState("");
-
   const handleInputChange = (event) => {
     setSearchTerm(event.target.value);
   };
@@ -131,31 +127,34 @@ function Header() {
   // get authToken
   const authToken = useSelector((state) => state.user.authToken);
 
-  // 서버에 검색 요청
-  const handleSearch = async (event, isNavLink = false) => {
-    let queryTerm = isNavLink ? "" : searchTerm;
-
+  // 검색 요청
+  const handleSearch = async (event, searchTerm) => {
     // Enter 키의 keyCode는 13입니다.
-    if (event.key === "Enter" || isNavLink) {
-      if (queryTerm.trim() || isNavLink) {
-        // '/search' 페이지가 아닌 경우 이동
-        if (window.location.pathname !== "/search") {
-          navigate("/search");
-        }
+    if (event.key === "Enter") {
+      if (!searchTerm.trim()) {
+        alert('검색어를 입력해주세요');
+        return
+      }
 
-        try {
-          const response = await axios.get(`${BASE_URL}/search`, {
-            headers: {
-              Authorization: `Token ${authToken}`, // 헤더에 토큰 추가
-            },
-            params: {
-              query: queryTerm,
-            },
-          });
+      // '/search' 페이지가 아닌 경우 이동
+      if (window.location.pathname !== "/search") {
+        navigate("/search");
+      }
+
+      try {
+        const response = await axios.get(`${BASE_URL}/search`, {
+          headers: {
+            Authorization: `Token ${authToken}`, // 헤더에 토큰 추가
+          },
+          params: {
+            query: searchTerm,
+          },
+        });
+        if (response.status === 200) {
           dispatch(setSearchResults(response.data));
-        } catch (error) {
-          console.error("검색 중 오류 발생:", error);
         }
+      } catch (error) {
+        console.error("검색 중 오류 발생:", error);
       }
     }
   };
@@ -209,7 +208,7 @@ function Header() {
             <Row gap="20px">
               <SearchBox
                 type="text"
-                placeholder="검색"
+                placeholder="만다라트 목표, 사용자 이름, 게시물로 검색하세요"
                 id="search-box"
                 value={searchTerm}
                 onChange={handleInputChange}

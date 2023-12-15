@@ -5,7 +5,7 @@ import componentTheme from "./theme";
 import { useSelector } from "react-redux";
 
 
-function MandaSimple({ axiosURL, searchResult }) {
+function MandaSimpleSearched({ axiosURL, searchResult }) {
 
   // 테마
   const colorTheme = useSelector((state) => state.theme.themes[state.theme.currentTheme]);
@@ -141,4 +141,4 @@ const UserPosition = styled.span`
   font-weight: 400;
 `
 
-export default MandaSimple;
+export default MandaSimpleSearched;
