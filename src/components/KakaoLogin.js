@@ -67,10 +67,11 @@ function KakaoCallback() {
 
         // 서버에 가입 요청
         const data = userInfoResponse.data;
-        var username = `${data.properties.nickname}_${new Date().getTime()}`
+
+        const username = timeToUsername(data);
         const email = data.kakao_account.email;
-        const password = generateRandomPassword(); // 이 함수는 아래에 정의
-        const passwordCheck = password; // 동일한 비밀번호 확인 값
+        const password = generateRandomPassword();
+        const passwordCheck = password;
         const provider = "KAKAO";
 
         const signupResponse = await signup(username, email, password, passwordCheck, provider);
@@ -78,7 +79,7 @@ function KakaoCallback() {
         // 회원가입 성공했을 경우
         if (signupResponse.success) {
           if (signupResponse.username) {
-            var username = signupResponse.username;
+            username = signupResponse.username;
           }
           
           // 로그인 시도
@@ -127,6 +128,22 @@ function KakaoCallback() {
       .join("");
 
     return password;
+  }
+
+  function timeToUsername(data) {
+    let currentDateTime = new Date();
+    let seconds = String(currentDateTime.getSeconds()).padStart(2, '0');
+    let minutes = String(currentDateTime.getMinutes()).padStart(2, '0');
+    let hours = String(currentDateTime.getHours()).padStart(2, '0');
+    let timeString = `${seconds}${minutes}${hours}`;
+    let username = `${data.properties.nickname}_${timeString}`;
+
+    // 12자 초과할 경우 줄임
+    if (username.length > 12) {
+      username = username.slice(0, 12);
+    }
+
+    return username
   }
 
 

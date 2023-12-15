@@ -109,7 +109,7 @@ function LoginForm() {
             비밀번호 찾기
           </StyledText>
         </Row>
-        <LineText>간편 로그인</LineText>
+        <LineText>또는</LineText>
         <Row margin="16px 0px 0px 0px">
           {/* <LogoWrap backgroundcolor="#FFFFFF" border={`1px solid ${theme.color.border}`}>
             <SocialLogo
@@ -117,12 +117,12 @@ function LoginForm() {
               size="70%"
             ></SocialLogo>
           </LogoWrap> */}
-          <LogoWrap onClick={() => loginWithKakao()} backgroundcolor="#FEE500" border="none">
-            <SocialLogo
+          <KakaoLogin onClick={() => loginWithKakao()}>
+            <KakaoLogo
               src={process.env.PUBLIC_URL + "/logo/KaKao_Logo.svg"}
-              size="75%"
-            ></SocialLogo>
-          </LogoWrap>
+            ></KakaoLogo>
+            카카오 로그인
+          </KakaoLogin>
           {/* <LogoWrap backgroundcolor="#03C75A" border="none">
             <SocialLogo
               src={process.env.PUBLIC_URL + "/logo/Naver_Logo.svg"}
@@ -191,23 +191,29 @@ let StyledButton = styled.button`
   cursor: pointer;
 `;
 
-let LogoWrap = styled.button`
+let KakaoLogin = styled.button`
   ${({ theme }) => theme.component.iconSize.large};
-  border-radius: 50%;
-  background-color: ${({ backgroundcolor }) => backgroundcolor};
-  color: ${({ color }) => color};
-  border: ${({ border }) => border};
+  background-color: #FEE500;
+  color: rgba(0, 0, 0, 0.85);
+  
+  border-radius: 12px;
+  border: none;
   outline: none;
-  cursor: pointer;
+  
+  width: 100%;
+  height: 42px;
+
   display: flex;
   justify-content: center;
   align-items: center;
-  overflow: hidden;
+  gap: 8px;
+  
+  cursor: pointer;
 `;
 
-let SocialLogo = styled.img`
-  width: ${({ size }) => size};
-  height: ${({ size }) => size};
+let KakaoLogo = styled.img`
+  width: 16px;
+  height: 16px;
 `;
 
 const LineText = styled.div`
