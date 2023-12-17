@@ -51,11 +51,12 @@ export const signup = async (username, email, password, passwordCheck, provider)
 };
 
 // 로그인
-export const login = async (username, password) => {
+export const login = async (username, password, provider) => {
   try {
     const response = await axios.post(`${BASE_URL}/user/login/`, {
       username,
       password,
+      provider
     });
 
     // 응답 처리

@@ -31,7 +31,7 @@ function LoginForm() {
 
   // 일반 로그인
   const handleLoginClick = async () => {
-    const loginResponse = await login(username, password);
+    const loginResponse = await login(username, password, 'EMAIL');
     console.log(loginResponse);
     if (loginResponse.success) {
       dispatch(setUser({ userId: loginResponse.userId }));

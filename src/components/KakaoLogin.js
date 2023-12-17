@@ -83,7 +83,7 @@ function KakaoCallback() {
           }
           
           // 로그인 시도
-          const loginResponse = await login(username, password);
+          const loginResponse = await login(username, password, 'KAKAO');
 
           if (loginResponse.success) {
             dispatch(setUser({ userId: loginResponse.userId }));
