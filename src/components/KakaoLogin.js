@@ -68,9 +68,9 @@ function KakaoCallback() {
         // 서버에 가입 요청
         const data = userInfoResponse.data;
 
-        const username = timeToUsername(data);
+        let username = timeToUsername(data);
         const email = data.kakao_account.email;
-        const password = generateRandomPassword();
+        let password = username;
         const passwordCheck = password;
         const provider = "KAKAO";
 
