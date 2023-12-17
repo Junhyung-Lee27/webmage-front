@@ -164,7 +164,7 @@ function Header() {
       <FixedHeader>
         <HeaderLayout>
           <Stadardized>
-            <Row gap="48px">
+            <Row gap="48px" width="fit-content">
               <NavLink
                 onClick={() => {
                   dispatch(setSelectedUser(user));
@@ -205,7 +205,7 @@ function Header() {
                 </StyledLink> */}
               </Row>
             </Row>
-            <Row gap="20px">
+            <Row gap="20px" flex="1" justifycontent="flex-end">
               <SearchBox
                 type="text"
                 placeholder="만다라트 목표, 사용자 이름, 게시물로 검색하세요"
@@ -223,7 +223,7 @@ function Header() {
                     }}
                     src={process.env.PUBLIC_URL + "/icon/header/Notifications.svg"}
                   />
-                  { hasUnreadNotifications && <NewNotificationDot />}
+                  {hasUnreadNotifications && <NewNotificationDot />}
                   {isNotiVisible && (
                     <Notification notifications={notifications} setNotifications={setNotifications}>
                       ...
@@ -275,6 +275,7 @@ let Stadardized = styled.div`
 
 let Row = styled.div`
   position: ${({ position }) => position};
+  flex: ${({ flex }) => flex};
   height: 56px;
   width: ${({ width }) => width};
   padding: ${({ padding }) => padding};
@@ -312,11 +313,14 @@ let StyledLink = styled(NavLink)`
 `;
 
 let SearchBox = styled.input`
+  flex: 1;
+  margin: 0px 40px 0px 60px;
   height: 34px;
-  padding: 9px 40px 9px 16px;
+  padding: 9px 16px;
   box-sizing: border-box;
   font-size: 14px;
   color: ${({ theme }) => theme.color.font1};
+  text-align: center;
   background-color: ${({ theme }) => theme.color.bg2};
   border: 1px solid ${({ theme }) => theme.color.border};
   border-radius: 4px;

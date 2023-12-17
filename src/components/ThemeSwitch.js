@@ -26,7 +26,6 @@ let SwitchContainer = styled.img`
   width: 88px;
   height: 36px;
   border-radius: 18px;
-  margin-left: auto;
 `;
 
 export default ThemeSwitch;
