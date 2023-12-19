@@ -36,6 +36,15 @@ function Header() {
   const [isNotiVisible, setIsNotiVisible] = useState(false);
   const [hasUnreadNotifications, setHasUnreadNotifications] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
+  const [isMounted, setIsMounted] = useState(true);
+
+  // 마운트 설정
+  useEffect(() => {
+    setIsMounted(true);
+    return () => {
+      setIsMounted(false);
+    }
+  }, [])
 
   // 초기 notifications 불러오기
   useEffect(() => {
@@ -49,7 +58,7 @@ function Header() {
           Authorization: `Token ${authToken}`,
         },
       });
-      if (response.status === 200) {
+      if (response.status === 200 && isMounted) {
         setNotifications(response.data);
       }
     } catch (error) {
