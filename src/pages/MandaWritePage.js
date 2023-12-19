@@ -2,7 +2,7 @@ import styled, { ThemeProvider } from "styled-components";
 import { useSelector } from "react-redux";
 import Header from "../components/Header";
 import MandaWrite from "../components/MandaWrite";
-import MandaSimple from "../components/MandaSimple";
+// import MandaSimple from "../components/MandaSimple";
 import componentTheme from "../components/theme";
 import { BASE_URL } from "./../config";
 
