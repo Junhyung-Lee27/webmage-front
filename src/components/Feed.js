@@ -9,6 +9,7 @@ import axios from "axios";
 import FeedFooter from "./FeedFooter";
 import { setSelectedUser } from "../store/selectedUserSlice";
 import { useNavigate } from "react-router-dom";
+import { setFeeds } from "../store/feedSlice";
 
 function Feed({
   id, // 컴포넌트 고유 id
@@ -24,7 +25,7 @@ function Feed({
 }) {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  
+
   // 테마
   const colorTheme = useSelector((state) => state.theme.themes[state.theme.currentTheme]);
   const filterTheme = useSelector((state) => state.theme.filters[state.theme.currentTheme]);
@@ -38,6 +39,7 @@ function Feed({
   const user = useSelector((state) => state.user);
   const [isMenuOpen, setIsMenuOpen] = useState(false); // 옵션 메뉴
   const selectedUser = useSelector((state) => state.selectedUser);
+  const feeds = useSelector((state) => state.feed.feeds);
 
   // 특정 유저 프로필 화면
   const handleSelectedUser = async (userId, authToken) => {
@@ -48,7 +50,7 @@ function Feed({
           Authorization: `Token ${authToken}`,
         },
       });
-      
+
       dispatch(setSelectedUser(response.data));
     } catch (error) {
       console.error(error);
@@ -90,6 +92,42 @@ function Feed({
   };
 
   const imgUrl = "";
+
+  // 팔로우 처리
+  const followOnFeed = async () => {
+    const updatedFeeds = feeds.map((feed) => {
+      if (feed.userInfo.id === userInfo.id) {
+        return {
+          ...feed,
+          userInfo: {
+            ...feed.userInfo,
+            is_following: true, // 팔로우 상태 업데이트
+          },
+        };
+      }
+      return feed;
+    });
+
+    dispatch(setFeeds(updatedFeeds));
+  };
+
+  // 언팔로우 처리
+  const unfollowOnFeed = async () => {
+    const updatedFeeds = feeds.map((feed) => {
+      if (feed.userInfo.id === userInfo.id) {
+        return {
+          ...feed,
+          userInfo: {
+            ...feed.userInfo,
+            is_following: false, // 언팔로우 상태 업데이트
+          },
+        };
+      }
+      return feed;
+    });
+
+    dispatch(setFeeds(updatedFeeds));
+  };
 
   return (
     <ThemeProvider theme={theme}>
@@ -137,7 +175,13 @@ function Feed({
             </UserInfo>
 
             <OptionButtons>
-              {userInfo.id !== user.userId && <FollowButton userInfo={userInfo} />}
+              {userInfo.id !== user.userId && (
+                <FollowButton
+                  userInfo={userInfo}
+                  onFollow={() => followOnFeed(userInfo.id, user.authToken)}
+                  onUnfollow={() => unfollowOnFeed(userInfo.id, user.authToken)}
+                />
+              )}
               <OptionWrapper>
                 <FeedOptionIcon
                   src={process.env.PUBLIC_URL + "/icon/menu-horizontal.svg"}
@@ -236,72 +280,72 @@ function OptionMenu({
 
   return (
     <OptionLayout>
-        <OptionList>
-          {user.userId === userInfo.id ? (
-            <>
-              <Option
-                onClick={() => {
-                  setFeedMode("EDIT");
-                  handleShow();
-                }}
-              >
-                게시물 수정
-              </Option>
-              {feedMode === "EDIT" && show === true && (
-                <FeedWriteModal
-                  show={show}
-                  setShow={setShow}
-                  userId={user.userId}
-                  authToken={user.authToken}
-                  feedMode={feedMode}
-                  feedInfo={feedInfo}
-                  user={user}
-                  currentPage={currentPage}
-                  fetchFeeds={fetchFeeds}
-                ></FeedWriteModal>
-              )}
-              <Option onClick={() => setIsOpenDeleteFeedModal(true)}>게시물 삭제</Option>
-              {isOpenDeleteFeedModal === true && (
-                <DeleteFeedModal
-                  theme={theme}
-                  setIsOpenDeleteFeedModal={setIsOpenDeleteFeedModal}
-                  feedId={feedInfo.id}
-                  user={user}
-                  currentPage={currentPage}
-                  fetchFeeds={fetchFeeds}
-                />
-              )}
-            </>
-          ) : (
-            <>
-              <Option onClick={() => setIsOpenReportFeedModal(true)}>게시물 신고</Option>
-              {isOpenReportFeedModal === true && (
-                <ReportFeedModal
-                  theme={theme}
-                  setIsOpenReportFeedModal={setIsOpenReportFeedModal}
-                  setIsOpenBlockUserModal={setIsOpenBlockUserModal}
-                  user={user}
-                  feedInfo={feedInfo}
-                  currentPage={currentPage}
-                  fetchFeeds={fetchFeeds}
-                  setIsReportFeedSuccess={setIsReportFeedSuccess}
-                />
-              )}
-              <Option onClick={() => setIsOpenBlockUserModal(true)}>유저 차단</Option>
-              {isOpenBlockUserModal === true && (
-                <BlockUserModal
-                  theme={theme}
-                  setIsOpenBlockUserModal={setIsOpenBlockUserModal}
-                  user={user}
-                  userInfo={userInfo}
-                  currentPage={currentPage}
-                  fetchFeeds={fetchFeeds}
-                  isReportFeedSuccess={isReportFeedSuccess}
-                />
-              )}
-            </>
-          )}
-        </OptionList>
+      <OptionList>
+        {user.userId === userInfo.id ? (
+          <>
+            <Option
+              onClick={() => {
+                setFeedMode("EDIT");
+                handleShow();
+              }}
+            >
+              게시물 수정
+            </Option>
+            {feedMode === "EDIT" && show === true && (
+              <FeedWriteModal
+                show={show}
+                setShow={setShow}
+                userId={user.userId}
+                authToken={user.authToken}
+                feedMode={feedMode}
+                feedInfo={feedInfo}
+                user={user}
+                currentPage={currentPage}
+                fetchFeeds={fetchFeeds}
+              ></FeedWriteModal>
+            )}
+            <Option onClick={() => setIsOpenDeleteFeedModal(true)}>게시물 삭제</Option>
+            {isOpenDeleteFeedModal === true && (
+              <DeleteFeedModal
+                theme={theme}
+                setIsOpenDeleteFeedModal={setIsOpenDeleteFeedModal}
+                feedId={feedInfo.id}
+                user={user}
+                currentPage={currentPage}
+                fetchFeeds={fetchFeeds}
+              />
+            )}
+          </>
+        ) : (
+          <>
+            <Option onClick={() => setIsOpenReportFeedModal(true)}>게시물 신고</Option>
+            {isOpenReportFeedModal === true && (
+              <ReportFeedModal
+                theme={theme}
+                setIsOpenReportFeedModal={setIsOpenReportFeedModal}
+                setIsOpenBlockUserModal={setIsOpenBlockUserModal}
+                user={user}
+                feedInfo={feedInfo}
+                currentPage={currentPage}
+                fetchFeeds={fetchFeeds}
+                setIsReportFeedSuccess={setIsReportFeedSuccess}
+              />
+            )}
+            <Option onClick={() => setIsOpenBlockUserModal(true)}>유저 차단</Option>
+            {isOpenBlockUserModal === true && (
+              <BlockUserModal
+                theme={theme}
+                setIsOpenBlockUserModal={setIsOpenBlockUserModal}
+                user={user}
+                userInfo={userInfo}
+                currentPage={currentPage}
+                fetchFeeds={fetchFeeds}
+                isReportFeedSuccess={isReportFeedSuccess}
+              />
+            )}
+          </>
+        )}
+      </OptionList>
     </OptionLayout>
   );
 }
@@ -369,7 +413,7 @@ function BlockUserModal({
   userInfo,
   currentPage,
   fetchFeeds,
-  isReportFeedSuccess
+  isReportFeedSuccess,
 }) {
   const handleBlockUser = async (user, targetUser) => {
     try {
@@ -503,7 +547,7 @@ function ReportFeedModal({
           </StyledButton>
         </Buttons>
       </ModalContent>
-    </ModalOverlay> 
+    </ModalOverlay>
   );
 }
 
@@ -592,7 +636,6 @@ let ProfileImg = styled.img`
 let MediumIcon = styled.img`
   ${({ theme }) => theme.component.iconSize.small};
 `;
-
 
 let FeedOptionIcon = styled(MediumIcon)`
   box-sizing: content-box;

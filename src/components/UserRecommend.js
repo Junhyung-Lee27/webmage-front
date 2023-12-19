@@ -2,8 +2,9 @@ import styled, { ThemeProvider } from "styled-components";
 import { useSelector } from "react-redux";
 import componentTheme from "./theme";
 import FollowButton from "./FollowButton";
+import { useState } from "react";
 
-function UserRecommend({searchedUser}) {
+function UserRecommend({ searchedUser }) {
   // 테마
   const colorTheme = useSelector((state) => state.theme.themes[state.theme.currentTheme]);
   const filterTheme = useSelector((state) => state.theme.filters[state.theme.currentTheme]);
@@ -15,10 +16,26 @@ function UserRecommend({searchedUser}) {
 
   // 상태 관리
   const user = useSelector((state) => state.user);
-  let userInfo = {
+  const [userInfo, setUserInfo] = useState({
     id: searchedUser.id,
     is_following: searchedUser.is_following,
-  }
+  });
+
+  // 팔로우 처리
+  const followOnUserRecommend = async () => {
+    setUserInfo((prevUserInfo) => ({
+      ...prevUserInfo,
+      is_following: true,
+    }));
+  };
+
+  // 언팔로우 처리
+  const unfollowOnUserRecommend = async () => {
+    setUserInfo((prevUserInfo) => ({
+      ...prevUserInfo,
+      is_following: false,
+    }));
+  };
 
   return (
     <ThemeProvider theme={theme}>
@@ -49,7 +66,11 @@ function UserRecommend({searchedUser}) {
         </StyledText>
         {user.userId !== searchedUser.id && (
           <FollowButtonWrapper>
-            <FollowButton userInfo={userInfo} />
+            <FollowButton
+              userInfo={userInfo}
+              onFollow={() => followOnUserRecommend()}
+              onUnfollow={() => unfollowOnUserRecommend()}
+            />
           </FollowButtonWrapper>
         )}
       </RecommendContainer>
@@ -62,7 +83,7 @@ let RecommendContainer = styled.div`
   display: flex;
   flex-direction: column;
   gap: 16px;
-  width: calc((1080px - 48px)/3);
+  width: calc((1080px - 48px) / 3);
   height: 134px;
   padding: 24px;
   margin-right: 16px;
@@ -90,7 +111,7 @@ let Column = styled.div`
 let StyledProfile = styled.img`
   width: 56px;
   height: 56px;
-  border: 1px solid ${({ theme }) => theme.color.border };
+  border: 1px solid ${({ theme }) => theme.color.border};
   border-radius: 50%;
   object-fit: cover;
 `;
@@ -106,6 +127,6 @@ const FollowButtonWrapper = styled.div`
   position: absolute;
   right: 8px;
   top: 18px;
-`
+`;
 
 export default UserRecommend;

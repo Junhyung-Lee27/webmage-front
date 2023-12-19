@@ -7,7 +7,7 @@ import { setFeeds } from "../store/feedSlice";
 import { BASE_URL } from "./../config";
 import { WS_BASE_URL } from "./../config";
 
-function FollowButton({ userInfo }) {
+function FollowButton({ userInfo, onFollow, onUnfollow }) {
   const dispatch = useDispatch();
 
   // 테마
@@ -41,11 +41,12 @@ function FollowButton({ userInfo }) {
       const response = await axios.post(
         `${BASE_URL}/user/follow/`,
         { following_id: followedId },
-        { headers: { "Content-Type": "application/json", Authorization: `Token ${user.authToken}` } }
+        {
+          headers: { "Content-Type": "application/json", Authorization: `Token ${user.authToken}` },
+        }
       );
 
       if (response.status === 201) {
-        
         // 웹소켓을 통해 팔로우 이벤트 메시지 전송
         if (ws) {
           ws.send(
@@ -58,25 +59,8 @@ function FollowButton({ userInfo }) {
             })
           );
         }
-
-        // feeds 배열에서 is_following 업데이트
-        const updatedFeeds = feeds.map((feed) => {
-          if (feed.userInfo.id === followedId) {
-            return {
-              ...feed,
-              userInfo: {
-                ...feed.userInfo,
-                is_following: true, // 팔로우 상태 업데이트
-              },
-            };
-          }
-          return feed;
-        });
-
-        dispatch(setFeeds(updatedFeeds)); // 업데이트된 feeds 배열로 상태 업데이트
-
-        // UserProfile, UserRecommend에서 userInfo 전달 받은 케이스
-        userInfo.is_following = true;
+        // 팔로우 상태 업데이트
+        await onFollow();
       }
     } catch (error) {
       console.log("팔로우 중 오류 발생: ", error); // 오류 처리
@@ -90,24 +74,9 @@ function FollowButton({ userInfo }) {
         headers: { "Content-Type": "application/json", Authorization: `Token ${authToken}` },
       });
 
-      // feeds 배열에서 is_following 업데이트
-      const updatedFeeds = feeds.map((feed) => {
-        if (feed.userInfo.id === followedId) {
-          return {
-            ...feed,
-            userInfo: {
-              ...feed.userInfo,
-              is_following: false, // 언팔로우 상태 업데이트
-            },
-          };
-        }
-        return feed;
-      });
-
-      dispatch(setFeeds(updatedFeeds)); // 업데이트된 feeds 배열로 상태 업데이트
-
-      // UserProfile, UserRecommend에서 userInfo 전달 받은 케이스
-      userInfo.is_following = false;
+      if (response.status === 204) {
+        await onUnfollow();
+      }
     } catch (error) {
       console.log("팔로우 취소중 오류 발생: ", error); // 오류 처리
     }
@@ -145,7 +114,7 @@ let Follow = styled.button`
 let Following = styled.button`
   border: none;
   background: none;
-  color: ${({ theme }) => theme.color.font2 };
+  color: ${({ theme }) => theme.color.font2};
   border-radius: 0.25rem;
   font-size: 14px;
   font-weight: 500;

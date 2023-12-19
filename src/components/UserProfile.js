@@ -17,9 +17,25 @@ export default function UserProfile() {
   // 상태관리
   const user = useSelector((state) => state.user);
   const selectedUser = useSelector((state) => state.selectedUser);
-  let userInfo = {
+  const [userInfo, setUserInfo] = useState({
     id: selectedUser.userId,
     is_following: selectedUser.is_following,
+  });
+
+  // 팔로우 처리
+  const followOnUserProfile = async () => {
+    setUserInfo((prevUserInfo) => ({
+      ...prevUserInfo,
+      is_following: true,
+    }));
+  };
+
+  // 언팔로우 처리
+  const unfollowOnUserProfile = async () => {
+    setUserInfo((prevUserInfo) => ({
+      ...prevUserInfo,
+      is_following: false,
+    }));
   };
 
   return (
@@ -50,7 +66,11 @@ export default function UserProfile() {
         ) : null}
         {user.userId !== selectedUser.userId && (
           <FollowButtonWrapper>
-            <FollowButton userInfo={userInfo} />
+            <FollowButton
+              userInfo={userInfo}
+              onFollow={() => followOnUserProfile()}
+              onUnfollow={() => unfollowOnUserProfile()}
+            />
           </FollowButtonWrapper>
         )}
       </ProfileBox>
@@ -153,4 +173,4 @@ const FollowButtonWrapper = styled.div`
   position: absolute;
   right: 8px;
   top: 18px;
-`
+`;
