@@ -8,7 +8,7 @@ import Notification from "./Notification";
 
 import { logout } from "../services/authService";
 import { setIsLoggedIn, resetUserState, setUser } from "../store/userSlice";
-import { setSearchResults, clearSearchResults } from "../store/searchSlice";
+import { setSearchedKeyword } from "../store/searchSlice";
 import { BASE_URL } from "./../config";
 import { WS_BASE_URL } from "./../config";
 
@@ -75,7 +75,7 @@ function Header() {
 
     client.onmessage = (message) => {
       const data = JSON.parse(message.data);
-      if (data.type === "follow" || "comment" || "reaction") {
+      if (data.type === "follow" || data.type === "comment" || data.type === "reaction") {
         setNotifications((prevNotifications) => [data, ...prevNotifications]);
       }
     };
@@ -88,7 +88,11 @@ function Header() {
       console.log("WebSocket Client Disconnected");
     };
 
-    return () => client.close();
+    return () => {
+      if (client.readyState === WebSocket.OPEN) {
+        client.close();
+      }
+    };
   }, [user.userId, user.authToken]);
 
   // 로그아웃 요청
@@ -127,35 +131,20 @@ function Header() {
   // get authToken
   const authToken = useSelector((state) => state.user.authToken);
 
-  // 검색 요청
-  const handleSearch = async (event, searchTerm) => {
-    // Enter 키의 keyCode는 13입니다.
+  // 검색창 동작
+  const handleSearch = async (event) => {
+    
     if (event.key === "Enter") {
       if (!searchTerm.trim()) {
-        alert('검색어를 입력해주세요');
-        return
+        alert("검색어를 입력해주세요");
+        return;
       }
 
-      // '/search' 페이지가 아닌 경우 이동
-      if (window.location.pathname !== "/search") {
-        navigate("/search");
-      }
+      // 검색 키워드 상태 저장
+      dispatch(setSearchedKeyword(searchTerm));
 
-      try {
-        const response = await axios.get(`${BASE_URL}/search`, {
-          headers: {
-            Authorization: `Token ${authToken}`, // 헤더에 토큰 추가
-          },
-          params: {
-            query: searchTerm,
-          },
-        });
-        if (response.status === 200) {
-          dispatch(setSearchResults(response.data));
-        }
-      } catch (error) {
-        console.error("검색 중 오류 발생:", error);
-      }
+      // 검색 페이지 이동
+      navigate(`/search/${searchTerm}`);
     }
   };
 
@@ -208,7 +197,7 @@ function Header() {
             <Row gap="20px" flex="1" justifycontent="flex-end">
               <SearchBox
                 type="text"
-                placeholder="만다라트 목표, 사용자 이름, 게시물로 검색하세요"
+                placeholder="만다라트, 사용자, 게시물 내용으로 검색하기"
                 id="search-box"
                 value={searchTerm}
                 onChange={handleInputChange}
@@ -313,14 +302,13 @@ let StyledLink = styled(NavLink)`
 `;
 
 let SearchBox = styled.input`
-  flex: 1;
   margin: 0px 40px 0px 60px;
+  flex: 1;
   height: 34px;
-  padding: 9px 16px;
+  padding: 11px 16px;
   box-sizing: border-box;
   font-size: 14px;
   color: ${({ theme }) => theme.color.font1};
-  text-align: center;
   background-color: ${({ theme }) => theme.color.bg2};
   border: 1px solid ${({ theme }) => theme.color.border};
   border-radius: 4px;

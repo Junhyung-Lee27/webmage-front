@@ -1,8 +1,9 @@
 import styled, { ThemeProvider } from "styled-components";
 import { useSelector } from "react-redux";
 import componentTheme from "./theme";
+import FollowButton from "./FollowButton";
 
-function UserRecommend({user}) {
+function UserRecommend({searchedUser}) {
   // 테마
   const colorTheme = useSelector((state) => state.theme.themes[state.theme.currentTheme]);
   const filterTheme = useSelector((state) => state.theme.filters[state.theme.currentTheme]);
@@ -12,48 +13,63 @@ function UserRecommend({user}) {
     component: componentTheme,
   };
 
+  // 상태 관리
+  const user = useSelector((state) => state.user);
+  let userInfo = {
+    id: searchedUser.id,
+    is_following: searchedUser.is_following,
+  }
+
   return (
     <ThemeProvider theme={theme}>
       <RecommendContainer backgroundcolor={theme.color.bg}>
         <Row>
           <StyledProfile
             src={
-              user.userImg instanceof File
-                ? URL.createObjectURL(user.userImg)
+              searchedUser.userImg instanceof File
+                ? URL.createObjectURL(searchedUser.userImg)
                 : process.env.PUBLIC_URL + "/testImg/profile2.jpg"
             }
           />
           <Column>
             <StyledText size="16" weight="500" color={theme.color.font1}>
-              {user.username}
+              {searchedUser.username}
             </StyledText>
             <StyledText size="12" weight="400" color={theme.color.font2}>
-              {user.userPosition}
+              {searchedUser.userPosition}
             </StyledText>
           </Column>
-          <StyledAddBox
+          {/* <StyledAddBox
             src={process.env.PUBLIC_URL + "/icon/add.svg"}
             filter={theme.filter.primary}
-          ></StyledAddBox>
+          ></StyledAddBox> */}
         </Row>
         <StyledText size="12" weight="300" color={theme.color.font2}>
           {user.userHash}
         </StyledText>
+        {user.userId !== searchedUser.id && (
+          <FollowButtonWrapper>
+            <FollowButton userInfo={userInfo} />
+          </FollowButtonWrapper>
+        )}
       </RecommendContainer>
     </ThemeProvider>
   );
 }
 
 let RecommendContainer = styled.div`
+  position: relative;
   display: flex;
   flex-direction: column;
-  box-sizing: content-box;
   gap: 16px;
-  width: 100%;
+  width: calc((1080px - 48px)/3);
+  height: 134px;
   padding: 24px;
+  margin-right: 16px;
+  margin-bottom: 16px;
   border-radius: 8px;
   box-sizing: border-box;
-  box-shadow: 0px 8px 24px 0px rgba(0, 0, 0, 0.15);
+  border: 1px solid ${({ theme }) => theme.color.border};
   background-color: ${({ backgroundcolor }) => backgroundcolor};
 `;
 
@@ -86,11 +102,10 @@ let StyledText = styled.span`
   cursor: ${({ cursor = "default" }) => cursor};
 `;
 
-let StyledAddBox = styled.img`
-  width: 32px;
-  height: 32px;
-  margin-left: auto;
-  filter: ${({ theme }) => theme.filter.font2};
-`;
+const FollowButtonWrapper = styled.div`
+  position: absolute;
+  right: 8px;
+  top: 18px;
+`
 
 export default UserRecommend;

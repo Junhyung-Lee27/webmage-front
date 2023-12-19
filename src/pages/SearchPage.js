@@ -1,13 +1,19 @@
 import styled, { ThemeProvider } from "styled-components";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import Header from "../components/Header";
 import UserRecommend from "../components/UserRecommend";
 import MandaSimpleSearched from "../components/MandaSimpleSearched";
 import Feed from "../components/Feed";
 import componentTheme from "./../components/theme";
 import { useState, useRef, useEffect } from "react";
+import axios from "axios";
+import { BASE_URL } from "./../config";
+import { setSearchedUsers } from "../store/searchSlice";
 
 function SearchPage() {
+  const dispatch = useDispatch();
+
+  // 테마
   const colorTheme = useSelector((state) => state.theme.themes[state.theme.currentTheme]);
   const filterTheme = useSelector((state) => state.theme.filters[state.theme.currentTheme]);
   const theme = {
@@ -16,15 +22,74 @@ function SearchPage() {
     component: componentTheme,
   };
 
-  //// 검색 결과 상태
-  const searchResults = useSelector((state) => state.search);
-  let mandaSimples = searchResults.manda_simples;
-  let feeds = searchResults.feeds;
-  let users = searchResults.users;
+  // 상태 관리
+  const user = useSelector((state) => state.user);
+  const search = useSelector((state) => state.search); // 검색 결과
+  const searchKeyword = search.keyword; // 검색 키워드
+  const searchedUsers = search.users; // 유저 검색 결과
+  const searchedMandaSimples = search.manda_simples; // 만다라트 검색 결과
+  const searchedFeeds = search.feeds; // 피드 검색 결과
+  const [userPage, setUserPage] = useState(1); // 서버에 요청할 페이지 번호
+  const [maxLoadedPage, setMaxLoadedPage] = useState(1); // 현재 로드된 최대 페이지 번호를 추적
+  const [isScrolling, setIsScrolling] = useState(false); // 스크롤 중 상태
 
-  // OtherManda 스크롤 버튼
+  // 유저 검색
+  const getSearchedUsers = async (keyword, authToken, page) => {
+    if (page == 1 && maxLoadedPage > 1) {
+      return;
+    }
+
+    if (page != 1 && page <= maxLoadedPage) {
+      return;
+    }
+
+    try {
+      const response = await axios.get(`${BASE_URL}/user/search/?keyword=${keyword}&page=${page}`, {
+        headers: {
+          Authorization: `Token ${authToken}`,
+        },
+      });
+
+      if (response.status === 200) {
+        if (response.data.message === "No more pages") {
+          setShowNextButton(false);
+          setMaxLoadedPage(page);
+          return;
+        }
+
+        if (page === 1) {
+          dispatch(setSearchedUsers(response.data));
+        } else if (page !== 1) {
+          dispatch(setSearchedUsers([...searchedUsers, ...response.data]));
+        }
+      }
+
+      // 최대 로드된 페이지 업데이트
+      if (page > maxLoadedPage) {
+        setMaxLoadedPage(page);
+      }
+    } catch (error) {
+      console.log("유저 검색 중 오류 발생: ", error);
+    }
+  };
+
+  // 다음 페이지 검색 요청
+  useEffect(() => {
+    if (searchKeyword) {
+      getSearchedUsers(searchKeyword, user.authToken, userPage);
+    }
+  }, [searchKeyword, user.authToken, userPage]);
+
+  // 검색 키워드 변경 시 페이지 초기화
+  useEffect(() => {
+    setUserPage(1);
+    setShowNextButton(true);
+    dispatch(setSearchedUsers([]));
+    setMaxLoadedPage(1);
+  }, [searchKeyword, dispatch]);
+
+  // 스크롤 동작
   const scrollContainerRef = useRef(null);
-
   const [showPrevButton, setShowPrevButton] = useState(false);
   const [showNextButton, setShowNextButton] = useState(true);
 
@@ -33,7 +98,7 @@ function SearchPage() {
       const { scrollLeft, scrollWidth, clientWidth } = scrollContainerRef.current;
 
       setShowPrevButton(scrollLeft > 0);
-      setShowNextButton(scrollLeft < scrollWidth - clientWidth);
+      setShowNextButton(scrollLeft <= scrollWidth - clientWidth);
     }
   };
 
@@ -47,43 +112,72 @@ function SearchPage() {
     }
   }, []);
 
+  // 이전 페이지로 이동
   const handlePrevClick = () => {
+    if (isScrolling) return; // 스크롤 중이면 아무것도 하지 않음
+    setIsScrolling(true); // 스크롤 시작
+
+    setUserPage((prev) => (prev > 1 ? prev - 1 : prev));
     if (scrollContainerRef.current) {
-      scrollContainerRef.current.scrollLeft -= 600;
+      scrollContainerRef.current.scrollLeft -= 1080;
     }
+
+    setTimeout(() => {
+      setIsScrolling(false);
+    }, 500);
   };
 
-  const handleNextClick = () => {
+  // 다음 페이지로 이동
+  const handleNextClick = async () => {
+    if (isScrolling) return;
+    setIsScrolling(true);
+
+    await getSearchedUsers(searchKeyword, user.authToken, userPage + 1);
+
+    setUserPage((prev) => prev + 1);
     if (scrollContainerRef.current) {
-      scrollContainerRef.current.scrollLeft += 600;
+      scrollContainerRef.current.scrollLeft += 1080;
     }
+
+    setTimeout(() => {
+      setIsScrolling(false);
+    }, 500);
   };
+
+  // OtherManda(MandaSimples)
 
   return (
     <ThemeProvider theme={theme}>
       <PageLayout>
         <Header></Header>
         <Contents>
-          {showPrevButton && (
-            <PrevButton
-              onClick={handlePrevClick}
-              src={process.env.PUBLIC_URL + "/icon/arrow-left.svg"}
-            />
-          )}
-          <OtherManda ref={scrollContainerRef}>
+          {/* <OtherManda ref={scrollContainerRef}>
             {mandaSimples.map((mandaSimple) => (
               <MandaSimpleSearched key={mandaSimple.id} searchResult={mandaSimple} />
             ))}
-          </OtherManda>
-          {showNextButton && (
-            <NextButton
-              onClick={handleNextClick}
-              src={process.env.PUBLIC_URL + "/icon/arrow-right.svg"}
-            />
-          )}
+          </OtherManda> */}
           <HorizontalBorder />
-          <Row>
-            <Feeds>
+
+          <Recommends ref={scrollContainerRef}>
+            {showPrevButton && (
+              <PrevButton
+                onClick={handlePrevClick}
+                src={process.env.PUBLIC_URL + "/icon/arrow-left.svg"}
+              />
+            )}
+            {searchedUsers.map((searchedUser) => (
+              <UserRecommend key={searchedUser.id} searchedUser={searchedUser} />
+            ))}
+            {showNextButton && (
+              <NextButton
+                onClick={handleNextClick}
+                src={process.env.PUBLIC_URL + "/icon/arrow-right.svg"}
+              />
+            )}
+          </Recommends>
+
+          <HorizontalBorder />
+          {/* <Feeds>
               {feeds.map((feed) => (
                 <Feed
                   key={feed.contentInfo.id}
@@ -91,14 +185,8 @@ function SearchPage() {
                   contentInfo={feed.contentInfo}
                 />
               ))}
-            </Feeds>
-            <VerticalBorder />
-            <Recommends>
-              {users.map((user) => (
-                <UserRecommend key={user.id} user={user} />
-              ))}
-            </Recommends>
-          </Row>
+            </Feeds> */}
+          {/* <VerticalBorder /> */}
         </Contents>
       </PageLayout>
     </ThemeProvider>
@@ -111,14 +199,14 @@ let PageLayout = styled.div`
   display: flex;
   flex-direction: column;
   height: 100vh;
-  background-color: ${({ theme }) => theme.color.bg};
+  background-color: ${({ theme }) => theme.color.bg2};
 `;
 
 let Contents = styled.div`
   display: flex;
   flex-direction: column;
   justify-content: center;
-  align-items: center;
+  align-items: flex-start;
   width: 1080px;
   margin: 40px auto 0px auto;
   position: relative;
@@ -139,7 +227,7 @@ const OtherManda = styled.div`
 
 const ScrollButton = styled.img`
   position: absolute;
-  top: 120px;
+  top: 47%;
   border-radius: 50%;
   border: 1px solid ${({ theme }) => theme.color.border};
   background-color: ${({ theme }) => theme.color.bg2};
@@ -151,11 +239,11 @@ const ScrollButton = styled.img`
 `;
 
 const PrevButton = styled(ScrollButton)`
-  left: -48px;
+  left: -64px;
 `;
 
 const NextButton = styled(ScrollButton)`
-  right: -40px;
+  right: -64px;
 `;
 
 let HorizontalBorder = styled.hr`
@@ -191,10 +279,20 @@ let Feeds = styled.div`
 let Recommends = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 16px;
-  width: auto;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  box-sizing: border-box;
+  width: fit-content;
+  max-height: 400px;
   margin-top: 48px;
-  margin-bottom: 80px;
+  margin-bottom: 40px;
+  overflow-x: scroll;
+  white-space: nowrap;
+  scroll-behavior: smooth;
+
+  &::-webkit-scrollbar {
+    height: 0px;
+  }
 `;
 
 export default SearchPage;

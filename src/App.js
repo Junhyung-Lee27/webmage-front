@@ -31,7 +31,7 @@ function App() {
           path="/setting"
           element={isLoggedIn ? <SettingPage /> : <Navigate to="/" replace />}
         />
-        <Route path="/search" element={isLoggedIn ? <SearchPage /> : <Navigate to="/" replace />} />
+        <Route path={`/search/:keyword`} element={isLoggedIn ? <SearchPage /> : <Navigate to="/" replace />} />
         <Route path="/feed" element={isLoggedIn ? <FeedPage /> : <Navigate to="/" replace />} />
         {/* <Route path="/chat" element={isLoggedIn ? <ChatPage /> : <Navigate to="/" replace />} /> */}
         <Route path="/user/kakao-callback" element={<KakaoCallback />}></Route>

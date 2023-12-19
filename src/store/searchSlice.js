@@ -2,14 +2,22 @@ import { createSlice } from "@reduxjs/toolkit";
 
 const searchSlice = createSlice({
   name: "search",
-  initialState: { manda_simples: [], feeds: [], users: [] },
+  initialState: { keyword: "", manda_simples: [], feeds: [], users: [] },
   reducers: {
-    setSearchResults(state, action) {
-      state.manda_simples = action.payload.manda_simples;
-      state.feeds = action.payload.feeds;
-      state.users = action.payload.users;
+    setSearchedKeyword(state, action) {
+      state.keyword = action.payload;
     },
-    clearSearchResults(state) {
+    setSearchedMandaSimples(state, action) {
+      state.manda_simples = action.payload;
+    },
+    setSearchedFeeds(state, action) {
+      state.feeds = action.payload;
+    },
+    setSearchedUsers(state, action) {
+      state.users = action.payload;
+    },
+    clearSearchedResults(state) {
+      state.keyword = "";
       state.manda_simples = [];
       state.feeds = [];
       state.users = [];
@@ -17,5 +25,11 @@ const searchSlice = createSlice({
   },
 });
 
-export const { setSearchResults, clearSearchResults } = searchSlice.actions;
+export const {
+  setSearchedKeyword,
+  setSearchedMandaSimples,
+  setSearchedFeeds,
+  setSearchedUsers,
+  clearSearchedResults,
+} = searchSlice.actions;
 export default searchSlice.reducer;
