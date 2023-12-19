@@ -55,9 +55,9 @@ export default function UserProfile() {
             <Count>{selectedUser.successCount}</Count>
           </CountWrapper>
         </NumericInfos>
-        {selectedUser.userPosition != "" &&
-        selectedUser.userInfo != "" &&
-        selectedUser.userHash != "" ? (
+        {selectedUser.userPosition !== "" &&
+        selectedUser.userInfo !== "" &&
+        selectedUser.userHash !== "" ? (
           <UserDetails>
             <UserPosition>{selectedUser.userPosition}</UserPosition>
             <UserIntroduce>{selectedUser.userInfo}</UserIntroduce>
