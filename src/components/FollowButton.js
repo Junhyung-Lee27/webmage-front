@@ -75,11 +75,11 @@ function FollowButton({ userInfo }) {
 
         dispatch(setFeeds(updatedFeeds)); // 업데이트된 feeds 배열로 상태 업데이트
 
-        // UserProfile 컴포넌트에서 userInfo를 받았을 경우
+        // UserProfile, UserRecommend에서 userInfo 전달 받은 케이스
         userInfo.is_following = true;
       }
     } catch (error) {
-      console.error(error.response); // 오류 처리
+      console.log("팔로우 중 오류 발생: ", error); // 오류 처리
     }
   };
 
@@ -106,10 +106,10 @@ function FollowButton({ userInfo }) {
 
       dispatch(setFeeds(updatedFeeds)); // 업데이트된 feeds 배열로 상태 업데이트
 
-      // UserProfile 컴포넌트에서 userInfo를 받았을 경우
+      // UserProfile, UserRecommend에서 userInfo 전달 받은 케이스
       userInfo.is_following = false;
     } catch (error) {
-      console.error(error.response); // 오류 처리
+      console.log("팔로우 취소중 오류 발생: ", error); // 오류 처리
     }
   };
 
