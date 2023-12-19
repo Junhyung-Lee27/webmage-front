@@ -21,45 +21,51 @@ export default function FeedFooter(props) {
   // 상태 관리
   const user = useSelector((state) => state.user);
   const feedInfo = props.feedInfo;
-  const [ws, setWs] = useState(null);
+  const [isMounted, setIsMounted] = useState(true); // 마운트 상태
 
-  // 웹소켓 연결 생성
+  // 마운트 설정
   useEffect(() => {
-    const newWs = new WebSocket(
-      `${WS_BASE_URL}/ws/notifications/${user.userId}/?token=${user.authToken}`
-    );
-    setWs(newWs);
-
+    setIsMounted(true);
     return () => {
-      newWs.close();
+      setIsMounted(false);
     };
   }, []);
 
   ////////// 이모지 //////////
 
-  // 상태 관리
+  // 이모지 관련 상태 관리
   const [myReactions, setMyReactions] = useState([]); // 피드에 대한 자신의 이모지
   const [emojiInfoRaw, setEmojiInfoRaw] = useState({}); // 피드 이모지 정보
   const [emojiInfo, setEmojiInfo] = useState({}); //피드 최다 이모지 및 총 이모지 갯수 표시를 위한 변수
   const [isEmojiModalOpen, setIsEmojiModalOpen] = useState(false); // 이모지 모달
   const [modalTimerId, setModalTimerId] = useState(null); // 이모지 모달 타이머
 
-  // 이모지 카운트 조회
-  async function getEmojiCount(feedId, authToken) {
-    try {
-      const response = await axios.get(`${BASE_URL}/feed/emoji/${feedId}/`, {
-        headers: {
-          Authorization: `Token ${authToken}`,
-        },
-      });
-
-      setEmojiInfoRaw(response.data.emoji_count);
-      setMyReactions(response.data.user_reactions);
-    } catch (error) {
-      console.log("이모지 카운트 조회 중 오류 발생: ", error);
-      alert("이모지 카운트 조회 중 오류가 발생했습니다");
+  // 이모지 초기화
+  useEffect(() => {
+    if (isMounted) {
+      setEmojiInfoRaw(feedInfo.emoji_count);
+      setMyReactions(feedInfo.user_reactions);
     }
-  }
+  }, [isMounted, feedInfo.emoji_count, feedInfo.user_reactions]);
+
+  // 이모지 카운트 조회 -> 이모지 상태 업데이트
+  useEffect(() => {
+    setEmojiInfo(getEmojiInfo(emojiInfoRaw));
+  }, [emojiInfoRaw]);
+
+  // 가장 많은 이모지 5가지, 총 카운트 추출
+  const getEmojiInfo = (emoji_count) => {
+    let total_count = Object.values(emoji_count).reduce((acc, value) => acc + value, 0);
+
+    let sortedEmojis = Object.entries(emoji_count)
+      .sort((a, b) => b[1] - a[1])
+      .filter(([key, value]) => value > 0)
+      .slice(0, 5);
+
+    let topEmojis = sortedEmojis.map(([key, value]) => ({ key, value }));
+
+    return { total_count, topEmojis };
+  };
 
   // 이모지 입력
   async function addEmoji(feedId, authToken, emojiName, totalCount) {
@@ -73,6 +79,11 @@ export default function FeedFooter(props) {
       return;
     }
 
+    // 임시 웹소켓 연결 생성
+    const tempWs = new WebSocket(
+      `${WS_BASE_URL}/ws/notifications/${user.userId}/?token=${user.authToken}`
+    );
+
     try {
       const response = await axios.post(
         `${BASE_URL}/feed/emoji/add/`,
@@ -85,19 +96,17 @@ export default function FeedFooter(props) {
       );
 
       if (response.status === 200 || response.status === 201) {
-        if (ws) {
-          ws.send(
-            JSON.stringify({
-              type: "reaction_event",
-              feed_id: feedId,
-              user_id: user.userId,
-              username: user.username,
-              user_image: user.userImg,
-              total_count: totalCount + 1,
-            })
-          );
-        }
-        
+        tempWs.send(
+          JSON.stringify({
+            type: "reaction_event",
+            feed_id: feedId,
+            user_id: user.userId,
+            username: user.username,
+            user_image: user.userImg,
+            total_count: totalCount + 1,
+          })
+        );
+
         let newEmojiInfo = { ...emojiInfoRaw };
         newEmojiInfo[emojiName] = (newEmojiInfo[emojiName] || 0) + 1;
 
@@ -108,6 +117,11 @@ export default function FeedFooter(props) {
     } catch (error) {
       console.log("이모지 입력/수정 중 오류 발생: ", error);
       alert("이모지 입력/수정 중 오류가 발생했습니다.");
+    } finally {
+      // 웹소켓 연결 닫기
+      setTimeout(() => {
+        tempWs.close();
+      }, 5000);
     }
   }
 
@@ -134,30 +148,6 @@ export default function FeedFooter(props) {
       alert("이모지 취소 중 오류가 발생했습니다.");
     }
   }
-
-  // 최초 마운트 -> 이모지 카운트 조회
-  useEffect(() => {
-    getEmojiCount(feedInfo.id, user.authToken);
-  }, [feedInfo.id && user.authToken]);
-
-  // 이모지 카운트 조회 -> 이모지 상태 업데이트
-  useEffect(() => {
-    setEmojiInfo(getEmojiInfo(emojiInfoRaw));
-  }, [emojiInfoRaw]);
-
-  // 가장 많은 이모지 5가지, 총 카운트 추출
-  const getEmojiInfo = (emoji_count) => {
-    let total_count = Object.values(emoji_count).reduce((acc, value) => acc + value, 0);
-
-    let sortedEmojis = Object.entries(emoji_count)
-      .sort((a, b) => b[1] - a[1])
-      .filter(([key, value]) => value > 0)
-      .slice(0, 5);
-
-    let topEmojis = sortedEmojis.map(([key, value]) => ({ key, value }));
-
-    return { total_count, topEmojis };
-  };
 
   // EmojiModal open/close 함수
   const openEmojiModal = () => {
@@ -190,7 +180,6 @@ export default function FeedFooter(props) {
       setIsCommentOpen(true);
     }
   }, [feedInfo.id, selectedFeedId]);
-  
 
   return (
     <ThemeProvider theme={theme}>
@@ -270,7 +259,6 @@ export default function FeedFooter(props) {
         )}
         {isCommentOpen && (
           <CommentComponent
-            ws={ws}
             feedInfo={feedInfo}
             commentsInfo={commentsInfo}
             setCommentsInfo={setCommentsInfo}
@@ -367,26 +355,27 @@ function CommentComponent(props) {
   const [editingCommentId, setEditingCommentId] = useState(null); // 수정하는 댓글의 id
   const [editingCommentText, setEditingCommentText] = useState(""); // 수정하는 댓글의 텍스트
   const [editingCommentIndex, setEditingCommentIndex] = useState(null); // 수정하는 댓글의 인덱스
-  const ws = props.ws
 
   // 댓글 조회 요청
-  async function getComments(feedId, authToken, page) {
+  async function getComments(feedId, authToken, page, isMounted) {
     try {
       const response = await axios.get(`${BASE_URL}/feed/${feedId}/comment?page=${page}`, {
         headers: {
           Authorization: `Token ${authToken}`,
         },
       });
-      if (response.data.message === "No more pages") {
+      if (isMounted) {
+        if (response.data.message === "No more pages") {
         setNoMoreComments(true);
         return;
-      }
-      
-      if (page === 1) {
-        setCommentsInfo(response.data.comment_info);
-        setCommentsCount(response.data.count);
-      } else {
-        setCommentsInfo((prevComments) => [...prevComments, ...response.data.comment_info]);
+        }
+        
+        if (page === 1) {
+          setCommentsInfo(response.data.comment_info);
+          setCommentsCount(response.data.count);
+        } else {
+          setCommentsInfo((prevComments) => [...prevComments, ...response.data.comment_info]);
+        }
       }
     } catch (error) {
       console.log("댓글 조회 중 오류 발생: ", error);
@@ -402,7 +391,11 @@ function CommentComponent(props) {
 
   // 초기 댓글 요청
   useEffect(() => {
-    getComments(props.feedInfo.id, user.authToken, currentPage);
+    let isMounted = true;
+    
+    getComments(props.feedInfo.id, user.authToken, currentPage, isMounted);
+
+    return () => {isMounted = false;}
   }, []);
 
   // 댓글 입력 요청
@@ -411,6 +404,12 @@ function CommentComponent(props) {
 
     if (e.key === "Enter" && !e.shiftKey && trimmedCommentInput !== "") {
       e.preventDefault();
+
+      // 임시 웹소켓 연결 생성
+      const tempWs = new WebSocket(
+        `${WS_BASE_URL}/ws/notifications/${user.userId}/?token=${user.authToken}`
+      );
+
       try {
         const response = await axios.post(
           `${BASE_URL}/feed/${feedId}/comment/add/`,
@@ -423,19 +422,17 @@ function CommentComponent(props) {
         );
 
         if (response.status === 201 || response.status === 200) {
-          if (ws) {
-            ws.send(
-              JSON.stringify({
-                type: "comment_event",
-                user_id: user.userId,
-                feed_id: feedId,
-                username: user.username,
-                user_image: user.userImg,
-                comment: trimmedCommentInput,
-              })
-            );
-          }
-          
+          tempWs.send(
+            JSON.stringify({
+              type: "comment_event",
+              user_id: user.userId,
+              feed_id: feedId,
+              username: user.username,
+              user_image: user.userImg,
+              comment: trimmedCommentInput,
+            })
+          );
+
           const newComment = response.data;
           setCommentsInfo((prevComments) => [newComment, ...prevComments]);
           setCommentInput("");

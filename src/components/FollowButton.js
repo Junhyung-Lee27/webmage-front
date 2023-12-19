@@ -3,12 +3,10 @@ import axios from "axios";
 import { useDispatch, useSelector } from "react-redux";
 import styled, { ThemeProvider } from "styled-components";
 import componentTheme from "../components/theme";
-import { setFeeds } from "../store/feedSlice";
 import { BASE_URL } from "./../config";
 import { WS_BASE_URL } from "./../config";
 
 function FollowButton({ userInfo, onFollow, onUnfollow }) {
-  const dispatch = useDispatch();
 
   // 테마
   const colorTheme = useSelector((state) => state.theme.themes[state.theme.currentTheme]);
@@ -22,21 +20,22 @@ function FollowButton({ userInfo, onFollow, onUnfollow }) {
   // 상태 관리
   const user = useSelector((state) => state.user);
   const feeds = useSelector((state) => state.feed.feeds);
-  const [ws, setWs] = useState(null);
+  const [isMounted, setIsMounted] = useState(false); // 팔로우버튼 마운트 상태
 
-  // 웹소켓 연결 생성
+  // 마운트 설정
   useEffect(() => {
-    const newWs = new WebSocket(
-      `${WS_BASE_URL}/ws/notifications/${user.userId}/?token=${user.authToken}`
-    );
-    setWs(newWs);
-
+    setIsMounted(true);
     return () => {
-      newWs.close();
-    };
-  }, []);
+      setIsMounted(false);
+    }
+  }, [])
 
   const followButtonClick = async (followedId, user) => {
+    // 임시 웹소켓 연결 생성
+    const tempWs = new WebSocket(
+      `${WS_BASE_URL}/ws/notifications/${user.userId}/?token=${user.authToken}`
+    );
+
     try {
       const response = await axios.post(
         `${BASE_URL}/user/follow/`,
@@ -46,24 +45,27 @@ function FollowButton({ userInfo, onFollow, onUnfollow }) {
         }
       );
 
-      if (response.status === 201) {
+      if (response.status === 201 && isMounted) {
         // 웹소켓을 통해 팔로우 이벤트 메시지 전송
-        if (ws) {
-          ws.send(
-            JSON.stringify({
-              type: "follow_event",
-              followed_user_id: followedId,
-              username: user.username,
-              user_id: user.userId,
-              user_image: user.userImg,
-            })
-          );
-        }
+        tempWs.send(
+          JSON.stringify({
+            type: "follow_event",
+            followed_user_id: followedId,
+            username: user.username,
+            user_id: user.userId,
+            user_image: user.userImg,
+          })
+        );
         // 팔로우 상태 업데이트
         await onFollow();
       }
     } catch (error) {
       console.log("팔로우 중 오류 발생: ", error); // 오류 처리
+    } finally {
+      // 웹소켓 연결 닫기
+      setTimeout(() => {
+        tempWs.close();
+      }, 5000);
     }
   };
 
@@ -74,7 +76,7 @@ function FollowButton({ userInfo, onFollow, onUnfollow }) {
         headers: { "Content-Type": "application/json", Authorization: `Token ${authToken}` },
       });
 
-      if (response.status === 204) {
+      if (response.status === 204 && isMounted) {
         await onUnfollow();
       }
     } catch (error) {
