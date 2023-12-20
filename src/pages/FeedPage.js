@@ -33,12 +33,23 @@ function FeedPage() {
   const [hasMoreFeeds, setHasMoreFeeds] = useState(true); // 더 불러올 피드가 있는지
   const [activeTab, setActiveTab] = useState("전체"); // 활성화된 탭 (마이, 전체)
   const user = useSelector((state) => state.user); // 유저 상태
-  const [recommUsers, setRecommUsers] = useState([]); // 추천 유저 상태
+  const [recommUsers, setRecommUsers] = useState({}); // 추천 유저 상태
+  const trendingUsers = recommUsers.trending_users;
+  const familiarUsers = recommUsers.familiar_users;
+  const activeUsers = recommUsers.active_users;
   const [followingStatus, setFollowingStatus] = useState({}); // 각 사용자에 대한 팔로우 상태
   const [show, setShow] = useState(false); // 피드 작성, 편집 모달 노출 상태
   const [feedMode, setFeedMode] = useState(""); // 피드 작성, 편집 모드 구분
   const selectedFeedId = useSelector((state) => state.selectedFeedId); // 선택된 피드 상태
-  let users = recommUsers;
+  const [isMounted, setIsMounted] = useState(false);
+
+  // 마운트 상태 설정
+  useEffect(() => {
+    setIsMounted(true);
+    return () => {
+      setIsMounted(false);
+    }
+  }, [])
 
   // 추천 피드 로드
   useEffect(() => {
@@ -183,6 +194,31 @@ function FeedPage() {
   // 피드 게시물 생성, 편집 모달
   const handleShow = () => setShow(true);
 
+  // 추천 유저 조회 함수
+  const fetchRecommendedUsers = async (authToken) => {
+    try {
+      const response = await axios.get(`${BASE_URL}/user/recommend/`, {
+        headers: {
+          Authorization: `Token ${authToken}`,
+        },
+      });
+      
+      if (response.status === 200 & isMounted) {
+        setRecommUsers(response.data);
+      }
+    } catch (error) {
+      console.log("추천 유저 조회 중 오류 발생: ", error)
+    }
+  }
+
+  // 마운트 시 추천 유저 조회
+  useEffect(() => {
+    if (isMounted) {
+      fetchRecommendedUsers(user.authToken);
+    }
+  }, [isMounted, user.authToken])
+  
+
   return (
     <ThemeProvider theme={theme}>
       <PageLayout>
@@ -252,12 +288,31 @@ function FeedPage() {
                 ></FeedWriteModal>
               )}
               <StyledText color={theme.color.font1} cursor="default">
-                추천
+                최근 주목받는 사용자
               </StyledText>
               <Recommends>
-                {users.map((user) => (
-                  <UserRecommend key={user.id} user={user} />
-                ))}
+                {trendingUsers &&
+                  trendingUsers.map((targetUser) => (
+                    <UserRecommend key={targetUser.id} targetUser={targetUser} />
+                  ))}
+              </Recommends>
+              <StyledText color={theme.color.font1} cursor="default">
+                알 수도 있는 사용자
+              </StyledText>
+              <Recommends>
+                {familiarUsers &&
+                  familiarUsers.map((targetUser) => (
+                    <UserRecommend key={targetUser.id} targetUser={targetUser} />
+                  ))}
+              </Recommends>
+              <StyledText color={theme.color.font1} cursor="default">
+                최근 활동적인 사용자
+              </StyledText>
+              <Recommends>
+                {activeUsers &&
+                  activeUsers.map((targetUser) => (
+                    <UserRecommend key={targetUser.id} targetUser={targetUser} />
+                  ))}
               </Recommends>
             </Aside>
           </Stadardized>
@@ -334,7 +389,6 @@ let Recommends = styled.div`
   width: 100%;
   display: flex;
   flex-direction: column;
-  gap: 16px;
   margin-top: 8px;
 `;
 

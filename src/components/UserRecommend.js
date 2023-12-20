@@ -4,7 +4,7 @@ import componentTheme from "./theme";
 import FollowButton from "./FollowButton";
 import { useState } from "react";
 
-function UserRecommend({ searchedUser }) {
+function UserRecommend({ targetUser }) {
   // 테마
   const colorTheme = useSelector((state) => state.theme.themes[state.theme.currentTheme]);
   const filterTheme = useSelector((state) => state.theme.filters[state.theme.currentTheme]);
@@ -17,8 +17,8 @@ function UserRecommend({ searchedUser }) {
   // 상태 관리
   const user = useSelector((state) => state.user);
   const [userInfo, setUserInfo] = useState({
-    id: searchedUser.id,
-    is_following: searchedUser.is_following,
+    id: targetUser.id,
+    is_following: targetUser.is_following,
   });
 
   // 팔로우 처리
@@ -43,17 +43,17 @@ function UserRecommend({ searchedUser }) {
         <Row>
           <StyledProfile
             src={
-              searchedUser.userImg instanceof File
-                ? URL.createObjectURL(searchedUser.userImg)
+              targetUser.userImg instanceof File
+                ? URL.createObjectURL(targetUser.userImg)
                 : process.env.PUBLIC_URL + "/testImg/profile2.jpg"
             }
           />
           <Column>
             <StyledText size="16" weight="500" color={theme.color.font1}>
-              {searchedUser.username}
+              {targetUser.username}
             </StyledText>
             <StyledText size="12" weight="400" color={theme.color.font2}>
-              {searchedUser.userPosition}
+              {targetUser.userPosition}
             </StyledText>
           </Column>
           {/* <StyledAddBox
@@ -64,7 +64,7 @@ function UserRecommend({ searchedUser }) {
         <StyledText size="12" weight="300" color={theme.color.font2}>
           {user.userHash}
         </StyledText>
-        {user.userId !== searchedUser.id && (
+        {user.userId !== targetUser.id && (
           <FollowButtonWrapper>
             <FollowButton
               userInfo={userInfo}
@@ -82,7 +82,7 @@ let RecommendContainer = styled.div`
   position: relative;
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 50px;
   width: calc((1080px - 48px) / 3);
   height: 134px;
   padding: 24px;

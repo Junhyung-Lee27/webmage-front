@@ -26,7 +26,7 @@ function SearchPage() {
   const user = useSelector((state) => state.user);
   const search = useSelector((state) => state.search); // 검색 결과
   const searchKeyword = search.keyword; // 검색 키워드
-  const searchedUsers = search.users; // 유저 검색 결과
+  const targetUsers = search.users; // 유저 검색 또는 추천 결과
   const searchedMandaSimples = search.manda_simples; // 만다라트 검색 결과
   const searchedFeeds = search.feeds; // 피드 검색 결과
   const [userPage, setUserPage] = useState(1); // 서버에 요청할 페이지 번호
@@ -60,7 +60,7 @@ function SearchPage() {
         if (page === 1) {
           dispatch(setSearchedUsers(response.data));
         } else if (page !== 1) {
-          dispatch(setSearchedUsers([...searchedUsers, ...response.data]));
+          dispatch(setSearchedUsers([...targetUsers, ...response.data]));
         }
       }
 
@@ -165,8 +165,8 @@ function SearchPage() {
                 src={process.env.PUBLIC_URL + "/icon/arrow-left.svg"}
               />
             )}
-            {searchedUsers.map((searchedUser) => (
-              <UserRecommend key={searchedUser.id} searchedUser={searchedUser} />
+            {targetUsers.map((targetUser) => (
+              <UserRecommend key={targetUser.id} targetUser={targetUser} />
             ))}
             {showNextButton && (
               <NextButton
