@@ -213,6 +213,20 @@ function Feed({
           <FeedContents>
             {/*피드 본문*/}
             <FeedArticle>
+              <MandaInfoContainer>
+                <MandaInfo>
+                  <MandaInfoTitle>핵심 목표</MandaInfoTitle>
+                  <MandaInfoText>{feedInfo.main_title}</MandaInfoText>
+                </MandaInfo>
+                <MandaInfo>
+                  <MandaInfoTitle>세부 목표</MandaInfoTitle>
+                  <MandaInfoText>{feedInfo.sub_title}</MandaInfoText>
+                </MandaInfo>
+                <MandaInfo>
+                  <MandaInfoTitle>실천 방법</MandaInfoTitle>
+                  <MandaInfoText>{feedInfo.content}</MandaInfoText>
+                </MandaInfo>
+              </MandaInfoContainer>
               <StyledText
                 size="14px"
                 weight="400"
@@ -237,7 +251,7 @@ function Feed({
                 })}
               </FeedTags>
             </FeedArticle>
-            {/* 만다라트, 이미지 영역 */}
+            {/* 이미지 영역 */}
             <PictureWrap>
               <PrevBtn src={process.env.PUBLIC_URL + "/icon/prev-image-btn.svg"}></PrevBtn>
               <NextBtn src={process.env.PUBLIC_URL + "/icon/next-image-btn.svg"}></NextBtn>
@@ -703,6 +717,36 @@ let FeedArticle = styled.div`
   width: 292px;
 `;
 
+let MandaInfoContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+
+  font-size: 14px;
+  color: ${({ theme }) => theme.color.font1};
+
+  margin-bottom: 24px;
+
+  border: 1px solid ${({ theme }) => theme.color.border};
+  border-radius: 8px;
+  padding: 12px 16px;
+`;
+
+let MandaInfo = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 12px;
+`;
+
+let MandaInfoTitle = styled.span`
+  background-color: ${({ theme }) => theme.color.bg3};
+  padding: 4px 8px;
+  border-radius: 8px;
+`;
+
+let MandaInfoText = styled.span``;
+
 let FeedTags = styled.div`
   display: flex;
   flex-direction: column;
@@ -742,8 +786,12 @@ let NextBtn = styled.img`
 
 let PictureWrap = styled.div`
   width: 370px;
-  height: 208px;
+  height: 276px;
   position: relative;
+
+  border-radius: 8px;
+  border: 1px solid ${({ theme }) => theme.color.border};
+  overflow: hidden;
 
   &:hover ${PrevBtn}, &:hover ${NextBtn} {
     opacity: 0.6;
@@ -753,13 +801,12 @@ let PictureWrap = styled.div`
 
 let Picture = styled.img`
   width: 100%;
-  height: 208px;
+  height: 276px;
   object-fit: cover;
-  border-radius: 4px;
+  border-radius: 8px;
 `;
 
-let HorizontalLine = styled.hr`
-  border: none;
+let HorizontalLine = styled.div`
   border-top: 1px solid ${({ theme }) => theme.color.border};
   width: 100%;
   margin: 16px 0px;
