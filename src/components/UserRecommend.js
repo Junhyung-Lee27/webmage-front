@@ -55,15 +55,11 @@ function UserRecommend({ targetUser }) {
             <StyledText size="12" weight="400" color={theme.color.font2}>
               {targetUser.userPosition}
             </StyledText>
+            <StyledText size="12" weight="400" color={theme.color.font2} margintop="auto">
+              {targetUser.userHash}
+            </StyledText>
           </Column>
-          {/* <StyledAddBox
-            src={process.env.PUBLIC_URL + "/icon/add.svg"}
-            filter={theme.filter.primary}
-          ></StyledAddBox> */}
         </Row>
-        <StyledText size="12" weight="300" color={theme.color.font2}>
-          {user.userHash}
-        </StyledText>
         {user.userId !== targetUser.id && (
           <FollowButtonWrapper>
             <FollowButton
@@ -80,11 +76,7 @@ function UserRecommend({ targetUser }) {
 
 let RecommendContainer = styled.div`
   position: relative;
-  display: flex;
-  flex-direction: column;
-  gap: 50px;
   width: calc((1080px - 48px) / 3);
-  height: 134px;
   padding: 24px;
   margin-right: 16px;
   margin-bottom: 16px;
@@ -102,6 +94,7 @@ let Row = styled.div`
 `;
 
 let Column = styled.div`
+  height: 56px;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
@@ -120,13 +113,15 @@ let StyledText = styled.span`
   font-size: ${({ size }) => size + "px"};
   font-weight: ${({ weight }) => weight};
   color: ${({ color }) => color};
+
+  margin-top: ${({ margintop }) => margintop};
   cursor: ${({ cursor = "default" }) => cursor};
 `;
 
 const FollowButtonWrapper = styled.div`
   position: absolute;
-  right: 8px;
-  top: 18px;
+  right: 20px;
+  top: 20px;
 `;
 
 export default UserRecommend;

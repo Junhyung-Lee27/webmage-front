@@ -8,7 +8,7 @@ import componentTheme from "./../components/theme";
 import { useState, useRef, useEffect } from "react";
 import axios from "axios";
 import { BASE_URL } from "./../config";
-import { setSearchedUsers } from "../store/searchSlice";
+import { setSearchedUsers, setSearchedMandaSimples } from "../store/searchSlice";
 
 function SearchPage() {
   const dispatch = useDispatch();
@@ -22,24 +22,26 @@ function SearchPage() {
     component: componentTheme,
   };
 
-  // 상태 관리
+  // 상태
   const user = useSelector((state) => state.user);
   const search = useSelector((state) => state.search); // 검색 결과
   const searchKeyword = search.keyword; // 검색 키워드
-  const targetUsers = search.users; // 유저 검색 또는 추천 결과
-  const searchedMandaSimples = search.manda_simples; // 만다라트 검색 결과
-  const searchedFeeds = search.feeds; // 피드 검색 결과
-  const [userPage, setUserPage] = useState(1); // 서버에 요청할 페이지 번호
-  const [maxLoadedPage, setMaxLoadedPage] = useState(1); // 현재 로드된 최대 페이지 번호를 추적
-  const [isScrolling, setIsScrolling] = useState(false); // 스크롤 중 상태
 
-  // 유저 검색
+  // [UserRecommend] 상태
+  const targetUsers = search.users; // 유저 검색 또는 추천 결과
+  const [userPage, setUserPage] = useState(1); // 서버에 요청할 페이지 번호
+  const [maxLoadedUserPage, setMaxLoadedUserPage] = useState(1); // 현재 로드된 최대 페이지 번호를 추적
+  const [isUserScrolling, setIsUserScrolling] = useState(false); // 스크롤 중 상태
+  const userScrollContainerRef = useRef(null);
+  const [showUserPrevButton, setShowUserPrevButton] = useState(false);
+  const [showUserNextButton, setShowUserNextButton] = useState(true);
+
+  // [UserRecommend] 검색 결과 불러오기
   const getSearchedUsers = async (keyword, authToken, page) => {
-    if (page == 1 && maxLoadedPage > 1) {
+    if (page === 1 && maxLoadedUserPage > 1) {
       return;
     }
-
-    if (page != 1 && page <= maxLoadedPage) {
+    if (page !== 1 && page <= maxLoadedUserPage) {
       return;
     }
 
@@ -52,8 +54,8 @@ function SearchPage() {
 
       if (response.status === 200) {
         if (response.data.message === "No more pages") {
-          setShowNextButton(false);
-          setMaxLoadedPage(page);
+          setShowUserNextButton(false);
+          setMaxLoadedUserPage(page);
           return;
         }
 
@@ -65,45 +67,41 @@ function SearchPage() {
       }
 
       // 최대 로드된 페이지 업데이트
-      if (page > maxLoadedPage) {
-        setMaxLoadedPage(page);
+      if (page > maxLoadedUserPage) {
+        setMaxLoadedUserPage(page);
       }
     } catch (error) {
       console.log("유저 검색 중 오류 발생: ", error);
     }
   };
 
-  // 다음 페이지 검색 요청
+  // [UserRecommend] 다음 페이지 검색 요청
   useEffect(() => {
     if (searchKeyword) {
       getSearchedUsers(searchKeyword, user.authToken, userPage);
     }
   }, [searchKeyword, user.authToken, userPage]);
 
-  // 검색 키워드 변경 시 페이지 초기화
+  // [UserRecommend] 검색 키워드 변경 시 페이지 초기화
   useEffect(() => {
     setUserPage(1);
-    setShowNextButton(true);
+    setShowUserNextButton(true);
     dispatch(setSearchedUsers([]));
-    setMaxLoadedPage(1);
+    setMaxLoadedUserPage(1);
   }, [searchKeyword, dispatch]);
 
-  // 스크롤 동작
-  const scrollContainerRef = useRef(null);
-  const [showPrevButton, setShowPrevButton] = useState(false);
-  const [showNextButton, setShowNextButton] = useState(true);
-
+  // [UserRecommend] 스크롤 동작
   const handleScroll = () => {
-    if (scrollContainerRef.current) {
-      const { scrollLeft, scrollWidth, clientWidth } = scrollContainerRef.current;
+    if (userScrollContainerRef.current) {
+      const { scrollLeft, scrollWidth, clientWidth } = userScrollContainerRef.current;
 
-      setShowPrevButton(scrollLeft > 0);
-      setShowNextButton(scrollLeft <= scrollWidth - clientWidth);
+      setShowUserPrevButton(scrollLeft > 0);
+      setShowUserNextButton(scrollLeft <= scrollWidth - clientWidth);
     }
   };
 
   useEffect(() => {
-    const container = scrollContainerRef.current;
+    const container = userScrollContainerRef.current;
     if (container) {
       container.addEventListener("scroll", handleScroll);
       return () => {
@@ -112,69 +110,207 @@ function SearchPage() {
     }
   }, []);
 
-  // 이전 페이지로 이동
+  // [UserRecommend] 이전 페이지로 이동
   const handlePrevClick = () => {
-    if (isScrolling) return; // 스크롤 중이면 아무것도 하지 않음
-    setIsScrolling(true); // 스크롤 시작
+    if (isUserScrolling) return; // 스크롤 중이면 아무것도 하지 않음
+    setIsUserScrolling(true); // 스크롤 시작
 
     setUserPage((prev) => (prev > 1 ? prev - 1 : prev));
-    if (scrollContainerRef.current) {
-      scrollContainerRef.current.scrollLeft -= 1080;
+    if (userScrollContainerRef.current) {
+      userScrollContainerRef.current.scrollLeft -= 1080;
     }
 
     setTimeout(() => {
-      setIsScrolling(false);
+      setIsUserScrolling(false);
     }, 500);
   };
 
-  // 다음 페이지로 이동
+  // [UserRecommend] 다음 페이지로 이동
   const handleNextClick = async () => {
-    if (isScrolling) return;
-    setIsScrolling(true);
+    console.log('isUserScrolling? : ', isUserScrolling);
+    if (isUserScrolling) return;
+    setIsUserScrolling(true);
 
     await getSearchedUsers(searchKeyword, user.authToken, userPage + 1);
 
     setUserPage((prev) => prev + 1);
-    if (scrollContainerRef.current) {
-      scrollContainerRef.current.scrollLeft += 1080;
+    if (userScrollContainerRef.current) {
+      userScrollContainerRef.current.scrollLeft += 1080;
     }
 
     setTimeout(() => {
-      setIsScrolling(false);
+      setIsUserScrolling(false);
     }, 500);
   };
 
-  // OtherManda(MandaSimples)
+  // [MandaSimples] 상태
+  const mandaSimples = search.manda_simples;
+  const [mandaSimplePage, setMandaSimplePage] = useState(1); // 서버에 요청할 페이지 번호
+  const [maxLoadedMandaSimplePage, setMaxLoadedMandaSimplePage] = useState(1); // 현재 로드된 최대 페이지 번호를 추적
+  const [isMandaSimpleScrolling, setIsMandaSimpleScrolling] = useState(false); // 스크롤 중 상태
+  const mandaSimpleScrollContainerRef = useRef(null);
+  const [showMandaSimplePrevButton, setShowMandaSimplePrevButton] = useState(false);
+  const [showMandaSimpleNextButton, setShowMandaSimpleNextButton] = useState(true);
+
+  // [MandaSimples] 검색 결과 불러오기
+  const getSearchedMandaSimples = async (keyword, authToken, page) => {
+    if (page === 1 && maxLoadedMandaSimplePage > 1) {
+      return;
+    }
+    if (page !== 1 && page <= maxLoadedMandaSimplePage) {
+      return;
+    }
+
+    try {
+      const response = await axios.get(
+        `${BASE_URL}/manda/search/mandasimple/?keyword=${keyword}&page=${page}`,
+        {
+          headers: {
+            Authorization: `Token ${authToken}`,
+          },
+        }
+      );
+
+      if (response.status === 200) {
+        if (response.data.message === "No more pages") {
+          setShowMandaSimpleNextButton(false);
+          setMaxLoadedMandaSimplePage(page);
+          return;
+        }
+
+        if (page === 1) {
+          dispatch(setSearchedMandaSimples(response.data));
+        } else if (page !== 1) {
+          dispatch(setSearchedMandaSimples([...mandaSimples, ...response.data]));
+        }
+      }
+
+      // 최대 로드된 페이지 업데이트
+      if (page > maxLoadedMandaSimplePage) {
+        setMaxLoadedMandaSimplePage(page);
+      }
+    } catch (error) {
+      console.log("만다라트 검색 중 오류 발생: ", error);
+    }
+  };
+
+  // [MandaSimples] 다음 페이지 검색 요청
+  useEffect(() => {
+    if (searchKeyword) {
+      getSearchedMandaSimples(searchKeyword, user.authToken, mandaSimplePage);
+    }
+  }, [searchKeyword, user.authToken, mandaSimplePage]);
+
+  // [MandaSimple] 검색 키워드 변경 시 페이지 초기화
+  useEffect(() => {
+    setMandaSimplePage(1);
+    setShowMandaSimpleNextButton(true);
+    dispatch(setSearchedMandaSimples([]));
+    setMaxLoadedMandaSimplePage(1);
+  }, [searchKeyword, dispatch]);
+
+  // [MandaSimple] 스크롤 동작
+  const handleMandaSimpleScroll = () => {
+    if (mandaSimpleScrollContainerRef.current) {
+      const { scrollLeft, scrollWidth, clientWidth } = mandaSimpleScrollContainerRef.current;
+
+      setShowMandaSimplePrevButton(scrollLeft > 0);
+      setShowMandaSimpleNextButton(scrollLeft <= scrollWidth - clientWidth);
+    }
+  };
+
+  useEffect(() => {
+    const container = mandaSimpleScrollContainerRef.current;
+    if (container) {
+      container.addEventListener("scroll", handleMandaSimpleScroll);
+      return () => {
+        container.removeEventListener("scroll", handleMandaSimpleScroll);
+      };
+    }
+  }, []);
+
+  // [MandaSimple] 이전 페이지로 이동
+  const handleMandaSimplePrevClick = () => {
+    if (isMandaSimpleScrolling) return; // 스크롤 중이면 아무것도 하지 않음
+    setIsMandaSimpleScrolling(true); // 스크롤 시작
+
+    setMandaSimplePage((prev) => (prev > 1 ? prev - 1 : prev));
+    if (mandaSimpleScrollContainerRef.current) {
+      mandaSimpleScrollContainerRef.current.scrollLeft -= 1080;
+    }
+
+    setTimeout(() => {
+      setIsMandaSimpleScrolling(false);
+    }, 500);
+  };
+
+  // [MandaSimple] 다음 페이지로 이동
+  const handleMandaSimpleNextClick = async () => {
+    console.log('isMandaSimpleScrolling? : ', isMandaSimpleScrolling);
+    if (isMandaSimpleScrolling) return;
+    setIsMandaSimpleScrolling(true);
+
+    await getSearchedMandaSimples(searchKeyword, user.authToken, mandaSimplePage + 1);
+
+    setMandaSimplePage((prev) => prev + 1);
+    if (mandaSimpleScrollContainerRef.current) {
+      mandaSimpleScrollContainerRef.current.scrollLeft += 1080;
+    }
+
+    setTimeout(() => {
+      setIsMandaSimpleScrolling(false);
+    }, 500);
+  };
+
+  // [Feed] 피드 검색 결과 상태
+  const searchedFeeds = search.feeds; // 피드 검색 결과
 
   return (
     <ThemeProvider theme={theme}>
       <PageLayout>
         <Header></Header>
         <Contents>
-          {/* <OtherManda ref={scrollContainerRef}>
-            {mandaSimples.map((mandaSimple) => (
-              <MandaSimpleSearched key={mandaSimple.id} searchResult={mandaSimple} />
-            ))}
-          </OtherManda> */}
+          <MandaSimplesWrapper>
+            {showMandaSimplePrevButton && (
+              <PrevButton
+                onClick={handleMandaSimplePrevClick}
+                src={process.env.PUBLIC_URL + "/icon/arrow-left.svg"}
+              />
+            )}
+            <MandaSimples ref={mandaSimpleScrollContainerRef}>
+              {mandaSimples.map((mandaSimple) => (
+                <MandaSimpleSearched key={mandaSimple.id} mandaSimple={mandaSimple} />
+              ))}
+            </MandaSimples>
+            {showMandaSimpleNextButton && (
+              <NextButton
+                onClick={handleMandaSimpleNextClick}
+                src={process.env.PUBLIC_URL + "/icon/arrow-right.svg"}
+              />
+            )}
+          </MandaSimplesWrapper>
+
           <HorizontalBorder />
 
-          <Recommends ref={scrollContainerRef}>
-            {showPrevButton && (
+          <RecommendsWrapper>
+            {showUserPrevButton && (
               <PrevButton
                 onClick={handlePrevClick}
                 src={process.env.PUBLIC_URL + "/icon/arrow-left.svg"}
               />
             )}
-            {targetUsers.map((targetUser) => (
-              <UserRecommend key={targetUser.id} targetUser={targetUser} />
-            ))}
-            {showNextButton && (
+            <Recommends ref={userScrollContainerRef}>
+              {targetUsers.map((targetUser) => (
+                <UserRecommend key={targetUser.id} targetUser={targetUser} />
+              ))}
+            </Recommends>
+            {showUserNextButton && (
               <NextButton
                 onClick={handleNextClick}
                 src={process.env.PUBLIC_URL + "/icon/arrow-right.svg"}
               />
             )}
-          </Recommends>
+          </RecommendsWrapper>
 
           <HorizontalBorder />
           {/* <Feeds>
@@ -205,21 +341,32 @@ let PageLayout = styled.div`
 let Contents = styled.div`
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  align-items: flex-start;
+  justify-content: flex-start;
+  align-items: center;
   width: 1080px;
   margin: 40px auto 0px auto;
-  position: relative;
 `;
 
-const OtherManda = styled.div`
-  display: flex;
-  gap: 40px;
-  width: calc(100% + 32px);
-  overflow-x: scroll;
-  white-space: nowrap;
-  scroll-behavior: smooth;
+const MandaSimplesWrapper = styled.div`
+  position: relative;
+  width: 1080px;
+`
 
+const MandaSimples = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  box-sizing: border-box;
+  width: fit-content;
+  max-height: 800px; // 2 rows
+  margin-top: 48px;
+  margin-bottom: 40px;
+
+  position: relative;
+
+  overflow-x: scroll;
+  scroll-behavior: smooth;
   &::-webkit-scrollbar {
     height: 0px;
   }
@@ -227,23 +374,23 @@ const OtherManda = styled.div`
 
 const ScrollButton = styled.img`
   position: absolute;
-  top: 47%;
+  top: 43%;
   border-radius: 50%;
   border: 1px solid ${({ theme }) => theme.color.border};
-  background-color: ${({ theme }) => theme.color.bg2};
+  background-color: ${({ theme }) => theme.color.bg};
   padding: 4px;
 
   &:hover {
-    background-color: ${({ theme }) => theme.color.bg3};
+    border: 1px solid ${({ theme }) => theme.color.secondary};
   }
 `;
 
 const PrevButton = styled(ScrollButton)`
-  left: -64px;
+  left: calc(-48px - 16px);
 `;
 
 const NextButton = styled(ScrollButton)`
-  right: -64px;
+  right: -48px;
 `;
 
 let HorizontalBorder = styled.hr`
@@ -276,6 +423,11 @@ let Feeds = styled.div`
   margin-bottom: 80px;
 `;
 
+let RecommendsWrapper = styled.div`
+  position: relative;
+  width: 1080px;
+`;
+
 let Recommends = styled.div`
   display: flex;
   flex-direction: column;
@@ -283,13 +435,14 @@ let Recommends = styled.div`
   flex-wrap: wrap;
   box-sizing: border-box;
   width: fit-content;
-  max-height: 400px;
+  max-height: 244px; // 2 rows
   margin-top: 48px;
   margin-bottom: 40px;
-  overflow-x: scroll;
-  white-space: nowrap;
-  scroll-behavior: smooth;
 
+  position: relative;
+
+  overflow-x: scroll;
+  scroll-behavior: smooth;
   &::-webkit-scrollbar {
     height: 0px;
   }
