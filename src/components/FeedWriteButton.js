@@ -22,8 +22,8 @@ export default function FeedWriteButton({ handleShow, setShow, setFeedMode }) {
           handleShow();
         }}
       >
-        <StyledText size="1rem" weight="700" color={theme.color.bg} align="center">
-          게시물 작성
+        <StyledText size="1rem" weight="500" color={theme.color.bg} align="center">
+          피드 게시물 작성
         </StyledText>
       </WriteFeed>
     </ThemeProvider>
@@ -32,8 +32,7 @@ export default function FeedWriteButton({ handleShow, setShow, setFeedMode }) {
 
 let WriteFeed = styled.button`
   width: 100%;
-  height: 42px;
-  margin: 42px auto 32px auto;
+  height: 64px;
   font-size: 16px;
   font-weight: 700;
   line-height: 20px;
