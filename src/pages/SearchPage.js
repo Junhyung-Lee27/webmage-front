@@ -8,7 +8,8 @@ import componentTheme from "./../components/theme";
 import { useState, useRef, useEffect } from "react";
 import axios from "axios";
 import { BASE_URL } from "./../config";
-import { setSearchedUsers, setSearchedMandaSimples } from "../store/searchSlice";
+import { setSearchedUsers, setSearchedMandaSimples, setSearchedFeeds } from "../store/searchSlice";
+import { setFeeds, clearFeeds } from "../store/feedSlice";
 
 function SearchPage() {
   const dispatch = useDispatch();
@@ -26,6 +27,15 @@ function SearchPage() {
   const user = useSelector((state) => state.user);
   const search = useSelector((state) => state.search); // 검색 결과
   const searchKeyword = search.keyword; // 검색 키워드
+  const [isMounted, setIsMounted] = useState(true);
+
+  // 마운트 상태 설정
+  useEffect(() => {
+    setIsMounted(true);
+    return () => {
+      setIsMounted(false);
+    };
+  }, []);
 
   // [UserRecommend] 상태
   const targetUsers = search.users; // 유저 검색 또는 추천 결과
@@ -33,8 +43,7 @@ function SearchPage() {
   const [maxLoadedUserPage, setMaxLoadedUserPage] = useState(1); // 현재 로드된 최대 페이지 번호를 추적
   const [isUserScrolling, setIsUserScrolling] = useState(false); // 스크롤 중 상태
   const userScrollContainerRef = useRef(null);
-  const [showUserPrevButton, setShowUserPrevButton] = useState(false);
-  const [showUserNextButton, setShowUserNextButton] = useState(true);
+  const [finalUserPageLoaded, setFinalUserPageLoaded] = useState(false);
 
   // [UserRecommend] 검색 결과 불러오기
   const getSearchedUsers = async (keyword, authToken, page) => {
@@ -42,6 +51,10 @@ function SearchPage() {
       return;
     }
     if (page !== 1 && page <= maxLoadedUserPage) {
+      return;
+    }
+    if (finalUserPageLoaded == true) {
+      console.log("더 이상 불러올 사용자 검색 결과가 없습니다.");
       return;
     }
 
@@ -52,10 +65,10 @@ function SearchPage() {
         },
       });
 
-      if (response.status === 200) {
+      if (response.status === 200 && isMounted) {
         if (response.data.message === "No more pages") {
-          setShowUserNextButton(false);
           setMaxLoadedUserPage(page);
+          setFinalUserPageLoaded(true);
           return;
         }
 
@@ -75,17 +88,17 @@ function SearchPage() {
     }
   };
 
-  // [UserRecommend] 다음 페이지 검색 요청
+  // [UserRecommend] 마운트 시 유저 검색 요청
   useEffect(() => {
-    if (searchKeyword) {
+    if (isMounted && searchKeyword) {
       getSearchedUsers(searchKeyword, user.authToken, userPage);
     }
-  }, [searchKeyword, user.authToken, userPage]);
+  }, [isMounted, searchKeyword, user.authToken, userPage]);
 
   // [UserRecommend] 검색 키워드 변경 시 페이지 초기화
   useEffect(() => {
     setUserPage(1);
-    setShowUserNextButton(true);
+    setFinalUserPageLoaded(false);
     dispatch(setSearchedUsers([]));
     setMaxLoadedUserPage(1);
   }, [searchKeyword, dispatch]);
@@ -94,9 +107,6 @@ function SearchPage() {
   const handleScroll = () => {
     if (userScrollContainerRef.current) {
       const { scrollLeft, scrollWidth, clientWidth } = userScrollContainerRef.current;
-
-      setShowUserPrevButton(scrollLeft > 0);
-      setShowUserNextButton(scrollLeft <= scrollWidth - clientWidth);
     }
   };
 
@@ -117,7 +127,7 @@ function SearchPage() {
 
     setUserPage((prev) => (prev > 1 ? prev - 1 : prev));
     if (userScrollContainerRef.current) {
-      userScrollContainerRef.current.scrollLeft -= 1080;
+      userScrollContainerRef.current.scrollLeft -= 638;
     }
 
     setTimeout(() => {
@@ -127,7 +137,6 @@ function SearchPage() {
 
   // [UserRecommend] 다음 페이지로 이동
   const handleNextClick = async () => {
-    console.log('isUserScrolling? : ', isUserScrolling);
     if (isUserScrolling) return;
     setIsUserScrolling(true);
 
@@ -135,7 +144,7 @@ function SearchPage() {
 
     setUserPage((prev) => prev + 1);
     if (userScrollContainerRef.current) {
-      userScrollContainerRef.current.scrollLeft += 1080;
+      userScrollContainerRef.current.scrollLeft += 638;
     }
 
     setTimeout(() => {
@@ -149,8 +158,7 @@ function SearchPage() {
   const [maxLoadedMandaSimplePage, setMaxLoadedMandaSimplePage] = useState(1); // 현재 로드된 최대 페이지 번호를 추적
   const [isMandaSimpleScrolling, setIsMandaSimpleScrolling] = useState(false); // 스크롤 중 상태
   const mandaSimpleScrollContainerRef = useRef(null);
-  const [showMandaSimplePrevButton, setShowMandaSimplePrevButton] = useState(false);
-  const [showMandaSimpleNextButton, setShowMandaSimpleNextButton] = useState(true);
+  const [finalMandaSimplePageLoaded, setFinalMandaSimplePageLoaded] = useState(false);
 
   // [MandaSimples] 검색 결과 불러오기
   const getSearchedMandaSimples = async (keyword, authToken, page) => {
@@ -158,6 +166,10 @@ function SearchPage() {
       return;
     }
     if (page !== 1 && page <= maxLoadedMandaSimplePage) {
+      return;
+    }
+    if (finalMandaSimplePageLoaded == true) {
+      console.log("더 이상 불러올 만다라트 검색 결과가 없습니다.");
       return;
     }
 
@@ -171,10 +183,10 @@ function SearchPage() {
         }
       );
 
-      if (response.status === 200) {
+      if (response.status === 200 && isMounted) {
         if (response.data.message === "No more pages") {
-          setShowMandaSimpleNextButton(false);
           setMaxLoadedMandaSimplePage(page);
+          setFinalMandaSimplePageLoaded(true);
           return;
         }
 
@@ -194,17 +206,17 @@ function SearchPage() {
     }
   };
 
-  // [MandaSimples] 다음 페이지 검색 요청
+  // [MandaSimples] 마운트 시 mandaSimple 검색 요청
   useEffect(() => {
-    if (searchKeyword) {
+    if (isMounted && searchKeyword) {
       getSearchedMandaSimples(searchKeyword, user.authToken, mandaSimplePage);
     }
-  }, [searchKeyword, user.authToken, mandaSimplePage]);
+  }, [isMounted, searchKeyword, user.authToken, mandaSimplePage]);
 
   // [MandaSimple] 검색 키워드 변경 시 페이지 초기화
   useEffect(() => {
     setMandaSimplePage(1);
-    setShowMandaSimpleNextButton(true);
+    setFinalMandaSimplePageLoaded(false);
     dispatch(setSearchedMandaSimples([]));
     setMaxLoadedMandaSimplePage(1);
   }, [searchKeyword, dispatch]);
@@ -213,9 +225,6 @@ function SearchPage() {
   const handleMandaSimpleScroll = () => {
     if (mandaSimpleScrollContainerRef.current) {
       const { scrollLeft, scrollWidth, clientWidth } = mandaSimpleScrollContainerRef.current;
-
-      setShowMandaSimplePrevButton(scrollLeft > 0);
-      setShowMandaSimpleNextButton(scrollLeft <= scrollWidth - clientWidth);
     }
   };
 
@@ -236,7 +245,7 @@ function SearchPage() {
 
     setMandaSimplePage((prev) => (prev > 1 ? prev - 1 : prev));
     if (mandaSimpleScrollContainerRef.current) {
-      mandaSimpleScrollContainerRef.current.scrollLeft -= 1080;
+      mandaSimpleScrollContainerRef.current.scrollLeft -= 638;
     }
 
     setTimeout(() => {
@@ -246,7 +255,6 @@ function SearchPage() {
 
   // [MandaSimple] 다음 페이지로 이동
   const handleMandaSimpleNextClick = async () => {
-    console.log('isMandaSimpleScrolling? : ', isMandaSimpleScrolling);
     if (isMandaSimpleScrolling) return;
     setIsMandaSimpleScrolling(true);
 
@@ -254,7 +262,7 @@ function SearchPage() {
 
     setMandaSimplePage((prev) => prev + 1);
     if (mandaSimpleScrollContainerRef.current) {
-      mandaSimpleScrollContainerRef.current.scrollLeft += 1080;
+      mandaSimpleScrollContainerRef.current.scrollLeft += 638;
     }
 
     setTimeout(() => {
@@ -262,68 +270,209 @@ function SearchPage() {
     }, 500);
   };
 
-  // [Feed] 피드 검색 결과 상태
-  const searchedFeeds = search.feeds; // 피드 검색 결과
+  // [Feeds] 상태
+  const feeds = useSelector((state) => state.feed.feeds); // 피드 상태
+  const [feedsPage, setFeedsPage] = useState(1); // 서버에 요청할 페이지 번호
+  const [isFeedLoaded, setIsFeedLoaded] = useState(false); // 피드 로드 상태
+  const [hasMoreFeeds, setHasMoreFeeds] = useState(true); // 더 불러올 피드가 있는지
+  const [show, setShow] = useState(false); // 피드 작성, 편집 모달 노출 상태
+  const [feedMode, setFeedMode] = useState(""); // 피드 작성, 편집 모드 구분
+
+  // [Feeds] 검색 결과 불러오기
+  async function fetchSearchedFeeds(keyword, authToken, page) {
+    if (!hasMoreFeeds) {
+      return;
+    } else {
+      try {
+        const response = await axios.get(
+          `${BASE_URL}/feed/search/?keyword=${keyword}&page=${page}`,
+          {
+            headers: {
+              Authorization: `Token ${authToken}`,
+            },
+          }
+        );
+        if (response.data.message === "No more pages") {
+          setHasMoreFeeds(false);
+          return;
+        }
+
+        if (response.status === 200 && isMounted) {
+          if (feedsPage === 1) {
+            console.log(response.data);
+            dispatch(setFeeds(response.data));
+          } else {
+            dispatch(setFeeds([...feeds, ...response.data]));
+          }
+        }
+      } catch (error) {
+        console.error(error);
+      }
+    }
+  }
+
+  // [Feeds] 마운트 시 검색된 피드 페이지 요청
+  useEffect(() => {
+    if (isMounted && searchKeyword) {
+      fetchSearchedFeeds(searchKeyword, user.authToken, feedsPage).then(() => {
+        setIsFeedLoaded(true);
+      });
+    }
+  }, [isMounted, searchKeyword, user.authToken, feedsPage]);
+
+  // [Feeds] 검색 키워드 변경 시 페이지 초기화
+  useEffect(() => {
+    setHasMoreFeeds(true);
+    setFeedsPage(1);
+    setIsFeedLoaded(false);
+  }, [searchKeyword, dispatch]);
+
+  // [Feeds] 피드 게시물 생성, 편집 모달
+  const handleShow = () => setShow(true);
+
+  // [Feeds] Intersection Observer 설정 (스크롤이 하단에 도달했을 때 감지)
+  useEffect(() => {
+    if (!isFeedLoaded || !hasMoreFeeds) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) {
+          setFeedsPage((prevPage) => prevPage + 1); // 페이지 번호 증가
+          setIsFeedLoaded(false);
+        }
+      },
+      { threshold: 1.0 }
+    );
+
+    // 관찰할 대상 요소 지정
+    const target = document.getElementById("feedEnd");
+    if (target) observer.observe(target);
+
+    return () => {
+      if (target) observer.unobserve(target); // 정리 작업
+    };
+  }, [isFeedLoaded && hasMoreFeeds]);
+
+  // 각 섹션(만다라트, 게시물, 피드)의 참조
+  const mandaSimplesRef = useRef(null);
+  const usersRef = useRef(null);
+  const feedsRef = useRef(null);
+
+  // 스크롤 이동 함수
+  const scrollToSection = (ref) => {
+    if (ref.current) {
+      ref.current.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
+    }
+  };
 
   return (
     <ThemeProvider theme={theme}>
       <PageLayout>
         <Header></Header>
-        <Contents>
-          <MandaSimplesWrapper>
-            {showMandaSimplePrevButton && (
-              <PrevButton
-                onClick={handleMandaSimplePrevClick}
-                src={process.env.PUBLIC_URL + "/icon/arrow-left.svg"}
-              />
-            )}
-            <MandaSimples ref={mandaSimpleScrollContainerRef}>
-              {mandaSimples.map((mandaSimple) => (
-                <MandaSimpleSearched key={mandaSimple.id} mandaSimple={mandaSimple} />
-              ))}
-            </MandaSimples>
-            {showMandaSimpleNextButton && (
-              <NextButton
-                onClick={handleMandaSimpleNextClick}
-                src={process.env.PUBLIC_URL + "/icon/arrow-right.svg"}
-              />
-            )}
-          </MandaSimplesWrapper>
+        <Body>
+          <Stadardized>
+            <Nav>
+              <NavButton onClick={() => scrollToSection(mandaSimplesRef)}>
+                만다라트 검색 결과
+              </NavButton>
+              <NavButton onClick={() => scrollToSection(usersRef)}>사용자 검색 결과</NavButton>
+              <NavButton onClick={() => scrollToSection(feedsRef)}>게시물 검색 결과</NavButton>
+            </Nav>
+            <Article>
+              <MandaSimplesWrapper>
+                <TitleWrapper>
+                  <Title ref={mandaSimplesRef}>
+                    <Highlight>만다라트</Highlight> 검색 결과
+                  </Title>
+                </TitleWrapper>
+                {mandaSimples.length > 0 && (
+                  <PrevButton
+                    onClick={handleMandaSimplePrevClick}
+                    src={process.env.PUBLIC_URL + "/icon/prev-image-btn.svg"}
+                    top="44%"
+                  />
+                )}
+                <MandaSimples ref={mandaSimpleScrollContainerRef} length={mandaSimples.length}>
+                  {mandaSimples.length > 0 ? (
+                    mandaSimples.map((mandaSimple) => (
+                      <MandaSimpleSearched key={mandaSimple.id} mandaSimple={mandaSimple} />
+                    ))
+                  ) : (
+                    <NoResult>만다라트 검색 결과가 없습니다.</NoResult>
+                  )}
+                </MandaSimples>
+                {mandaSimples.length > 0 && (
+                  <NextButton
+                    onClick={handleMandaSimpleNextClick}
+                    src={process.env.PUBLIC_URL + "/icon/next-image-btn.svg"}
+                    top="44%"
+                  />
+                )}
+              </MandaSimplesWrapper>
 
-          <HorizontalBorder />
-
-          <RecommendsWrapper>
-            {showUserPrevButton && (
-              <PrevButton
-                onClick={handlePrevClick}
-                src={process.env.PUBLIC_URL + "/icon/arrow-left.svg"}
-              />
-            )}
-            <Recommends ref={userScrollContainerRef}>
-              {targetUsers.map((targetUser) => (
-                <UserRecommend key={targetUser.id} targetUser={targetUser} />
-              ))}
-            </Recommends>
-            {showUserNextButton && (
-              <NextButton
-                onClick={handleNextClick}
-                src={process.env.PUBLIC_URL + "/icon/arrow-right.svg"}
-              />
-            )}
-          </RecommendsWrapper>
-
-          <HorizontalBorder />
-          {/* <Feeds>
-              {feeds.map((feed) => (
-                <Feed
-                  key={feed.contentInfo.id}
-                  userInfo={feed.userInfo}
-                  contentInfo={feed.contentInfo}
-                />
-              ))}
-            </Feeds> */}
-          {/* <VerticalBorder /> */}
-        </Contents>
+              <RecommendsWrapper>
+                <TitleWrapper>
+                  <Title ref={usersRef}>
+                    <Highlight>사용자</Highlight> 검색 결과
+                  </Title>
+                </TitleWrapper>
+                {targetUsers.length > 0 && (
+                  <PrevButton
+                    onClick={handlePrevClick}
+                    src={process.env.PUBLIC_URL + "/icon/prev-image-btn.svg"}
+                    top="42.5%"
+                  />
+                )}
+                <Recommends ref={userScrollContainerRef} length={targetUsers.length}>
+                  {targetUsers.length > 0 ? (
+                    targetUsers.map((targetUser) => (
+                      <UserRecommend key={targetUser.id} targetUser={targetUser} />
+                    ))
+                  ) : (
+                    <NoResult>사용자 검색 결과가 없습니다.</NoResult>
+                  )}
+                </Recommends>
+                {targetUsers.length > 0 && (
+                  <NextButton
+                    onClick={handleNextClick}
+                    src={process.env.PUBLIC_URL + "/icon/next-image-btn.svg"}
+                    top="42.5%"
+                  />
+                )}
+              </RecommendsWrapper>
+              <FeedsWrapper>
+                <TitleWrapper>
+                  <Title ref={feedsRef}>
+                    <Highlight>게시물</Highlight> 검색 결과
+                  </Title>
+                </TitleWrapper>
+                <Feeds>
+                  {feeds.map((feed, index) => (
+                    <Feed
+                      id={`feed-${feed.feedInfo.id}`}
+                      key={index}
+                      userInfo={feed.userInfo}
+                      feedInfo={feed.feedInfo}
+                      show={show}
+                      setShow={setShow}
+                      handleShow={handleShow}
+                      feedMode={feedMode}
+                      setFeedMode={setFeedMode}
+                      currentPage={feedsPage}
+                      fetchFeeds={fetchSearchedFeeds}
+                    />
+                  ))}
+                  {!hasMoreFeeds && <span>더 이상 불러올 게시물이 없습니다.</span>}
+                  <div id="feedEnd" /> {/* 스크롤 감지를 위한 요소 */}
+                </Feeds>
+              </FeedsWrapper>
+            </Article>
+            <Aside>광고</Aside>
+          </Stadardized>
+        </Body>
       </PageLayout>
     </ThemeProvider>
   );
@@ -334,36 +483,140 @@ let PageLayout = styled.div`
   font-family: Pretendard-Regular;
   display: flex;
   flex-direction: column;
-  height: 100vh;
+  height: 100%;
   background-color: ${({ theme }) => theme.color.bg2};
 `;
 
-let Contents = styled.div`
+let Body = styled.div`
+  display: flex;
+  align-content: space-between;
+  justify-content: center;
+  width: 100%;
+  margin-top: 64px; // height of Header
+`;
+
+let Stadardized = styled.div`
+  position: absolute;
+  
+  display: flex;
+  justify-content: space-between;
+  width: 1280px;
+  gap: 24px;
+  margin-top: 24px;
+`;
+
+const Nav = styled.nav`
+  position: fixed;
+  top: 88px;
+  left: calc((100% - 1280px) / 2);
+
+  width: 256px;
+  height: fit-content;
   display: flex;
   flex-direction: column;
-  justify-content: flex-start;
-  align-items: center;
-  width: 1080px;
-  margin: 40px auto 0px auto;
+  background-color: ${({ theme }) => theme.color.bg};
+  border-radius: 8px;
+  border: 1px solid ${({ theme }) => theme.color.border};
+  overflow: hidden;
+`;
+
+let NavButton = styled.button`
+  width: 100%;
+  height: 56px;
+  background: none;
+  border: none;
+  font-size: 14px;
+  text-align: left;
+  padding: 16px;
+
+  &:hover{
+    background-color: ${({ theme }) => theme.color.bg2};
+  }
+`
+
+const Article = styled.article`
+  width: 656px;
+  margin-left: calc(256px + 24px);
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+`
+
+const Aside = styled.aside`
+  width: 320px;
+  border: 1px solid green;
+`
+
+const TitleWrapper = styled.div`
+  padding-bottom: 12px;
+  border-bottom: 1px solid ${({ theme }) => theme.color.border};
+`
+
+const Title = styled.h1`
+  color: ${({ theme }) => theme.color.font1};
+  font-size: 16px;
+  font-weight: 600;
+  display: inline;
+`;
+
+const Highlight = styled(Title)`
+  color: ${({ theme }) => theme.color.primary};
+`;
+
+const ScrollButton = styled.img`
+  position: absolute;
+  top: ${({ top }) => top};
+  z-index: 99;
+  width: 64px;
+  height: 80px;
+
+  background-color: ${({ theme }) => theme.color.font1};
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+  cursor: pointer;
+
+  &:hover {
+    border: 1px solid ${({ theme }) => theme.color.secondary};
+  }
+`;
+
+const PrevButton = styled(ScrollButton)`
+  border-radius: 8px;
+  left: -16px;
+`;
+
+const NextButton = styled(ScrollButton)`
+  border-radius: 8px;
+  right: -16px;
 `;
 
 const MandaSimplesWrapper = styled.div`
   position: relative;
-  width: 1080px;
-`
+  width: 100%;
+  padding: 16px;
+  border: 1px solid ${({ theme }) => theme.color.border};
+  border-radius: 8px;
+  background-color: ${({ theme }) => theme.color.bg};
+
+  &:hover ${PrevButton}, &:hover ${NextButton} {
+    opacity: 0.6;
+    pointer-events: all;
+  }
+`;
 
 const MandaSimples = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  flex-wrap: wrap;
-  box-sizing: border-box;
-  width: fit-content;
-  max-height: 800px; // 2 rows
-  margin-top: 48px;
-  margin-bottom: 40px;
-
+  width: 100%;
+  box-sizing: content-box;
+  max-height: 742px; // 2 rows
+  margin-top: 16px;
   position: relative;
+  
+  display: flex;
+  flex-direction: ${({ length }) => length > 2 ? "column" : "row"};
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 16px;
 
   overflow-x: scroll;
   scroll-behavior: smooth;
@@ -372,25 +625,14 @@ const MandaSimples = styled.div`
   }
 `;
 
-const ScrollButton = styled.img`
-  position: absolute;
-  top: 43%;
-  border-radius: 50%;
-  border: 1px solid ${({ theme }) => theme.color.border};
-  background-color: ${({ theme }) => theme.color.bg};
-  padding: 4px;
-
-  &:hover {
-    border: 1px solid ${({ theme }) => theme.color.secondary};
-  }
-`;
-
-const PrevButton = styled(ScrollButton)`
-  left: calc(-48px - 16px);
-`;
-
-const NextButton = styled(ScrollButton)`
-  right: -48px;
+const NoResult = styled.div`
+  width: 100%;
+  height: 100px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  color: ${({ theme }) => theme.color.font2};
 `;
 
 let HorizontalBorder = styled.hr`
@@ -414,32 +656,51 @@ let Row = styled.div`
   gap: 38px;
 `;
 
+let FeedsWrapper = styled.div`
+  width: 100%;
+  padding: 16px;
+  border: 1px solid ${({ theme }) => theme.color.border};
+  border-radius: 8px;
+  background-color: ${({ theme }) => theme.color.bg};
+`
+
 let Feeds = styled.div`
   width: 100%;
-  margin: 32px 0px 0px -40px;
+  box-sizing: content-box;
+  margin-top: 16px;
+  margin-bottom: 80px;
+  
   display: flex;
   flex-direction: column;
-  align-items: center;
-  margin-bottom: 80px;
+  gap: 16px;
 `;
 
 let RecommendsWrapper = styled.div`
   position: relative;
-  width: 1080px;
+  width: 100%;
+  padding: 16px;
+  border: 1px solid ${({ theme }) => theme.color.border};
+  border-radius: 8px;
+  background-color: ${({ theme }) => theme.color.bg};
+
+  &:hover ${PrevButton}, &:hover ${NextButton} {
+    opacity: 0.6;
+    pointer-events: all;
+  }
 `;
 
 let Recommends = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  flex-wrap: wrap;
-  box-sizing: border-box;
-  width: fit-content;
-  max-height: 244px; // 2 rows
-  margin-top: 48px;
-  margin-bottom: 40px;
-
+  width: 100%;
+  box-sizing: content-box;
+  max-height: 366px; // 3 rows
+  margin-top: 16px;
   position: relative;
+
+  display: flex;
+  flex-direction: ${({ length }) => (length > 4 ? "column" : "row")};
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 16px;
 
   overflow-x: scroll;
   scroll-behavior: smooth;
