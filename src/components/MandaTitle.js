@@ -299,13 +299,12 @@ function DeleteMandaModal({ theme, manda, user, setIsOpenDeleteMandaModal, setSe
 }
 
 const Container = styled.div`
-  width: 100%;
   position: relative;
-  height: 36px;
-
+  width: 720px;
   display: flex;
   justify-content: flex-end;
   align-items: center;
+  padding: 8px 24px;
 `;
 
 const Title = styled.h1`
