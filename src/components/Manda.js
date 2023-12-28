@@ -225,11 +225,10 @@ function Manda({ writeMode, setWriteMode, selectedSubIndex, setSelectedSubIndex,
 const GridContainer = styled.div`
   display: inline-flex;
   flex-wrap: wrap;
-  width: 772px;
+  width: 720px;
   height: 628px;
-  margin-top: 12px;
   border-radius: 8px;
-  box-shadow: 0px 8px 24px 0px rgba(0, 0, 0, 0.15);
+  /* box-shadow: 0px 8px 24px 0px rgba(0, 0, 0, 0.15); */
 `;
 
 const GridItem = styled.table`
