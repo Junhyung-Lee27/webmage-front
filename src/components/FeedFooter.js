@@ -351,10 +351,19 @@ function CommentComponent(props) {
   const commentsInfo = props.commentsInfo; // 댓글 정보
   const setCommentsInfo = props.setCommentsInfo; // 댓글 정보 업데이트 함수
   const commentsCount = props.commentsCount; // 댓글 개수
-  const setCommentsCount = props.setCommentsCount // 댓글 개수 업데이트 함수
+  const setCommentsCount = props.setCommentsCount; // 댓글 개수 업데이트 함수
   const [editingCommentId, setEditingCommentId] = useState(null); // 수정하는 댓글의 id
   const [editingCommentText, setEditingCommentText] = useState(""); // 수정하는 댓글의 텍스트
   const [editingCommentIndex, setEditingCommentIndex] = useState(null); // 수정하는 댓글의 인덱스
+  const [isMounted, setIsMounted] = useState(true);
+
+  // 마운트 상태 설정
+  useEffect(() => {
+    setIsMounted(true);
+    return () => {
+      setIsMounted(false);
+    };
+  }, []);
 
   // 댓글 조회 요청
   async function getComments(feedId, authToken, page, isMounted) {
@@ -366,10 +375,10 @@ function CommentComponent(props) {
       });
       if (isMounted) {
         if (response.data.message === "No more pages") {
-        setNoMoreComments(true);
-        return;
+          setNoMoreComments(true);
+          return;
         }
-        
+
         if (page === 1) {
           setCommentsInfo(response.data.comment_info);
           setCommentsCount(response.data.count);
@@ -382,21 +391,25 @@ function CommentComponent(props) {
     }
   }
 
-  // "댓글 더보기" 버튼 클릭 이벤트
+  // 초기 댓글 로딩 (컴포넌트 마운트 시 한 번만 실행)
+  useEffect(() => {
+    if (isMounted) {
+      getComments(props.feedInfo.id, user.authToken, 1, isMounted);
+    }
+  }, [props.feedInfo.id, user.authToken, isMounted]);
+
+  // 추가 댓글 로딩 (currentPage 변경 시 실행)
+  useEffect(() => {
+    if (isMounted && currentPage > 1) {
+      getComments(props.feedInfo.id, user.authToken, currentPage, isMounted);
+    }
+  }, [currentPage, props.feedInfo.id, user.authToken, isMounted]);
+
+  // "댓글 더보기" 버튼 클릭 시 currentPage 변경
   const handleLoadMoreComments = () => {
     const newPage = currentPage + 1;
-    getComments(props.feedInfo.id, user.authToken, newPage);
     setCurrentPage(newPage);
   };
-
-  // 초기 댓글 요청
-  useEffect(() => {
-    let isMounted = true;
-    
-    getComments(props.feedInfo.id, user.authToken, currentPage, isMounted);
-
-    return () => {isMounted = false;}
-  }, []);
 
   // 댓글 입력 요청
   async function submitAddComment(e, feedId, user, commentInput) {
@@ -558,6 +571,8 @@ function CommentComponent(props) {
         // 삭제된 댓글을 목록에서 제거
         const updatedComments = commentsInfo.filter((comment) => comment.id !== commentId);
         setCommentsInfo(updatedComments);
+
+        // 댓글 개수 수정
         if (commentsCount != 1) {
           setCommentsCount((prevCount) => prevCount - 1);
         } else {
