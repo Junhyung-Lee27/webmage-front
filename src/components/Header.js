@@ -247,7 +247,7 @@ let FixedHeader = styled.div`
   z-index: 10;
   ${({ theme }) => theme.component.font.importPretendard};
   font-family: Pretendard-Regular;
-  height: 56px;
+  height: 64px;
   width: 100%;
   box-sizing: border-box;
   background-color: ${({ theme }) => theme.color.bg};
@@ -266,7 +266,7 @@ let HeaderLayout = styled.div`
 let Stadardized = styled.div`
   display: flex;
   justify-content: space-between;
-  width: 1080px;
+  width: 1280px;
   margin-left: auto;
   margin-right: auto;
 `;
@@ -274,7 +274,7 @@ let Stadardized = styled.div`
 let Row = styled.div`
   position: ${({ position }) => position};
   flex: ${({ flex }) => flex};
-  height: 56px;
+  height: 64px;
   width: ${({ width }) => width};
   padding: ${({ padding }) => padding};
   box-sizing: border-box;
