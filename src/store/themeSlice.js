@@ -5,7 +5,7 @@ import { createSlice } from "@reduxjs/toolkit";
 const themes = {
   light: {
     bg: "#FFFFFF", // 가장 밝은 배경
-    bg2: "#FAF9FF", // 덜 밝은 배경
+    bg2: "#FEFDFE", // 덜 밝은 배경
     bg3: "#EBE9FA", // 더 덜 밝은 배경
     primary: "#7269FF", // 브랜드 컬러
     secondary: "#251F4B", // 브랜드 서브 컬러
