@@ -37,7 +37,6 @@ function FeedPage() {
   const trendingUsers = recommUsers.trending_users;
   const familiarUsers = recommUsers.familiar_users;
   const activeUsers = recommUsers.active_users;
-  const [followingStatus, setFollowingStatus] = useState({}); // 각 사용자에 대한 팔로우 상태
   const [show, setShow] = useState(false); // 피드 작성, 편집 모달 노출 상태
   const [feedMode, setFeedMode] = useState(""); // 피드 작성, 편집 모드 구분
   const selectedFeedId = useSelector((state) => state.selectedFeedId); // 선택된 피드 상태
@@ -51,7 +50,7 @@ function FeedPage() {
     }
   }, [])
 
-  // 추천 피드 로드
+  // 피드 유형 선택
   useEffect(() => {
     async function fetchFeeds() {
       if (activeTab === "마이") {
@@ -180,17 +179,6 @@ function FeedPage() {
     };
   }, [isFeedLoaded && hasMoreFeeds]);
 
-  // 팔로잉 (feeds 상태가 업데이트될 때마다 followingStatus 상태 업데이트)
-  useEffect(() => {
-    const newFollowingStatus = {};
-    feeds.forEach((feed) => {
-      const userId = feed.userInfo.id;
-      const isFollowing = feed.userInfo.is_following;
-      newFollowingStatus[userId] = isFollowing;
-    });
-    setFollowingStatus(newFollowingStatus);
-  }, [feeds]);
-
   // 피드 게시물 생성, 편집 모달
   const handleShow = () => setShow(true);
 
@@ -218,16 +206,15 @@ function FeedPage() {
     }
   }, [isMounted, user.authToken])
   
-
   return (
     <ThemeProvider theme={theme}>
       <PageLayout>
         <Header></Header>
         <Body>
           <Stadardized>
-            <FeedsNav>
+            <NavAndWriteButton>
               <Nav>
-                <StyledText
+                <StyledNavText
                   color={activeTab === "마이" ? theme.color.font1 : theme.color.border}
                   onClick={async () => {
                     setHasMoreFeeds(true);
@@ -238,8 +225,8 @@ function FeedPage() {
                   }}
                 >
                   마이
-                </StyledText>
-                <StyledText
+                </StyledNavText>
+                <StyledNavText
                   color={activeTab === "전체" ? theme.color.font1 : theme.color.border}
                   onClick={() => {
                     setHasMoreFeeds(true);
@@ -250,30 +237,8 @@ function FeedPage() {
                   }}
                 >
                   전체
-                </StyledText>
+                </StyledNavText>
               </Nav>
-              <Feeds>
-                {feeds.map((feed, index) => (
-                  <Feed
-                    id={`feed-${feed.feedInfo.id}`}
-                    key={index}
-                    userInfo={feed.userInfo}
-                    feedInfo={feed.feedInfo}
-                    show={show}
-                    setShow={setShow}
-                    handleShow={handleShow}
-                    feedMode={feedMode}
-                    setFeedMode={setFeedMode}
-                    user={user}
-                    currentPage={currentPage}
-                    fetchFeeds={activeTab === "마이" ? fetchMyFeeds : fetchRecommendedFeeds}
-                  />
-                ))}
-                {!hasMoreFeeds && <span>더 이상 불러올 게시물이 없습니다.</span>}
-                <div id="feedEnd" /> {/* 스크롤 감지를 위한 요소 */}
-              </Feeds>
-            </FeedsNav>
-            <Aside>
               <FeedWriteButton handleShow={handleShow} setFeedMode={setFeedMode} />
               {feedMode === "WRITE" && show === true && (
                 <FeedWriteModal
@@ -287,33 +252,67 @@ function FeedPage() {
                   fetchFeeds={activeTab === "마이" ? fetchMyFeeds : fetchRecommendedFeeds}
                 ></FeedWriteModal>
               )}
-              <StyledText color={theme.color.font1} cursor="default">
-                최근 주목받는 사용자
-              </StyledText>
-              <Recommends>
-                {trendingUsers &&
-                  trendingUsers.map((targetUser) => (
-                    <UserRecommend key={targetUser.id} targetUser={targetUser} />
-                  ))}
-              </Recommends>
-              <StyledText color={theme.color.font1} cursor="default">
-                알 수도 있는 사용자
-              </StyledText>
-              <Recommends>
-                {familiarUsers &&
-                  familiarUsers.map((targetUser) => (
-                    <UserRecommend key={targetUser.id} targetUser={targetUser} />
-                  ))}
-              </Recommends>
-              <StyledText color={theme.color.font1} cursor="default">
-                최근 활동적인 사용자
-              </StyledText>
-              <Recommends>
-                {activeUsers &&
-                  activeUsers.map((targetUser) => (
-                    <UserRecommend key={targetUser.id} targetUser={targetUser} />
-                  ))}
-              </Recommends>
+            </NavAndWriteButton>
+            <Feeds>
+              {feeds.map((feed, index) => (
+                <Feed
+                  id={`feed-${feed.feedInfo.id}`}
+                  key={index}
+                  userInfo={feed.userInfo}
+                  feedInfo={feed.feedInfo}
+                  show={show}
+                  setShow={setShow}
+                  handleShow={handleShow}
+                  feedMode={feedMode}
+                  setFeedMode={setFeedMode}
+                  user={user}
+                  currentPage={currentPage}
+                  fetchFeeds={activeTab === "마이" ? fetchMyFeeds : fetchRecommendedFeeds}
+                />
+              ))}
+              {!hasMoreFeeds && <span>더 이상 불러올 게시물이 없습니다.</span>}
+              <div id="feedEnd" /> {/* 스크롤 감지를 위한 요소 */}
+            </Feeds>
+            <Aside>
+              <RecommendsWrapper>
+                <TitleWrapper>
+                  <StyledText color={theme.color.font1} cursor="default" margin="0px 0px 8px 0px">
+                    최근 주목받는 사용자
+                  </StyledText>
+                </TitleWrapper>
+                <Recommends>
+                  {trendingUsers &&
+                    trendingUsers.map((targetUser) => (
+                      <UserRecommend key={targetUser.id} targetUser={targetUser} />
+                    ))}
+                </Recommends>
+              </RecommendsWrapper>
+              <RecommendsWrapper>
+                <TitleWrapper>
+                  <StyledText color={theme.color.font1} cursor="default" margin="0px 0px 8px 0px">
+                    알 수도 있는 사용자
+                  </StyledText>
+                </TitleWrapper>
+                <Recommends>
+                  {familiarUsers &&
+                    familiarUsers.map((targetUser) => (
+                      <UserRecommend key={targetUser.id} targetUser={targetUser} />
+                    ))}
+                </Recommends>
+              </RecommendsWrapper>
+              <RecommendsWrapper>
+                <TitleWrapper>
+                  <StyledText color={theme.color.font1} cursor="default" margin="0px 0px 8px 0px">
+                    최근 활동적인 사용자
+                  </StyledText>
+                </TitleWrapper>
+                <Recommends>
+                  {activeUsers &&
+                    activeUsers.map((targetUser) => (
+                      <UserRecommend key={targetUser.id} targetUser={targetUser} />
+                    ))}
+                </Recommends>
+              </RecommendsWrapper>
             </Aside>
           </Stadardized>
         </Body>
@@ -335,19 +334,27 @@ let Body = styled.div`
   display: flex;
   align-content: space-between;
   justify-content: center;
-  width: 100%;
-  margin-top: 56px;
+  margin-top: 64px;
   /* flex-grow: 1; */
 `;
 
 let Stadardized = styled.div`
   display: flex;
-  justify-content: space-between;
-  width: 1080px;
-  gap: 32px;
-  margin-top: 16px;
+  width: 1280px;
+  gap: 24px;
+  margin-top: 24px;
   margin-bottom: 80px;
 `;
+
+let NavAndWriteButton = styled.div`
+  position: fixed;
+  top: 88px;
+  left: calc((100% - 1280px) / 2);
+  
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+`
 
 let FeedsNav = styled.div`
   width: 70%;
@@ -357,39 +364,76 @@ let FeedsNav = styled.div`
 `;
 
 let Nav = styled.div`
+  width: 256px;
+  height: 64px;
   display: flex;
-  gap: 1rem;
-  /* margin-left: 3rem; */
+  align-items: center;
+  justify-content: space-between;
+  background-color: ${({ theme }) => theme.color.bg};
+  border: 1px solid ${({ theme }) => theme.color.border};
+  border-radius: 8px;
+  padding: 24px;
+  text-align: center;
 `;
 
 let Feeds = styled.div`
-  width: 100%;
-  /* margin: 32px 0px 0px -40px; */
+  width: 656px;
+  margin-left: calc(256px + 24px);
   display: flex;
   flex-direction: column;
   align-items: center;
+  gap: 16px;
 `;
 
 let Aside = styled.aside`
-  width: 30%;
+  width: 320px;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
+  gap: 16px;
 `;
+
+let RecommendsWrapper = styled.div`
+  width: 100%;
+  padding: 16px;
+  border: 1px solid ${({ theme }) => theme.color.border};
+  border-radius: 8px;
+  background-color: ${({ theme }) => theme.color.bg};
+
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+`
+
+const TitleWrapper = styled.div`
+  padding-bottom: 12px;
+  border-bottom: 1px solid ${({ theme }) => theme.color.border};
+`
 
 let StyledText = styled.span`
   width: 100%;
-  font-size: 1.1rem;
-  font-weight: 700;
+  font-size: 16px;
+  font-weight: 600;
+  margin: ${({ margin }) => margin};
   color: ${({ color }) => color};
   cursor: ${({ cursor = "pointer" }) => cursor};
 `;
+
+let StyledNavText = styled(StyledText)`
+  width: 128px;
+  line-height: 48px;
+  border-radius: 8px;
+
+  &:hover {
+    background-color: ${({ theme }) => theme.color.bg3};
+  }
+`
 
 let Recommends = styled.div`
   width: 100%;
   display: flex;
   flex-direction: column;
-  margin-top: 8px;
+  gap: 12px;
 `;
 
 let StyledButton = styled.button`

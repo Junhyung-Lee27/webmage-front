@@ -122,28 +122,25 @@ function MainPage() {
         <Header></Header>
         <Body>
           <Stadardized>
-            <TopGroup>
-              <ProfileLog>
-                <UserProfile />
-                {/* <MandaLog>만다로그</MandaLog> */}
-              </ProfileLog>
-              <MyManda>
-                <MandaTitle />
-                <Manda currPage={currPage} setCurrPage={setCurrPage} />
-              </MyManda>
-            </TopGroup>
-            {/* <Line /> */}
+            {/* <ProfileLog> */}
+              <UserProfile />
+            {/* </ProfileLog> */}
+            <MyManda>
+              <MandaTitle />
+              <Manda currPage={currPage} setCurrPage={setCurrPage} />
+            </MyManda>
+            <MandaLog>만다로그</MandaLog>
             {/* <TodoGroup>
-              <TodoList date="Today" todos={todoInfo}>
-                오늘
-              </TodoList>
-              <TodoList date="Tomorrow" todos={todoInfo}>
-                내일
-              </TodoList>
-              <TodoList date="This Week" todos={todoInfo}>
-                이번 주
-              </TodoList>
-            </TodoGroup> */}
+                <TodoList date="Today" todos={todoInfo}>
+                  오늘
+                </TodoList>
+                <TodoList date="Tomorrow" todos={todoInfo}>
+                  내일
+                </TodoList>
+                <TodoList date="This Week" todos={todoInfo}>
+                  이번 주
+                </TodoList>
+              </TodoGroup> */}
           </Stadardized>
         </Body>
       </PageLayout>
@@ -165,33 +162,36 @@ let Body = styled.div`
   align-content: space-between;
   justify-content: center;
   width: 100%;
-  margin-top: 56px;
+  margin-top: 64px; // height of Header
 `;
 
 let Stadardized = styled.div`
   display: flex;
-  flex-direction: column;
-  width: 1080px;
-  gap: 32px;
-  margin-top: 16px;
-  margin-bottom: 80px;
+  justify-content: space-between;
+  width: 1280px;
+  gap: 24px;
+  margin-top: 24px;
 `;
 
-const TopGroup = styled.div`
-  display: flex;
-  justify-content: space-between;
-`
+// const TopGroup = styled.div`
+//   display: flex;
+  
+// `
 
 const MyManda = styled.div`
   display: flex;
   flex-direction: column;
+  border: 1px solid ${({ theme }) => theme.color.border};
+  border-radius: 8px;
+  background-color: ${({ theme }) => theme.color.bg};
+  overflow: hidden;
 `;
 
 const ProfileLog = styled.div`
   display: flex;
   flex-direction: column;
   gap: 10px;
-  margin-top: 48px;
+  /* margin-top: 48px; */
 `
 
 const Profile = styled.div`
@@ -204,26 +204,21 @@ const Profile = styled.div`
   align-items: center;
 `
 const MandaLog = styled.div`
-  display: inline-flex;
-  width: 222px;
+  width: 256px;
   height: 376px;
-  flex-direction: column;
+  display: flex;
   align-items: center;
-  background: grey;
-  color: white;
-  margin-top: 24px;
+  justify-content: center;
+  
+  background-color: ${({ theme }) => theme.color.bg};
+  border: 1px solid ${({ theme }) => theme.color.border};
+  border-radius: 8px;
 `
 
-const Line = styled.div`
-  border-bottom: 1px solid ${({ theme }) => theme.color.border};
-  margin: 30px 0px;
-  width: 1080px;
-`
-
-const TodoGroup = styled.div`
-  display: inline-flex;
-  justify-content: space-between;
-`
+// const TodoGroup = styled.div`
+//   display: flex;
+//   flex-direction: column;
+// `
 
 // const TodoList = styled.div`
 //   display: inline-flex;
