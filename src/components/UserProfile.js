@@ -79,14 +79,16 @@ export default function UserProfile() {
 }
 
 const ProfileBox = styled.div`
-  ${({ theme }) => theme.component.shadow.default};
   display: flex;
   flex-direction: column;
   align-items: center;
-  width: 250px;
+  width: 256px;
   height: fit-content;
   padding: 24px 24px 40px 24px;
   position: relative;
+  background-color: ${({ theme }) => theme.color.bg};
+  border: 1px solid ${({ theme }) => theme.color.border};
+  border-radius: 16px;
 `;
 
 const ProfileImageBox = styled.div`
@@ -94,8 +96,8 @@ const ProfileImageBox = styled.div`
   flex-direction: column;
   align-items: center;
   gap: 16px;
-  position: absolute;
-  top: -40px;
+  /* position: absolute; */
+  /* top: -40px; */
 `;
 
 const ProfileImage = styled.img`
@@ -117,7 +119,8 @@ const Username = styled.span`
 const NumericInfos = styled.div`
   display: flex;
   width: 100%;
-  margin-top: 90px;
+  /* margin-top: 90px; */
+  margin-top: 40px;
 `;
 
 const CountWrapper = styled.div`
