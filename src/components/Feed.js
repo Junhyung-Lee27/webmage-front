@@ -131,7 +131,7 @@ function Feed({
 
   return (
     <ThemeProvider theme={theme}>
-      <FeedBox bgcolor={theme.color.bg} id={id}>
+      <FeedBox id={id}>
         <FeedBody>
           {/*유저정보 및 팔로우버튼/메뉴버튼 */}
           <FeedHeader>
@@ -586,15 +586,15 @@ let UserName = styled(StyledText)`
 
 let FeedBox = styled.div`
   ${({ theme }) => theme.component.flexBox.rowCenter};
-  background-color: ${({ bgcolor }) => bgcolor};
   flex-direction: column;
-  box-shadow: 0px 0.5rem 1.5rem 0px rgba(0, 0, 0, 0.15);
+  /* box-shadow: 0px 0.5rem 1.5rem 0px rgba(0, 0, 0, 0.15); */
   /* width: calc(100% - 5rem); */
   box-sizing: border-box;
   width: 100%;
-  padding: 1.75rem 2.5rem;
-  margin: 1rem;
-  border-radius: 0.5rem;
+  padding: 1.3rem 2.0rem;
+  background-color: ${({ theme }) => theme.color.bg};
+  border: 1px solid ${({ theme }) => theme.color.border};
+  border-radius: 8px;
   cursor: default;
 `;
 
