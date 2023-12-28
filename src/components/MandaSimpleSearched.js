@@ -114,10 +114,11 @@ function MandaSimpleSearched({ mandaSimple }) {
 }
 
 const Container = styled.div`
-  width: calc((1080px - 48px) / 3);
+  width: calc((100% - 16px) / 2);
+  box-sizing: border-box;
   display: flex;
   flex-direction: column;
-  margin-right: 16px;
+  /* margin-right: 16px; */
   background: ${({ theme }) => theme.color.bg};
 
   border: 1px solid ${({ theme }) => theme.color.border};
@@ -135,8 +136,8 @@ const TableWrapper = styled.div`
 `
 
 const Table = styled.table`
-  width: calc((1080px - 48px) / 3);
-  height: 318px;
+  width: 100%;
+  height: 256px;
   table-layout: fixed; // 테이블 레이아웃 고정
 `;
 
@@ -151,7 +152,7 @@ const TableCell = styled.td`
   display: flex;
   align-items: center;
   width: calc(100% / 3); // 각 셀의 너비를 1/3로 설정
-  height: 100%; // 각 셀의 높이를 1/3로 설정
+  height: 100%;
   padding: 0.25rem;
   box-sizing: border-box;
   
