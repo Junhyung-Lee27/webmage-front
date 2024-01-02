@@ -59,13 +59,19 @@ function FeedPage() {
         });
       }
       if (activeTab === "전체") {
-        await fetchRecommendedFeeds(user, currentPage);
+        fetchRecommendedFeeds(user, currentPage).then(() => {
+          setIsFeedLoaded(true);
+        });
       }
-      setIsFeedLoaded(true);
     }
 
     fetchFeeds();
   }, [activeTab, user, currentPage]);
+
+  // activeTab 변경 시 가장 상단으로 스크롤 이동
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, [activeTab]);
 
   // 추천 피드 로드 후 선택된 피드가 있으면 불러옴
   useEffect(() => {
@@ -214,20 +220,8 @@ function FeedPage() {
           <Stadardized>
             <NavAndWriteButton>
               <Nav>
-                <StyledNavText
-                  color={activeTab === "마이" ? theme.color.font1 : theme.color.border}
-                  onClick={async () => {
-                    setHasMoreFeeds(true);
-                    setCurrentPage(1);
-                    setIsFeedLoaded(false);
-                    setActiveTab("마이");
-                    dispatch(setSelectedFeedId(null));
-                  }}
-                >
-                  마이
-                </StyledNavText>
-                <StyledNavText
-                  color={activeTab === "전체" ? theme.color.font1 : theme.color.border}
+                <NavButton
+                  active={activeTab === "전체"}
                   onClick={() => {
                     setHasMoreFeeds(true);
                     setCurrentPage(1);
@@ -237,7 +231,19 @@ function FeedPage() {
                   }}
                 >
                   전체
-                </StyledNavText>
+                </NavButton>
+                <NavButton
+                  active={activeTab === "마이"}
+                  onClick={async () => {
+                    setHasMoreFeeds(true);
+                    setCurrentPage(1);
+                    setIsFeedLoaded(false);
+                    setActiveTab("마이");
+                    dispatch(setSelectedFeedId(null));
+                  }}
+                >
+                  마이
+                </NavButton>
               </Nav>
               <FeedWriteButton handleShow={handleShow} setFeedMode={setFeedMode} />
               {feedMode === "WRITE" && show === true && (
@@ -356,6 +362,22 @@ let NavAndWriteButton = styled.div`
   gap: 16px;
 `
 
+let NavButton = styled.button`
+  width: 100%;
+  height: 56px;
+  padding: 16px 24px;
+  border: none;
+  background: ${({ active, theme }) => (active ? theme.color.bg3 : "none")};
+
+  font-size: 14px;
+  font-weight: ${({ active }) => (active ? "bold" : "normal")};
+  text-align: left;
+
+  &:hover {
+    font-weight: bold;
+  }
+`;
+
 let FeedsNav = styled.div`
   width: 70%;
   display: flex;
@@ -365,14 +387,15 @@ let FeedsNav = styled.div`
 
 let Nav = styled.div`
   width: 256px;
-  height: 64px;
+  height: fit-content;
   display: flex;
-  align-items: center;
-  justify-content: space-between;
+  flex-direction: column;
+  /* align-items: center;
+  justify-content: space-between; */
   background-color: ${({ theme }) => theme.color.bg};
   border: 1px solid ${({ theme }) => theme.color.border};
   border-radius: 8px;
-  padding: 24px;
+  overflow: hidden;
   text-align: center;
 `;
 
