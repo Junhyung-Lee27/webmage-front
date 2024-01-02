@@ -101,6 +101,7 @@ function SearchPage() {
     setFinalUserPageLoaded(false);
     dispatch(setSearchedUsers([]));
     setMaxLoadedUserPage(1);
+    window.scrollTo({ top: 0, behavior: "smooth" });
   }, [searchKeyword, dispatch]);
 
   // [UserRecommend] 스크롤 동작
@@ -299,7 +300,6 @@ function SearchPage() {
 
         if (response.status === 200 && isMounted) {
           if (feedsPage === 1) {
-            console.log(response.data);
             dispatch(setFeeds(response.data));
           } else {
             dispatch(setFeeds([...feeds, ...response.data]));
@@ -354,46 +354,109 @@ function SearchPage() {
   }, [isFeedLoaded && hasMoreFeeds]);
 
   // 각 섹션(만다라트, 게시물, 피드)의 참조
+  const headerRef = useRef(null);
   const mandaSimplesRef = useRef(null);
   const usersRef = useRef(null);
   const feedsRef = useRef(null);
 
   // 스크롤 이동 함수
-  const scrollToSection = (ref) => {
-    if (ref.current) {
-      ref.current.scrollIntoView({
+  const scrollToSection = (ref, headerRef) => {
+    console.log(ref);
+    console.log(headerRef);
+    
+    if (ref.current && headerRef.current) {
+      const elementPosition = ref.current.getBoundingClientRect().top + window.scrollY;
+      const headerHeight = headerRef.current.offsetHeight;
+
+      window.scrollTo({
+        top: elementPosition - headerHeight - 24, // Header의 높이만큼 빼서 스크롤
         behavior: "smooth",
-        block: "start",
       });
     }
   };
 
+
+  // 스크롤 위치 감지 훅
+  const useScrollspy = (refs, offset = 112) => {
+    const [activeRef, setActiveRef] = useState(null);
+
+    useEffect(() => {
+      const listener = () => {
+        const scroll = window.scrollY;
+
+        const active = refs.find((ref) => {
+          const element = ref.current;
+          if (!element) return false;
+
+          const rect = element.getBoundingClientRect();
+          const top = Math.max(0, rect.top + scroll - offset);
+          const bottom = rect.bottom + scroll - offset;
+
+          console.log(top, bottom);
+
+          return scroll >= top && scroll <= bottom;
+        });
+
+        setActiveRef(active || null);
+      };
+
+      window.addEventListener("scroll", listener);
+      return () => {
+        window.removeEventListener("scroll", listener);
+      };
+    }, [refs, offset]);
+
+    return activeRef;
+  };
+
+  const activeSectionRef = useScrollspy([mandaSimplesRef, usersRef, feedsRef]);
+
   return (
     <ThemeProvider theme={theme}>
       <PageLayout>
-        <Header></Header>
+        <Header ref={headerRef}></Header>
         <Body>
           <Stadardized>
             <Nav>
-              <NavButton onClick={() => scrollToSection(mandaSimplesRef)}>
+              <NavButton
+                active={activeSectionRef === mandaSimplesRef}
+                onClick={() => scrollToSection(mandaSimplesRef, headerRef)}
+              >
                 만다라트 검색 결과
               </NavButton>
-              <NavButton onClick={() => scrollToSection(usersRef)}>사용자 검색 결과</NavButton>
-              <NavButton onClick={() => scrollToSection(feedsRef)}>게시물 검색 결과</NavButton>
+              <NavButton
+                active={activeSectionRef === usersRef}
+                onClick={() => scrollToSection(usersRef, headerRef)}
+              >
+                사용자 검색 결과
+              </NavButton>
+              <NavButton
+                active={activeSectionRef === feedsRef}
+                onClick={() => scrollToSection(feedsRef, headerRef)}
+              >
+                게시물 검색 결과
+              </NavButton>
             </Nav>
             <Article>
-              <MandaSimplesWrapper>
+              <MandaSimplesWrapper ref={mandaSimplesRef}>
                 <TitleWrapper>
-                  <Title ref={mandaSimplesRef}>
+                  <Title>
                     <Highlight>만다라트</Highlight> 검색 결과
                   </Title>
                 </TitleWrapper>
                 {mandaSimples.length > 0 && (
-                  <PrevButton
-                    onClick={handleMandaSimplePrevClick}
-                    src={process.env.PUBLIC_URL + "/icon/prev-image-btn.svg"}
-                    top="44%"
-                  />
+                  <>
+                    <PrevButton
+                      onClick={handleMandaSimplePrevClick}
+                      src={process.env.PUBLIC_URL + "/icon/prev-image-btn.svg"}
+                      top="44%"
+                    />
+                    <NextButton
+                      onClick={handleMandaSimpleNextClick}
+                      src={process.env.PUBLIC_URL + "/icon/next-image-btn.svg"}
+                      top="44%"
+                    />
+                  </>
                 )}
                 <MandaSimples ref={mandaSimpleScrollContainerRef} length={mandaSimples.length}>
                   {mandaSimples.length > 0 ? (
@@ -404,27 +467,27 @@ function SearchPage() {
                     <NoResult>만다라트 검색 결과가 없습니다.</NoResult>
                   )}
                 </MandaSimples>
-                {mandaSimples.length > 0 && (
-                  <NextButton
-                    onClick={handleMandaSimpleNextClick}
-                    src={process.env.PUBLIC_URL + "/icon/next-image-btn.svg"}
-                    top="44%"
-                  />
-                )}
               </MandaSimplesWrapper>
 
-              <RecommendsWrapper>
+              <RecommendsWrapper ref={usersRef}>
                 <TitleWrapper>
-                  <Title ref={usersRef}>
+                  <Title>
                     <Highlight>사용자</Highlight> 검색 결과
                   </Title>
                 </TitleWrapper>
                 {targetUsers.length > 0 && (
-                  <PrevButton
-                    onClick={handlePrevClick}
-                    src={process.env.PUBLIC_URL + "/icon/prev-image-btn.svg"}
-                    top="42.5%"
-                  />
+                  <>
+                    <PrevButton
+                      onClick={handlePrevClick}
+                      src={process.env.PUBLIC_URL + "/icon/prev-image-btn.svg"}
+                      top="42.5%"
+                    />
+                    <NextButton
+                      onClick={handleNextClick}
+                      src={process.env.PUBLIC_URL + "/icon/next-image-btn.svg"}
+                      top="42.5%"
+                    />
+                  </>
                 )}
                 <Recommends ref={userScrollContainerRef} length={targetUsers.length}>
                   {targetUsers.length > 0 ? (
@@ -435,37 +498,37 @@ function SearchPage() {
                     <NoResult>사용자 검색 결과가 없습니다.</NoResult>
                   )}
                 </Recommends>
-                {targetUsers.length > 0 && (
-                  <NextButton
-                    onClick={handleNextClick}
-                    src={process.env.PUBLIC_URL + "/icon/next-image-btn.svg"}
-                    top="42.5%"
-                  />
-                )}
               </RecommendsWrapper>
-              <FeedsWrapper>
+
+              <FeedsWrapper ref={feedsRef}>
                 <TitleWrapper>
-                  <Title ref={feedsRef}>
+                  <Title>
                     <Highlight>게시물</Highlight> 검색 결과
                   </Title>
                 </TitleWrapper>
                 <Feeds>
-                  {feeds.map((feed, index) => (
-                    <Feed
-                      id={`feed-${feed.feedInfo.id}`}
-                      key={index}
-                      userInfo={feed.userInfo}
-                      feedInfo={feed.feedInfo}
-                      show={show}
-                      setShow={setShow}
-                      handleShow={handleShow}
-                      feedMode={feedMode}
-                      setFeedMode={setFeedMode}
-                      currentPage={feedsPage}
-                      fetchFeeds={fetchSearchedFeeds}
-                    />
-                  ))}
-                  {!hasMoreFeeds && <span>더 이상 불러올 게시물이 없습니다.</span>}
+                  {feeds.length > 0 ? (
+                    <>
+                      {feeds.map((feed, index) => (
+                        <Feed
+                          key={index}
+                          id={`feed-${feed.feedInfo.id}`}
+                          userInfo={feed.userInfo}
+                          feedInfo={feed.feedInfo}
+                          show={show}
+                          setShow={setShow}
+                          handleShow={handleShow}
+                          feedMode={feedMode}
+                          setFeedMode={setFeedMode}
+                          currentPage={feedsPage}
+                          fetchFeeds={fetchSearchedFeeds}
+                        />
+                      ))}
+                      {!hasMoreFeeds && <NoResult>더 이상 불러올 게시물이 없습니다.</NoResult>}
+                    </>
+                  ) : (
+                    <NoResult>게시물 검색 결과가 없습니다.</NoResult>
+                  )}
                   <div id="feedEnd" /> {/* 스크롤 감지를 위한 요소 */}
                 </Feeds>
               </FeedsWrapper>
@@ -497,7 +560,7 @@ let Body = styled.div`
 
 let Stadardized = styled.div`
   position: absolute;
-  
+
   display: flex;
   justify-content: space-between;
   width: 1280px;
@@ -523,16 +586,18 @@ const Nav = styled.nav`
 let NavButton = styled.button`
   width: 100%;
   height: 56px;
-  background: none;
+  padding: 16px 24px;
   border: none;
+  background: ${({ active, theme }) => (active ? theme.color.bg3 : "none")};
+  
   font-size: 14px;
+  font-weight: ${({ active }) => (active ? "bold" : "normal")};
   text-align: left;
-  padding: 16px;
 
-  &:hover{
-    background-color: ${({ theme }) => theme.color.bg2};
+  &:hover {
+    font-weight: bold;
   }
-`
+`;
 
 const Article = styled.article`
   width: 656px;
@@ -540,17 +605,17 @@ const Article = styled.article`
   display: flex;
   flex-direction: column;
   gap: 32px;
-`
+`;
 
 const Aside = styled.aside`
   width: 320px;
   border: 1px solid green;
-`
+`;
 
 const TitleWrapper = styled.div`
   padding-bottom: 12px;
   border-bottom: 1px solid ${({ theme }) => theme.color.border};
-`
+`;
 
 const Title = styled.h1`
   color: ${({ theme }) => theme.color.font1};
@@ -611,9 +676,9 @@ const MandaSimples = styled.div`
   max-height: 742px; // 2 rows
   margin-top: 16px;
   position: relative;
-  
+
   display: flex;
-  flex-direction: ${({ length }) => length > 2 ? "column" : "row"};
+  flex-direction: ${({ length }) => (length > 2 ? "column" : "row")};
   flex-wrap: wrap;
   align-items: flex-start;
   gap: 16px;
@@ -662,14 +727,13 @@ let FeedsWrapper = styled.div`
   border: 1px solid ${({ theme }) => theme.color.border};
   border-radius: 8px;
   background-color: ${({ theme }) => theme.color.bg};
-`
+`;
 
 let Feeds = styled.div`
   width: 100%;
   box-sizing: content-box;
   margin-top: 16px;
-  margin-bottom: 80px;
-  
+
   display: flex;
   flex-direction: column;
   gap: 16px;

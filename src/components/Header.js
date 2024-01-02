@@ -16,8 +16,9 @@ import axios from "axios";
 import { resetMandaState } from "../store/mandaSlice";
 import { persistor } from "../store/store";
 import { setSelectedUser } from "../store/selectedUserSlice";
+import React from "react";
 
-function Header() {
+const Header = React.forwardRef((props, ref) => {
   let navigate = useNavigate();
   let dispatch = useDispatch();
 
@@ -43,8 +44,8 @@ function Header() {
     setIsMounted(true);
     return () => {
       setIsMounted(false);
-    }
-  }, [])
+    };
+  }, []);
 
   // 초기 notifications 불러오기
   useEffect(() => {
@@ -142,7 +143,6 @@ function Header() {
 
   // 검색창 동작
   const handleSearch = async (event) => {
-    
     if (event.key === "Enter") {
       if (!searchTerm.trim()) {
         alert("검색어를 입력해주세요");
@@ -159,7 +159,7 @@ function Header() {
 
   return (
     <ThemeProvider theme={combinedTheme}>
-      <FixedHeader>
+      <FixedHeader ref={ref}>
         <HeaderLayout>
           <Stadardized>
             <Row gap="48px" width="fit-content">
@@ -240,7 +240,7 @@ function Header() {
       </FixedHeader>
     </ThemeProvider>
   );
-}
+});
 
 let FixedHeader = styled.div`
   position: fixed;
