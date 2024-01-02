@@ -16,38 +16,38 @@ export default function FeedWriteButton({ handleShow, setShow, setFeedMode }) {
   return (
     <ThemeProvider theme={theme}>
       <WriteFeed
-        bgcolor={theme.color.primary}
         onClick={() => {
           setFeedMode("WRITE");
           handleShow();
         }}
       >
-        <StyledText size="1rem" weight="500" color={theme.color.bg} align="center">
           피드 게시물 작성
-        </StyledText>
       </WriteFeed>
     </ThemeProvider>
   );
 }
 
 let WriteFeed = styled.button`
-  width: 100%;
-  height: 64px;
-  font-size: 16px;
-  font-weight: 700;
-  line-height: 20px;
-  color: white;
-  border: none;
-  border-radius: 8px;
   ${({ theme }) => theme.component.flexBox.rowCenter};
-  background-color: ${({ bgcolor }) => bgcolor};
-  cursor: pointer;
-`;
 
-let StyledText = styled.span`
-  font-size: ${({ size }) => size};
-  font-weight: ${({ weight }) => weight};
-  color: ${({ color }) => color};
-  text-align: ${({ align }) => align};
-  margin: ${({ margin }) => margin};
+  width: 100%;
+  height: 56px;
+
+  color: ${({ theme }) => theme.color.font1};
+  font-size: 14px;
+  font-weight: 600;
+  text-align: center;
+  letter-spacing: 1px;
+
+  border: 1px solid ${({ theme }) => theme.color.border};
+  border-radius: 8px;
+  background-color: ${({ theme }) => theme.color.bg};
+
+  cursor: pointer;
+
+  transition: color 0.15s ease, background-color 0.15s ease;
+  &:hover {
+    color: ${({ theme }) => theme.color.bg};
+    background-color: ${({ theme }) => theme.color.primary};
+  }
 `;
