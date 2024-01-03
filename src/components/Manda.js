@@ -90,18 +90,24 @@ function Manda({ writeMode, setWriteMode, selectedSubIndex, setSelectedSubIndex,
     .fill(null)
     .map(() => Array(9).fill(null));
 
-  // 데이터 로드되기 전
-  if (!dataLoaded) {
+  // 데이터 로드되기 전 또는 main 값이 없는 경우
+  if (!dataLoaded || !main) {
     for (let i = 0; i < 9; i++) {
       for (let j = 0; j < 9; j++) {
-        table[i][j] = { mainTitle: "", subTitle: "", content: "" };
+        table[i][j] = {
+          mainTitle: "",
+          subTitle: "",
+          content: "",
+          subsColorPercentile: 0,
+          contsColorPercentile: 0,
+        };
       }
     }
   }
   // 데이터 로드된 후
   else {
     // Main 배열 처리
-    table[4][4] = { mainTitle: main ? main.main_title || "" : "" };
+    table[4][4] = { mainTitle: main.main_title || "" };
 
     // Subs 배열 처리
     const subsPositions = [
@@ -225,8 +231,7 @@ function Manda({ writeMode, setWriteMode, selectedSubIndex, setSelectedSubIndex,
 const GridContainer = styled.div`
   display: inline-flex;
   flex-wrap: wrap;
-  width: 720px;
-  height: 628px;
+  width: 100%;
   border-radius: 8px;
   /* box-shadow: 0px 8px 24px 0px rgba(0, 0, 0, 0.15); */
 `;
@@ -238,7 +243,7 @@ const GridItem = styled.table`
   table-layout: fixed;
   background: ${(props) => (props.isCenterTable ? `${props.theme.color.primary}50` : ``)};
   border-collapse: collapse; // 테이블 셀 간의 간격 제거
-  
+
   /* 조건부 border 스타일 */
   border: ${(props) => {
     if (!props.dataLoaded) {
@@ -264,11 +269,13 @@ const GridItem = styled.table`
 `;
 
 const TableCell = styled.td`
+  // 셀 기본 스타일
   text-align: center;
   vertical-align: middle;
-  width: 84px;
-  height: 68px;
-  word-break: keep-all;
+  width: 78px;
+  height: 78px;
+  max-width: 78px;
+  max-height: 78px;
   padding: 0.5px;
   border: 1px solid ${({ theme }) => theme.color.bg};
   background: ${(props) => {
@@ -287,6 +294,11 @@ const TableCell = styled.td`
   color: ${({ theme }) => theme.color.font1};
   font-weight: ${(props) => (props.isTitle ? "600" : props.isCenterCell ? "600" : "500")};
   font-size: 12px;
+
+  // 자동 줄바꿈
+  white-space: normal; // 공백과 줄바꿈을 일반적으로 처리
+  word-break: keep-all; // 단어 중간에 줄바꿈 방지
+  overflow-wrap: break-word; // 단어가 너비 초과할 경우 줄바꿈
 `;
 
 export default Manda;
