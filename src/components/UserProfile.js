@@ -3,6 +3,7 @@ import styled, { ThemeProvider } from "styled-components";
 import componentTheme from "./theme";
 import FollowButton from "./FollowButton";
 import { useState } from "react";
+import { useEffect } from "react";
 
 export default function UserProfile() {
   // 테마
@@ -21,6 +22,15 @@ export default function UserProfile() {
     id: selectedUser.userId,
     is_following: selectedUser.is_following,
   });
+
+  // userInfo 업데이트
+  useEffect(() => {
+    setUserInfo((prevUserInfo) => ({
+      ...prevUserInfo,
+      id: selectedUser.userId, 
+      is_following: selectedUser.is_following
+    }));
+  }, [selectedUser])
 
   // 팔로우 처리
   const followOnUserProfile = async () => {
@@ -55,15 +65,18 @@ export default function UserProfile() {
             <Count>{selectedUser.successCount}</Count>
           </CountWrapper>
         </NumericInfos>
-        {selectedUser.userPosition !== "" &&
-        selectedUser.userInfo !== "" &&
-        selectedUser.userHash !== "" ? (
-          <UserDetails>
-            <UserPosition>{selectedUser.userPosition}</UserPosition>
-            <UserIntroduce>{selectedUser.userInfo}</UserIntroduce>
-            <UserHash>{selectedUser.userHash}</UserHash>
-          </UserDetails>
-        ) : null}
+        <UserDetails hasUserPosition = {selectedUser.userPosition}>
+          {(selectedUser.userPosition !== null ||
+            selectedUser.userPosition !== "") && (
+              <UserPosition>{selectedUser.userPosition}</UserPosition>
+            )}
+          {(selectedUser.userInfo !== null ||
+            selectedUser.userInfo !== "") && (
+              <UserIntroduce>{selectedUser.userInfo}</UserIntroduce>
+            )}
+          {(selectedUser.userHash !== null ||
+            selectedUser.userHash !== "") && <UserHash>{selectedUser.userHash}</UserHash>}
+        </UserDetails>
         {user.userId !== selectedUser.userId && (
           <FollowButtonWrapper>
             <FollowButton
@@ -79,16 +92,15 @@ export default function UserProfile() {
 }
 
 const ProfileBox = styled.div`
+  width: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
-  width: 256px;
   height: fit-content;
   padding: 24px 24px 40px 24px;
-  position: relative;
   background-color: ${({ theme }) => theme.color.bg};
   border: 1px solid ${({ theme }) => theme.color.border};
-  border-radius: 16px;
+  border-radius: 8px;
 `;
 
 const ProfileImageBox = styled.div`
@@ -149,7 +161,7 @@ const UserDetails = styled.div`
   width: 100%;
   display: flex;
   flex-direction: column;
-  margin-top: 40px;
+  margin-top: ${({ hasUserPosition }) => hasUserPosition ? "40px" : null};
 `;
 
 const UserPosition = styled.span`
