@@ -1,14 +1,18 @@
 import styled, { ThemeProvider } from "styled-components";
 import { useState } from "react";
-import { useSelector } from "react-redux";
-import { useLocation } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { useLocation, useNavigate } from "react-router-dom";
 import componentTheme from "./theme";
+import axios from "axios";
+import { BASE_URL } from "./../config";
 import FollowButton from "./FollowButton";
+import { setSelectedUser } from "../store/selectedUserSlice";
 
 function UserRecommend({ targetUser }) {
-  // 현재 url 주소
   const currentLocation = useLocation();
-  
+  let navigate = useNavigate();
+  let dispatch = useDispatch();
+
   // 테마
   const colorTheme = useSelector((state) => state.theme.themes[state.theme.currentTheme]);
   const filterTheme = useSelector((state) => state.theme.filters[state.theme.currentTheme]);
@@ -24,9 +28,11 @@ function UserRecommend({ targetUser }) {
     id: targetUser.id,
     is_following: targetUser.is_following,
   });
+  const selectedUser = useSelector((state) => state.selectedUser);
 
   // 팔로우 처리
-  const followOnUserRecommend = async () => {
+  const followOnUserRecommend = async (event) => {
+    event.stopPropagation();
     setUserInfo((prevUserInfo) => ({
       ...prevUserInfo,
       is_following: true,
@@ -34,16 +40,39 @@ function UserRecommend({ targetUser }) {
   };
 
   // 언팔로우 처리
-  const unfollowOnUserRecommend = async () => {
+  const unfollowOnUserRecommend = async (event) => {
+    event.stopPropagation();
     setUserInfo((prevUserInfo) => ({
       ...prevUserInfo,
       is_following: false,
     }));
   };
 
+  // 특정 유저의 프로필 불러오기 함수
+  const handleSelectedUser = async (userId, authToken) => {
+    try {
+      const response = await axios.get(`${BASE_URL}/user/profile/${userId}`, {
+        headers: {
+          accept: "application/json",
+          Authorization: `Token ${authToken}`,
+        },
+      });
+
+      dispatch(setSelectedUser(response.data));
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   return (
     <ThemeProvider theme={theme}>
-      <RecommendContainer currentLocation={currentLocation.pathname}>
+      <RecommendContainer
+        currentLocation={currentLocation.pathname}
+        onClick={() => {
+          handleSelectedUser(userInfo.id, user.authToken);
+          navigate(`/manda/${selectedUser.username}`);
+        }}
+      >
         <Row>
           <StyledProfile
             src={
@@ -68,8 +97,8 @@ function UserRecommend({ targetUser }) {
           <FollowButtonWrapper>
             <FollowButton
               userInfo={userInfo}
-              onFollow={() => followOnUserRecommend()}
-              onUnfollow={() => unfollowOnUserRecommend()}
+              onFollow={(event) => followOnUserRecommend(event)}
+              onUnfollow={(event) => unfollowOnUserRecommend(event)}
             />
           </FollowButtonWrapper>
         )}
@@ -82,13 +111,15 @@ let RecommendContainer = styled.div`
   position: relative;
   width: ${({ currentLocation }) =>
     currentLocation === "/feed" ? "100%" : "calc((100% - 16px) / 2)"};
-  padding: 8px;
-  /* border: 1px solid black; */
+  padding: 24px;
+  border: 1px solid ${({ theme }) => theme.color.border};
   border-radius: 8px;
   box-sizing: border-box;
   background-color: ${({ theme }) => theme.color.bg};
 
+  cursor: pointer;
   &:hover {
+    transition: 0.3s;
     background-color: ${({ theme }) => theme.color.bg3};
   }
 `;
@@ -125,13 +156,12 @@ let StyledText = styled.span`
   color: ${({ color }) => color};
 
   margin-top: ${({ margintop }) => margintop};
-  cursor: ${({ cursor = "default" }) => cursor};
 `;
 
 const FollowButtonWrapper = styled.div`
   position: absolute;
-  right: 8px;
-  top: 8px;
+  right: 24px;
+  top: 24px;
 `;
 
 export default UserRecommend;
