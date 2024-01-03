@@ -7,7 +7,6 @@ import { BASE_URL } from "./../config";
 import { WS_BASE_URL } from "./../config";
 
 function FollowButton({ userInfo, onFollow, onUnfollow }) {
-
   // 테마
   const colorTheme = useSelector((state) => state.theme.themes[state.theme.currentTheme]);
   const filterTheme = useSelector((state) => state.theme.filters[state.theme.currentTheme]);
@@ -30,7 +29,9 @@ function FollowButton({ userInfo, onFollow, onUnfollow }) {
     }
   }, [])
 
-  const followButtonClick = async (followedId, user) => {
+  const followButtonClick = async (event, followedId, user) => {
+    event.stopPropagation(); // 이벤트 버블링 방지
+
     // 임시 웹소켓 연결 생성
     const tempWs = new WebSocket(
       `${WS_BASE_URL}/ws/notifications/${user.userId}/?token=${user.authToken}`
@@ -57,7 +58,7 @@ function FollowButton({ userInfo, onFollow, onUnfollow }) {
           })
         );
         // 팔로우 상태 업데이트
-        await onFollow();
+        await onFollow(event);
       }
     } catch (error) {
       console.log("팔로우 중 오류 발생: ", error); // 오류 처리
@@ -69,7 +70,9 @@ function FollowButton({ userInfo, onFollow, onUnfollow }) {
     }
   };
 
-  const unfollowButtonClick = async (followedId, authToken) => {
+  const unfollowButtonClick = async (event, followedId, authToken) => {
+    event.stopPropagation(); // 이벤트 버블링 방지
+
     try {
       const response = await axios.delete(`${BASE_URL}/user/unfollow/`, {
         data: { following_id: followedId },
@@ -77,7 +80,7 @@ function FollowButton({ userInfo, onFollow, onUnfollow }) {
       });
 
       if (response.status === 204 && isMounted) {
-        await onUnfollow();
+        await onUnfollow(event);
       }
     } catch (error) {
       console.log("팔로우 취소중 오류 발생: ", error); // 오류 처리
@@ -87,11 +90,11 @@ function FollowButton({ userInfo, onFollow, onUnfollow }) {
   return (
     <ThemeProvider theme={theme}>
       {userInfo.is_following ? (
-        <Following onClick={() => unfollowButtonClick(userInfo.id, user.authToken)}>
+        <Following onClick={(event) => unfollowButtonClick(event, userInfo.id, user.authToken)}>
           v 팔로우중
         </Following>
       ) : (
-        <Follow onClick={() => followButtonClick(userInfo.id, user)}>+ 팔로우</Follow>
+        <Follow onClick={(event) => followButtonClick(event, userInfo.id, user)}>+ 팔로우</Follow>
       )}
     </ThemeProvider>
   );
