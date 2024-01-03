@@ -47,21 +47,40 @@ function FeedPage() {
     setIsMounted(true);
     return () => {
       setIsMounted(false);
-    }
-  }, [])
+    };
+  }, []);
+
+  // axios 요청 취소 인스턴스
+  const axiosCancelSource = useRef(axios.CancelToken.source());
 
   // 피드 유형 선택
   useEffect(() => {
     async function fetchFeeds() {
+      // 이전 요청 취소 및 새로운 취소토큰 생성
+      axiosCancelSource.current.cancel("Previous request cancelled");
+      axiosCancelSource.current = axios.CancelToken.source();
+
       if (activeTab === "마이") {
-        fetchMyFeeds(user, currentPage).then(() => {
-          setIsFeedLoaded(true);
-        });
+        fetchMyFeeds(user, currentPage, axiosCancelSource.current.token)
+          .then(() => {
+            setIsFeedLoaded(true);
+          })
+          .catch((error) => {
+            if (!axios.isCancel(error)) {
+              console.error("Error in feed loading: ", error); // 요청 중 오류 발생했을 때
+            }
+          });
       }
       if (activeTab === "전체") {
-        fetchRecommendedFeeds(user, currentPage).then(() => {
-          setIsFeedLoaded(true);
-        });
+        fetchRecommendedFeeds(user, currentPage, axiosCancelSource.current.token)
+          .then(() => {
+            setIsFeedLoaded(true);
+          })
+          .catch((error) => {
+            if (!axios.isCancel(error)) {
+              console.error("Error in feed loading: ", error); // 요청 중 오류 발생했을 때
+            }
+          });
       }
     }
 
@@ -70,7 +89,7 @@ function FeedPage() {
 
   // activeTab 변경 시 가장 상단으로 스크롤 이동
   useEffect(() => {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    window.scrollTo({ top: 0, behavior: "smooth" });
   }, [activeTab]);
 
   // 추천 피드 로드 후 선택된 피드가 있으면 불러옴
@@ -81,7 +100,7 @@ function FeedPage() {
   }, [feeds, activeTab, selectedFeedId, user]);
 
   // 내 피드
-  async function fetchMyFeeds(user, currentPage) {
+  async function fetchMyFeeds(user, currentPage, cancelToken) {
     if (hasMoreFeeds === false) {
       return;
     } else if (hasMoreFeeds) {
@@ -91,46 +110,48 @@ function FeedPage() {
           headers: {
             Authorization: `Token ${user.authToken}`,
           },
+          cancelToken: cancelToken,
         }
       );
+
       if (response.data.message === "No more pages") {
         setHasMoreFeeds(false); // 더 이상 페이지가 없음
         return;
       }
 
-      if (currentPage > 1) {
-        dispatch(setFeeds([...feeds, ...response.data])); // 기존 피드에 추가
-        console.log("my feeds loaded");
-      } else {
-        dispatch(setFeeds(response.data)); // 피드 초기화
+      if (response.status === 200 && isMounted) {
+        if (currentPage > 1) {
+          dispatch(setFeeds([...feeds, ...response.data])); // 기존 피드에 추가
+        } else {
+          dispatch(setFeeds(response.data)); // 피드 초기화
+        }
       }
     }
   }
 
   // 추천 피드 불러오기 (더 불러올 피드가 없을 경우 종료)
-  async function fetchRecommendedFeeds(user, currentPage) {
+  async function fetchRecommendedFeeds(user, currentPage, cancelToken) {
     if (!hasMoreFeeds) {
       return;
     } else {
-      try {
-        const response = await axios.get(`${BASE_URL}/feed/recommend/?page=${currentPage}`, {
-          headers: {
-            Authorization: `Token ${user.authToken}`,
-          },
-        });
-        if (response.data.message === "No more pages") {
-          setHasMoreFeeds(false);
-          return;
+      const response = await axios.get(`${BASE_URL}/feed/recommend/?page=${currentPage}`, {
+        headers: {
+          Authorization: `Token ${user.authToken}`,
+        },
+        cancelToken: cancelToken,
+      });
+
+      if (response.data.message === "No more pages") {
+        setHasMoreFeeds(false);
+        return;
+      }
+
+      if (response.status === 200 && isMounted) {
+        if (currentPage === 1) {
+          dispatch(setFeeds(response.data));
+        } else {
+          dispatch(setFeeds([...feeds, ...response.data]));
         }
-        if (response.status === 200) {
-          if (currentPage === 1) {
-            dispatch(setFeeds(response.data));
-          } else {
-            dispatch(setFeeds([...feeds, ...response.data]));
-          }
-        }
-      } catch (error) {
-        console.error(error);
       }
     }
   }
@@ -196,29 +217,29 @@ function FeedPage() {
           Authorization: `Token ${authToken}`,
         },
       });
-      
-      if (response.status === 200 & isMounted) {
+
+      if ((response.status === 200) & isMounted) {
         setRecommUsers(response.data);
       }
     } catch (error) {
-      console.log("추천 유저 조회 중 오류 발생: ", error)
+      console.log("추천 유저 조회 중 오류 발생: ", error);
     }
-  }
+  };
 
   // 마운트 시 추천 유저 조회
   useEffect(() => {
     if (isMounted) {
       fetchRecommendedUsers(user.authToken);
     }
-  }, [isMounted, user.authToken])
-  
+  }, [isMounted, user.authToken]);
+
   return (
     <ThemeProvider theme={theme}>
       <PageLayout>
         <Header></Header>
         <Body>
           <Stadardized>
-            <NavAndWriteButton>
+            <LeftSide>
               <Nav>
                 <NavButton
                   active={activeTab === "전체"}
@@ -258,7 +279,8 @@ function FeedPage() {
                   fetchFeeds={activeTab === "마이" ? fetchMyFeeds : fetchRecommendedFeeds}
                 ></FeedWriteModal>
               )}
-            </NavAndWriteButton>
+              <Advertise>광고</Advertise>
+            </LeftSide>
             <Feeds>
               {feeds.map((feed, index) => (
                 <Feed
@@ -282,7 +304,7 @@ function FeedPage() {
             <Aside>
               <RecommendsWrapper>
                 <TitleWrapper>
-                  <StyledText color={theme.color.font1} cursor="default" margin="0px 0px 8px 0px">
+                  <StyledText color={theme.color.font1} cursor="default">
                     최근 주목받는 사용자
                   </StyledText>
                 </TitleWrapper>
@@ -295,7 +317,7 @@ function FeedPage() {
               </RecommendsWrapper>
               <RecommendsWrapper>
                 <TitleWrapper>
-                  <StyledText color={theme.color.font1} cursor="default" margin="0px 0px 8px 0px">
+                  <StyledText color={theme.color.font1} cursor="default">
                     알 수도 있는 사용자
                   </StyledText>
                 </TitleWrapper>
@@ -308,7 +330,7 @@ function FeedPage() {
               </RecommendsWrapper>
               <RecommendsWrapper>
                 <TitleWrapper>
-                  <StyledText color={theme.color.font1} cursor="default" margin="0px 0px 8px 0px">
+                  <StyledText color={theme.color.font1} cursor="default">
                     최근 활동적인 사용자
                   </StyledText>
                 </TitleWrapper>
@@ -352,15 +374,17 @@ let Stadardized = styled.div`
   margin-bottom: 80px;
 `;
 
-let NavAndWriteButton = styled.div`
+let LeftSide = styled.div`
+  width: 224px;
+
   position: fixed;
   top: 88px;
   left: calc((100% - 1280px) / 2);
-  
+
   display: flex;
   flex-direction: column;
   gap: 16px;
-`
+`;
 
 let NavButton = styled.button`
   width: 100%;
@@ -386,7 +410,7 @@ let FeedsNav = styled.div`
 `;
 
 let Nav = styled.div`
-  width: 256px;
+  width: 100%;
   height: fit-content;
   display: flex;
   flex-direction: column;
@@ -399,9 +423,22 @@ let Nav = styled.div`
   text-align: center;
 `;
 
+const Advertise = styled.aside`
+  width: 224px;
+  height: 500px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background-color: ${({ theme }) => theme.color.bg};
+  border: 1px solid ${({ theme }) => theme.color.border};
+  border-radius: 8px;
+`;
+
 let Feeds = styled.div`
-  width: 656px;
-  margin-left: calc(256px + 24px);
+  width: 720px;
+  margin-left: calc(224px + 24px);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -409,7 +446,7 @@ let Feeds = styled.div`
 `;
 
 let Aside = styled.aside`
-  width: 320px;
+  width: 288px;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
@@ -426,18 +463,18 @@ let RecommendsWrapper = styled.div`
   display: flex;
   flex-direction: column;
   gap: 8px;
-`
+`;
 
 const TitleWrapper = styled.div`
   padding-bottom: 12px;
   border-bottom: 1px solid ${({ theme }) => theme.color.border};
-`
+`;
 
 let StyledText = styled.span`
   width: 100%;
-  font-size: 16px;
+  font-size: 14px;
   font-weight: 600;
-  margin: ${({ margin }) => margin};
+  margin-bottom: 8px;
   color: ${({ color }) => color};
   cursor: ${({ cursor = "pointer" }) => cursor};
 `;
@@ -450,7 +487,7 @@ let StyledNavText = styled(StyledText)`
   &:hover {
     background-color: ${({ theme }) => theme.color.bg3};
   }
-`
+`;
 
 let Recommends = styled.div`
   width: 100%;
