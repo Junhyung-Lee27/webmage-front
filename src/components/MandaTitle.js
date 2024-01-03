@@ -1,6 +1,6 @@
 import axios from "axios";
 import { BASE_URL } from "./../config";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router";
 import styled, { ThemeProvider } from "styled-components";
 import componentTheme from "./theme";
@@ -38,33 +38,45 @@ function MandaTitle() {
   //   setIsOpen(!isOpen);
   // };
 
+  // axios 요청 취소 인스턴스
+  const axiosCancelSource = useRef(axios.CancelToken.source());
+
   // 만다라트 리스트 불러오기
   useEffect(() => {
-    const fetchData = async (authToken) => {
-      try {
-        const response = await axios.get(`${BASE_URL}/manda/${user.userId}/`, {
-          headers: {
-            Authorization: `Token ${authToken}`,
-          },
-        });
+    // 이전 요청 취소 및 새로운 취소 토큰 생성
+    axiosCancelSource.current.cancel("Previous request cancelled");
+    axiosCancelSource.current = axios.CancelToken.source();
 
-        // 리스트 불러온 후 동작
-        const fetchedData = response.data.reverse();
+    fetchData(user.authToken, selectedUser.userId, axiosCancelSource.current.token);
+  }, [selectedUser.userId]);
 
-        // setMandaMainList(fetchedData);
+  const fetchData = async (authToken, userId, cancelToken) => {
+    try {
+      const response = await axios.get(`${BASE_URL}/manda/${userId}/`, {
+        headers: {
+          Authorization: `Token ${authToken}`,
+        },
+        cancelToken: cancelToken,
+      });
 
-        const mainTitles = fetchedData.map((main) => main.main_title);
-        setTitles(mainTitles);
+      // 마지막 생성된 만다라트로 설정
+      const fetchedData = response.data.reverse();
 
-        // 선택 상태 업데이트
-        setSelectedTitle(mainTitles[0]);
-        dispatch(setMain(fetchedData[0]));
-      } catch (error) {
-        console.error("만다라트 리스트 불러오기 에러 : ", error);
+      // setMandaMainList(fetchedData);
+      const mainTitles = fetchedData.map((main) => main.main_title);
+      setTitles(mainTitles);
+
+      // 만다라트 타이틀, 정보 상태 업데이트
+      setSelectedTitle(mainTitles[0]);
+      dispatch(setMain(fetchedData[0]));
+    } catch (error) {
+      if (axios.isCancel(error)) {
+        console.log("Request cancelled:", error.message);
+      } else {
+        console.error("만다라트 불러오기 error: ", error);
       }
-    };
-    fetchData(user.authToken);
-  }, [user.userId]);
+    }
+  };
 
   // 드롭다운 리스트 선택
   // const selectTitle = async (title, index) => {
@@ -300,7 +312,7 @@ function DeleteMandaModal({ theme, manda, user, setIsOpenDeleteMandaModal, setSe
 
 const Container = styled.div`
   position: relative;
-  width: 720px;
+  width: 100%;
   display: flex;
   justify-content: flex-end;
   align-items: center;
@@ -309,9 +321,13 @@ const Container = styled.div`
 
 const Title = styled.h1`
   color: ${({ theme }) => theme.color.font1};
+  height: 34px;
+  margin-right: auto;
+  
   font-size: 20px;
   font-weight: 700;
-  margin-right: auto;
+  line-height: 34px;
+  
   cursor: default;
 `;
 
@@ -376,6 +392,7 @@ const IconTextButton = styled.div`
   border-radius: 6px;
 
   &:hover {
+    transition: 0.3s;
     cursor: pointer;
     background: ${({ theme }) => theme.color.bg3};
   }
@@ -399,6 +416,7 @@ const AddManda = styled.button`
   font-weight: 700;
 
   &:hover {
+    transition: 0.3s;
     background-color: ${({ theme }) => theme.color.secondary};
     cursor: pointer;
   }
