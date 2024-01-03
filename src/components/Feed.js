@@ -41,7 +41,7 @@ function Feed({
   const selectedUser = useSelector((state) => state.selectedUser);
   const feeds = useSelector((state) => state.feed.feeds);
 
-  // 특정 유저 프로필 화면
+  // 특정 유저의 프로필 불러오기 함수
   const handleSelectedUser = async (userId, authToken) => {
     try {
       const response = await axios.get(`${BASE_URL}/user/profile/${userId}`, {
@@ -591,7 +591,7 @@ let FeedBox = styled.div`
   /* width: calc(100% - 5rem); */
   box-sizing: border-box;
   width: 100%;
-  padding: 1.3rem 2.0rem;
+  padding: 24px 32px;
   background-color: ${({ theme }) => theme.color.bg};
   border: 1px solid ${({ theme }) => theme.color.border};
   border-radius: 8px;
