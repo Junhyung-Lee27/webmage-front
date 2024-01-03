@@ -18,9 +18,18 @@ const mandaSlice = createSlice({
     setContents: (state, action) => {
       state.contents = action.payload;
     },
-    resetMandaState: () => mandaSlice.initialState,
+    resetMandaState: (state) => {
+      state.main = [];
+      state.subs = []; 
+      state.contents = [];
+    },
+    resetMandaSubAndContent: (state) => {
+      state.subs = []; 
+      state.contents = [];
+    },
   },
 });
 
-export const { setMain, setSubs, setContents, resetMandaState } = mandaSlice.actions;
+export const { setMain, setSubs, setContents, resetMandaState, resetMandaSubAndContent } =
+  mandaSlice.actions;
 export default mandaSlice.reducer;
