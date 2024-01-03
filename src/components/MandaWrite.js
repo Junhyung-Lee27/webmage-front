@@ -7,7 +7,7 @@ import { BASE_URL } from "./../config";
 import Manda from "../components/Manda";
 import { setContents, setSubs } from "../store/mandaSlice";
 
-function MandaWrite() {
+function MandaWrite({ writeMode, setWriteMode, selectedSubIndex, setSelectedSubIndex }) {
   // 테마
   const colorTheme = useSelector((state) => state.theme.themes[state.theme.currentTheme]);
   const filterTheme = useSelector((state) => state.theme.filters[state.theme.currentTheme]);
@@ -18,8 +18,6 @@ function MandaWrite() {
   };
 
   // 상태 관리
-  const [writeMode, setWriteMode] = useState("SUB"); // 작성 상태 관리 (SUB, CONTENT 중 무엇을 작성하고 있는지)
-  const [selectedSubIndex, setSelectedSubIndex] = useState(); // 현재 포커스된 3*3 테이블 상태 (초기 상태 = 가운데)
   const [isSaveBtnActive, setIsSaveBtnActive] = useState(false); // '저장' 버튼 활성화 상태
   const user = useSelector((state) => state.user); // 유저 상태
   let manda = useSelector((state) => state.manda); // 만다라트 상태
@@ -60,14 +58,16 @@ function MandaWrite() {
 
   return (
     <ThemeProvider theme={theme}>
-      <MainTitle>{manda.main.main_title}</MainTitle>
       <Row>
-        <Manda
-          writeMode={writeMode}
-          setWriteMode={setWriteMode}
-          selectedSubIndex={selectedSubIndex}
-          setSelectedSubIndex={setSelectedSubIndex}
-        />
+        <MyManda>
+          <MainTitle>{manda.main.main_title}</MainTitle>
+          <Manda
+            writeMode={writeMode}
+            setWriteMode={setWriteMode}
+            selectedSubIndex={selectedSubIndex}
+            setSelectedSubIndex={setSelectedSubIndex}
+          />
+        </MyManda>
         <WriteBoxComponent
           manda={manda}
           writeMode={writeMode}
@@ -233,10 +233,24 @@ function WriteBoxComponent({
   );
 }
 
+const MyManda = styled.div`
+  width: 720px;
+
+  display: flex;
+  flex-direction: column;
+  border: 1px solid ${({ theme }) => theme.color.border};
+  border-radius: 8px;
+  background-color: ${({ theme }) => theme.color.bg};
+  overflow: hidden;
+`;
+
 let MainTitle = styled.h1`
-  padding: 5px;
+  width: 100%;
+  height: 50px;
+  padding: 0px 16px;
   font-size: 20px;
-  font-weight: 700;
+  font-weight: 600;
+  line-height: 50px;
 `;
 
 let Row = styled.div`
@@ -246,24 +260,24 @@ let Row = styled.div`
 `;
 
 let WriteBox = styled.div`
-  width: 402px;
-  height: 628px;
+  width: 536px;
+  padding: 0px 24px;
+  
+  border: 1px solid ${({ theme }) => theme.color.border};
   border-radius: 8px;
   background: ${({ theme }) => theme.color.bg};
-  box-shadow: 0px 8px 24px 0px rgba(0, 0, 0, 0.15);
+  
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 24px;
-  padding: 40px 24px;
-  margin-top: 12px;
+  justify-content: space-evenly;
 `;
 
 let WriteBoxTitle = styled.span`
   text-align: center;
-  font-size: 16px;
+  font-size: 18px;
   font-weight: 700;
-  line-height: 20px;
+  line-height: 28px;
 `;
 
 let Highlight = styled(WriteBoxTitle)`
