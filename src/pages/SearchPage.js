@@ -128,7 +128,7 @@ function SearchPage() {
 
     setUserPage((prev) => (prev > 1 ? prev - 1 : prev));
     if (userScrollContainerRef.current) {
-      userScrollContainerRef.current.scrollLeft -= 638;
+      userScrollContainerRef.current.scrollLeft -= 702;
     }
 
     setTimeout(() => {
@@ -145,7 +145,7 @@ function SearchPage() {
 
     setUserPage((prev) => prev + 1);
     if (userScrollContainerRef.current) {
-      userScrollContainerRef.current.scrollLeft += 638;
+      userScrollContainerRef.current.scrollLeft += 702;
     }
 
     setTimeout(() => {
@@ -246,7 +246,7 @@ function SearchPage() {
 
     setMandaSimplePage((prev) => (prev > 1 ? prev - 1 : prev));
     if (mandaSimpleScrollContainerRef.current) {
-      mandaSimpleScrollContainerRef.current.scrollLeft -= 638;
+      mandaSimpleScrollContainerRef.current.scrollLeft -= 720;
     }
 
     setTimeout(() => {
@@ -263,7 +263,7 @@ function SearchPage() {
 
     setMandaSimplePage((prev) => prev + 1);
     if (mandaSimpleScrollContainerRef.current) {
-      mandaSimpleScrollContainerRef.current.scrollLeft += 638;
+      mandaSimpleScrollContainerRef.current.scrollLeft += 720;
     }
 
     setTimeout(() => {
@@ -361,8 +361,6 @@ function SearchPage() {
 
   // 스크롤 이동 함수
   const scrollToSection = (ref, headerRef) => {
-    console.log(ref);
-    console.log(headerRef);
     
     if (ref.current && headerRef.current) {
       const elementPosition = ref.current.getBoundingClientRect().top + window.scrollY;
@@ -374,7 +372,6 @@ function SearchPage() {
       });
     }
   };
-
 
   // 스크롤 위치 감지 훅
   const useScrollspy = (refs, offset = 112) => {
@@ -391,8 +388,6 @@ function SearchPage() {
           const rect = element.getBoundingClientRect();
           const top = Math.max(0, rect.top + scroll - offset);
           const bottom = rect.bottom + scroll - offset;
-
-          console.log(top, bottom);
 
           return scroll >= top && scroll <= bottom;
         });
@@ -533,7 +528,7 @@ function SearchPage() {
                 </Feeds>
               </FeedsWrapper>
             </Article>
-            <Aside>광고</Aside>
+            <Advertise>광고</Advertise>
           </Stadardized>
         </Body>
       </PageLayout>
@@ -600,16 +595,24 @@ let NavButton = styled.button`
 `;
 
 const Article = styled.article`
-  width: 656px;
+  width: 720px;
   margin-left: calc(256px + 24px);
   display: flex;
   flex-direction: column;
   gap: 32px;
 `;
 
-const Aside = styled.aside`
-  width: 320px;
-  border: 1px solid green;
+const Advertise = styled.aside`
+  width: 256px;
+  height: 500px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background-color: ${({ theme }) => theme.color.bg};
+  border: 1px solid ${({ theme }) => theme.color.border};
+  border-radius: 8px;
 `;
 
 const TitleWrapper = styled.div`
@@ -674,7 +677,7 @@ const MandaSimples = styled.div`
   width: 100%;
   box-sizing: content-box;
   max-height: 742px; // 2 rows
-  margin-top: 16px;
+  margin: 32px 0px 24px 0px;
   position: relative;
 
   display: flex;
@@ -756,15 +759,16 @@ let RecommendsWrapper = styled.div`
 let Recommends = styled.div`
   width: 100%;
   box-sizing: content-box;
-  max-height: 366px; // 3 rows
-  margin-top: 16px;
+  max-height: 406px; // 3 rows
+  margin: 32px 0px 24px 0px;
   position: relative;
 
   display: flex;
   flex-direction: ${({ length }) => (length > 4 ? "column" : "row")};
   flex-wrap: wrap;
   align-items: flex-start;
-  gap: 16px;
+  row-gap: 32px;
+  column-gap: 16px;
 
   overflow-x: scroll;
   scroll-behavior: smooth;
