@@ -348,6 +348,7 @@ let IconLink = styled(NavLink)`
   }
 
   &:hover {
+    transition: 0.3s;
     background-color: ${({ theme }) => theme.color.bg3};
   }
 `;
@@ -360,6 +361,7 @@ let NotiIconWrapper = styled.div`
   border-radius: 50%;
 
   &:hover {
+    transition: 0.3s;
     background-color: ${({ theme }) => theme.color.bg3};
   }
 `;
