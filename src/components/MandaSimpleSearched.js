@@ -1,10 +1,17 @@
 import styled, { ThemeProvider } from "styled-components";
 import componentTheme from "./theme";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import FollowButton from "./FollowButton";
 import { useState } from "react";
+import axios from "axios";
+import { BASE_URL } from "./../config";
+import { setSelectedUser } from "../store/selectedUserSlice";
+import { useNavigate } from "react-router-dom";
 
 function MandaSimpleSearched({ mandaSimple }) {
+  let navigate = useNavigate();
+  let dispatch = useDispatch();
+  
   // 테마
   const colorTheme = useSelector((state) => state.theme.themes[state.theme.currentTheme]);
   const filterTheme = useSelector((state) => state.theme.filters[state.theme.currentTheme]);
@@ -20,9 +27,12 @@ function MandaSimpleSearched({ mandaSimple }) {
     id: mandaSimple.userId,
     is_following: mandaSimple.is_following,
   });
+  const selectedUser = useSelector((state) => state.selectedUser);
 
   // 팔로우 처리
-  const followOnUserRecommend = async () => {
+  const followOnUserRecommend = async (event) => {
+    event.stopPropagation(); // 이벤트 버블링 방지
+
     setUserInfo((prevUserInfo) => ({
       ...prevUserInfo,
       is_following: true,
@@ -30,7 +40,9 @@ function MandaSimpleSearched({ mandaSimple }) {
   };
 
   // 언팔로우 처리
-  const unfollowOnUserRecommend = async () => {
+  const unfollowOnUserRecommend = async (event) => {
+    event.stopPropagation(); // 이벤트 버블링 방지
+
     setUserInfo((prevUserInfo) => ({
       ...prevUserInfo,
       is_following: false,
@@ -51,62 +63,84 @@ function MandaSimpleSearched({ mandaSimple }) {
 
   function truncateText(text, maxLength) {
     if (text.length > maxLength) {
-      return text.substring(0, maxLength) + '...';
+      return text.substring(0, maxLength) + "...";
     }
     return text;
   }
 
+  // 특정 유저의 프로필 불러오기 함수
+  const handleSelectedUser = async (userId, authToken) => {
+    try {
+      const response = await axios.get(`${BASE_URL}/user/profile/${userId}`, {
+        headers: {
+          accept: "application/json",
+          Authorization: `Token ${authToken}`,
+        },
+      });
+
+      dispatch(setSelectedUser(response.data));
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   return (
     <ThemeProvider theme={theme}>
       <Container>
-        <UserContainer>
+        <UserContainer
+          onClick={() => {
+            handleSelectedUser(userInfo.id, user.authToken);
+            navigate(`/manda/${selectedUser.username}`);
+          }}
+        >
           <Row>
-          <StyledProfile
-            src={
-              mandaSimple.userImg instanceof File
-                ? URL.createObjectURL(mandaSimple.userImg)
-                : process.env.PUBLIC_URL + "/testImg/profile2.jpg"
-            }
-          />
-          <Column>
-            <StyledText size="16" weight="500" color={theme.color.font1}>
-              {mandaSimple.username}
-            </StyledText>
-            <StyledText size="12" weight="400" color={theme.color.font2}>
-              {mandaSimple.userPosition}
-            </StyledText>
-            <StyledText size="12" weight="400" color={theme.color.font2} margintop="auto">
-              {mandaSimple.userHash}
-            </StyledText>
-          </Column>
-        </Row>
-        {user.userId !== mandaSimple.userId && (
-          <FollowButtonWrapper>
-            <FollowButton
-              userInfo={userInfo}
-              onFollow={() => followOnUserRecommend()}
-              onUnfollow={() => unfollowOnUserRecommend()}
+            <StyledProfile
+              src={
+                mandaSimple.userImg instanceof File
+                  ? URL.createObjectURL(mandaSimple.userImg)
+                  : process.env.PUBLIC_URL + "/testImg/profile2.jpg"
+              }
             />
-          </FollowButtonWrapper>
-        )}
+            <Column>
+              <StyledText
+                size="16"
+                weight="500"
+                color={theme.color.font1}
+              >
+                {mandaSimple.username}
+              </StyledText>
+              <StyledText size="12" weight="400" color={theme.color.font2}>
+                {mandaSimple.userPosition}
+              </StyledText>
+              <StyledText size="12" weight="400" color={theme.color.font2} margintop="auto">
+                {mandaSimple.userHash}
+              </StyledText>
+            </Column>
+          </Row>
+          {user.userId !== mandaSimple.userId && (
+            <FollowButtonWrapper>
+              <FollowButton
+                userInfo={userInfo}
+                onFollow={(event) => followOnUserRecommend(event)}
+                onUnfollow={(event) => unfollowOnUserRecommend(event)}
+              />
+            </FollowButtonWrapper>
+          )}
         </UserContainer>
         <TableWrapper>
-        <Table>
-          {[...Array(3)].map((_, rowIndex) => (
-            <TableRow key={rowIndex}>
-              {[...Array(3)].map((_, colIndex) => (
-                <TableCell key={rowIndex * 3 + colIndex}
-                  rowIndex={rowIndex}
-                  colIndex={colIndex}
-                >
-                  <TextWrapper>
-                    {truncateText(getCellContent(rowIndex, colIndex), 38)}
-                  </TextWrapper>
-                </TableCell>
-              ))}
-            </TableRow>
-          ))}
-        </Table>
+          <Table>
+            {[...Array(3)].map((_, rowIndex) => (
+              <TableRow key={rowIndex}>
+                {[...Array(3)].map((_, colIndex) => (
+                  <TableCell key={rowIndex * 3 + colIndex} rowIndex={rowIndex} colIndex={colIndex}>
+                    <TextWrapper>
+                      {truncateText(getCellContent(rowIndex, colIndex), 38)}
+                    </TextWrapper>
+                  </TableCell>
+                ))}
+              </TableRow>
+            ))}
+          </Table>
         </TableWrapper>
       </Container>
     </ThemeProvider>
@@ -186,6 +220,12 @@ const UserContainer = styled.div`
   position: relative;
   width: 100%;
   padding: 24px;
+  
+  &:hover {
+    transition: 0.3s;
+    background-color: ${({ theme }) => theme.color.bg3};
+  }
+  cursor: pointer;
 `;
 
 const UserImg = styled.img`
@@ -232,6 +272,7 @@ let StyledProfile = styled.img`
   border: 1px solid ${({ theme }) => theme.color.border};
   border-radius: 50%;
   object-fit: cover;
+  cursor: pointer;
 `;
 let StyledText = styled.span`
   font-size: ${({ size }) => size + "px"};
@@ -239,12 +280,12 @@ let StyledText = styled.span`
   color: ${({ color }) => color};
 
   margin-top: ${({ margintop }) => margintop};
-  cursor: ${({ cursor = "default" }) => cursor};
 `;
+
 const FollowButtonWrapper = styled.div`
   position: absolute;
-  right: 20px;
-  top: 20px;
+  right: 24px;
+  top: 24px;
 `;
 
 export default MandaSimpleSearched;
