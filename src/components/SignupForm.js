@@ -31,7 +31,7 @@ function SignupForm() {
     // 회원가입 성공했을 경우
     if (signupResponse.success) {
       // 로그인 시도
-      const loginResponse = await login(username, password);
+      const loginResponse = await login(username, password, "EMAIL");
       
       if (loginResponse.success) {
         dispatch(setUser({ userId: loginResponse.userId }));
