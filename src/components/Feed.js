@@ -745,7 +745,9 @@ let MandaInfoTitle = styled.span`
   border-radius: 8px;
 `;
 
-let MandaInfoText = styled.span``;
+let MandaInfoText = styled.span`
+  flex: 1;
+`;
 
 let FeedTags = styled.div`
   display: flex;

@@ -74,8 +74,9 @@ function MandaSimpleSearched({ mandaSimple, writeMode }) {
 }
 
 const Container = styled.div`
-  width: calc((100% - (16px * 4)) / 5);
+  width: calc((100% - (16px * 2)) / 3); // mandaSimple을 3개씩 보여주도록 함 (2개의 gap)
   height: 256px;
+  box-sizing: border-box;
 
   background: ${({ theme }) => theme.color.bg};
 

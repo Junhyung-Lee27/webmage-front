@@ -49,7 +49,7 @@ function MandaWritePage() {
         manda.subs[selectedSubIndex].id
       );
     }
-  }, [writeMode, selectedSubIndex]);
+  }, [writeMode, selectedSubIndex, manda.main.main_title]);
 
   // 추천된 세부 목표 또는 실천 방법을 요청하는 함수
   const fetchRecommendedSubMandas = async (authToken, title, titleType, subId = null) => {
@@ -80,7 +80,7 @@ function MandaWritePage() {
   };
 
   // [MandaSimple] 스크롤 이동 간격
-  const scrollDistance = (1246-(16*4))/5*3+(16*3);
+  const scrollDistance = (((848 - 2 - 32 - 16 * 2) / 3) * 2) + (16 * 2)
 
   // [MandaSimple] 이전 페이지로 이동
   const handleMandaSimplePrevClick = () => {
@@ -136,7 +136,8 @@ function MandaWritePage() {
                 {writeMode === "SUB" && (
                   <>
                     <Highlight>{manda.main.main_title}</Highlight>
-                    와(과) 유사한 다른 사용자의 <Highlight2>세부 목표</Highlight2>
+                    와(과) 유사한 <Highlight2>핵심목표</Highlight2>와{" "}
+                    <Highlight2>세부목표</Highlight2>
                   </>
                 )}
                 {writeMode === "CONTENT" &&
@@ -144,7 +145,8 @@ function MandaWritePage() {
                   manda.subs[selectedSubIndex] && (
                     <>
                       <Highlight>{manda.subs[selectedSubIndex].sub_title}</Highlight>
-                      와(과) 유사한 다른 사용자의 <Highlight2>실천 방법</Highlight2>
+                      와(과) 유사한 <Highlight2>세부목표</Highlight2>와{" "}
+                      <Highlight2>실천방법</Highlight2>
                     </>
                   )}
               </Title>
@@ -162,7 +164,7 @@ function MandaWritePage() {
                   />
                 </>
               )}
-              <OtherManda ref={mandaSimpleScrollContainerRef} length={mandaSimples.length}>
+              <OtherMandas ref={mandaSimpleScrollContainerRef} length={mandaSimples.length}>
                 {mandaSimples && mandaSimples.length > 0 ? (
                   mandaSimples.map((mandaSimple) => (
                     <MandaSimpleRecommend
@@ -172,9 +174,9 @@ function MandaWritePage() {
                     />
                   ))
                 ) : (
-                  <NoResult>유사한 목표가 없습니다.</NoResult>
+                  <NoResult>유사한 만다라트가 없습니다.</NoResult>
                 )}
-              </OtherManda>
+              </OtherMandas>
             </OtherMandaBox>
           </Stadardized>
         </Body>
@@ -241,7 +243,7 @@ const NextButton = styled(ScrollButton)`
 
 let OtherMandaBox = styled.div`
   position: relative;
-  width: 100%;
+  width: 848px;
   padding: 16px;
 
   display: flex;
@@ -269,7 +271,7 @@ const Highlight = styled.span`
   color: ${({ theme }) => theme.color.primary};
   font-size: 20px;
   font-weight: 600;
-  margin: 0px 4px;
+  margin-right: 2px;
 `
 
 const Highlight2 = styled.span`
@@ -278,7 +280,7 @@ const Highlight2 = styled.span`
   font-weight: 600;
 `
 
-const OtherManda = styled.div`
+const OtherMandas = styled.div`
   width: 100%;
   max-height: 256px;
 

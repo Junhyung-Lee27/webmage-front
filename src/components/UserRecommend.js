@@ -111,7 +111,7 @@ let RecommendContainer = styled.div`
   position: relative;
   width: ${({ currentLocation }) =>
     currentLocation === "/feed" ? "100%" : "calc((100% - 16px) / 2)"};
-  padding: 24px;
+  padding: 16px 24px;
   border: 1px solid ${({ theme }) => theme.color.border};
   border-radius: 8px;
   box-sizing: border-box;

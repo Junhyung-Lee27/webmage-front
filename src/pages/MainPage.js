@@ -220,7 +220,7 @@ function MainPage() {
             <TopGroup>
               <FixedLeftSide>
                 <UserProfile />
-                <MandaLog>만다라트 실천 캘린더</MandaLog>
+                {/* <MandaLog>만다라트 실천 캘린더</MandaLog> */}
               </FixedLeftSide>
               <MyManda>
                 <MandaTitle />
