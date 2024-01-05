@@ -5,9 +5,11 @@ import componentTheme from "./theme";
 import { useDispatch, useSelector } from "react-redux";
 import { BASE_URL } from "./../config";
 import Manda from "../components/Manda";
-import { setContents, setSubs } from "../store/mandaSlice";
+import { setContents, setMain, setSubs } from "../store/mandaSlice";
 
 function MandaWrite({ writeMode, setWriteMode, selectedSubIndex, setSelectedSubIndex }) {
+  const dispatch = useDispatch();
+  
   // 테마
   const colorTheme = useSelector((state) => state.theme.themes[state.theme.currentTheme]);
   const filterTheme = useSelector((state) => state.theme.filters[state.theme.currentTheme]);
@@ -18,7 +20,8 @@ function MandaWrite({ writeMode, setWriteMode, selectedSubIndex, setSelectedSubI
   };
 
   // 상태 관리
-  const [isSaveBtnActive, setIsSaveBtnActive] = useState(false); // '저장' 버튼 활성화 상태
+  const [isMainTitleSaveBtnActive, setIsMainTitleSaveBtnActive] = useState(false);
+  const [isSubTitleSaveBtnActive, setIsSubTitleSaveBtnActive] = useState(false);
   const user = useSelector((state) => state.user); // 유저 상태
   let manda = useSelector((state) => state.manda); // 만다라트 상태
   const main = manda.main;
@@ -27,15 +30,44 @@ function MandaWrite({ writeMode, setWriteMode, selectedSubIndex, setSelectedSubI
 
   // 입력 상태
   const [textInputs, setTextInputs] = useState(Array(8).fill(null));
+  const [mainTitle, setMainTitle] = useState(manda.main.main_title || "");
 
-  // 버튼 활성화/비활성화 (null 값을 빈 문자열로 변환해서 비교)
+  // main_title 작성 버튼 활성화/비활성화
+  useEffect(() => {
+    setIsMainTitleSaveBtnActive(mainTitle !== manda.main.main_title);
+  }, [mainTitle, manda.main.main_title]);
+
+  const handleSubmitMainTitle = async (authToken) => {
+    try {
+      // 서버로 메인 타이틀 데이터 전송
+      const response = await axios.patch(`${BASE_URL}/manda/edit/main/`,
+        { id: manda.main.id,
+          main_title: mainTitle 
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Token ${authToken}`,
+          },
+        }
+      );
+      
+      if (response.status === 200) {
+        dispatch(setMain(response.data));
+      }
+    } catch (error) {
+      console.error("mandaMain API 에러:", error);
+    }
+  };
+
+  // sub_title, contents 작성 버튼 활성화/비활성화 (null 값을 빈 문자열로 변환해서 비교)
   useEffect(() => {
     const checkDifferences = () => {
       // subs 배열에서 sub_title과 textInputs 비교
       if (writeMode === "SUB") {
         const subTitles = subs.map((sub) => sub.sub_title || "");
         const isDifferent = textInputs.some((input, index) => (input || "") !== subTitles[index]);
-        setIsSaveBtnActive(isDifferent);
+        setIsSubTitleSaveBtnActive(isDifferent);
       }
       // contents 배열에서 selectedSubIndex에 해당하는 sub_id와 일치하는 contents.content와 textInputs 비교
       else if (writeMode === "CONTENT") {
@@ -45,7 +77,7 @@ function MandaWrite({ writeMode, setWriteMode, selectedSubIndex, setSelectedSubI
         const isDifferent = textInputs.some(
           (input, index) => (input || "") !== contentTexts[index]
         );
-        setIsSaveBtnActive(isDifferent);
+        setIsSubTitleSaveBtnActive(isDifferent);
       }
     };
 
@@ -60,7 +92,22 @@ function MandaWrite({ writeMode, setWriteMode, selectedSubIndex, setSelectedSubI
     <ThemeProvider theme={theme}>
       <Row>
         <MyManda>
-          <MainTitle>{manda.main.main_title}</MainTitle>
+          <Row padding="0px 24px">
+            {/* <MainTitle>{manda.main.main_title}</MainTitle> */}
+            <MainTitle value={mainTitle} onChange={(e) => setMainTitle(e.target.value)}></MainTitle>
+            <StyledButton
+              width="120px"
+              height="32px"
+              isSaveBtnActive={isMainTitleSaveBtnActive}
+              onClick={() => {
+                if (isMainTitleSaveBtnActive) {
+                  handleSubmitMainTitle(user.authToken);
+                }
+              }}
+            >
+              저장
+            </StyledButton>
+          </Row>
           <Manda
             writeMode={writeMode}
             setWriteMode={setWriteMode}
@@ -74,7 +121,7 @@ function MandaWrite({ writeMode, setWriteMode, selectedSubIndex, setSelectedSubI
           selectedSubIndex={selectedSubIndex}
           textInputs={textInputs}
           setTextInputs={setTextInputs}
-          isSaveBtnActive={isSaveBtnActive}
+          isSubTitleSaveBtnActive={isSubTitleSaveBtnActive}
         />
       </Row>
     </ThemeProvider>
@@ -88,7 +135,7 @@ function WriteBoxComponent({
   selectedSubIndex,
   textInputs,
   setTextInputs,
-  isSaveBtnActive,
+  isSubTitleSaveBtnActive,
 }) {
   const dispatch = useDispatch();
 
@@ -216,9 +263,10 @@ function WriteBoxComponent({
         ))}
       </WriteList>
       <StyledButton
-        isSaveBtnActive={isSaveBtnActive}
+        height="42px"
+        isSaveBtnActive={isSubTitleSaveBtnActive}
         onClick={() => {
-          if (isSaveBtnActive) {
+          if (isSubTitleSaveBtnActive) {
             if (writeMode === "SUB") {
               handleSubmitSub();
             } else if (writeMode === "CONTENT") {
@@ -234,7 +282,7 @@ function WriteBoxComponent({
 }
 
 const MyManda = styled.div`
-  width: 720px;
+  width: 848px;
 
   display: flex;
   flex-direction: column;
@@ -244,23 +292,31 @@ const MyManda = styled.div`
   overflow: hidden;
 `;
 
-let MainTitle = styled.h1`
+let MainTitle = styled.input`
   width: 100%;
   height: 50px;
   padding: 0px 16px;
   font-size: 20px;
   font-weight: 600;
   line-height: 50px;
+  border: none;
+  outline: none;
 `;
 
 let Row = styled.div`
   display: flex;
   flex-direction: row;
+  align-items: center;
+  padding: ${({ padding }) => padding};
   gap: 24px;
 `;
 
 let WriteBox = styled.div`
-  width: 536px;
+  position: fixed;
+  right: calc((100% - 1280px) / 2);
+  
+  width: 408px;
+  height: 760px;
   padding: 0px 24px;
   
   border: 1px solid ${({ theme }) => theme.color.border};
@@ -321,11 +377,12 @@ let ItemInput = styled.input`
 `;
 
 let StyledButton = styled.button`
-  height: 42px;
-  width: 100%;
+  height: ${({ height }) => height};
+  width: ${({ width = "100%" }) => width};
   font-size: 16px;
-  font-weight: 700;
+  font-weight: 600;
   line-height: 20px;
+  letter-spacing: 4px;
   color: white;
   background: ${({ isSaveBtnActive, theme }) =>
     isSaveBtnActive ? theme.color.primary : theme.color.font2};
