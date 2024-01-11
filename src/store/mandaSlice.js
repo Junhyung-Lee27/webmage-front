@@ -6,6 +6,7 @@ const mandaSlice = createSlice({
     main: [],
     subs: [],
     contents: [],
+    privacy: ""
   },
   reducers: {
     // 핵심목표 변경
@@ -17,6 +18,9 @@ const mandaSlice = createSlice({
     },
     setContents: (state, action) => {
       state.contents = action.payload;
+    },
+    setPrivacy: (state, action) => {
+      state.privacy = action.payload;
     },
     resetMandaState: (state) => {
       state.main = [];
@@ -30,6 +34,6 @@ const mandaSlice = createSlice({
   },
 });
 
-export const { setMain, setSubs, setContents, resetMandaState, resetMandaSubAndContent } =
+export const { setMain, setSubs, setContents, setPrivacy, resetMandaState, resetMandaSubAndContent } =
   mandaSlice.actions;
 export default mandaSlice.reducer;

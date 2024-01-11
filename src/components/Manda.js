@@ -4,9 +4,14 @@ import styled, { ThemeProvider } from "styled-components";
 import componentTheme from "./theme";
 import { useDispatch, useSelector } from "react-redux";
 import { BASE_URL } from "./../config";
-import { resetMandaState, setSubs, setContents } from "../store/mandaSlice";
+import { resetMandaState, setSubs, setContents, setPrivacy, setMain } from "../store/mandaSlice";
 
-function Manda({ writeMode, setWriteMode, selectedSubIndex, setSelectedSubIndex, currPage }) {
+function Manda({
+  currPage,
+  setWriteMode,
+  setSelectedSubIndex,
+  setSelectedTitle,
+}) {
   const dispatch = useDispatch();
 
   // 테마
@@ -41,9 +46,15 @@ function Manda({ writeMode, setWriteMode, selectedSubIndex, setSelectedSubIndex,
 
           dispatch(setSubs(response.data.subs));
           dispatch(setContents(response.data.contents));
+          dispatch(setPrivacy(response.data.privacy));
           setDataLoaded(true);
         } catch (error) {
-          console.error("manda 불러오기 에러 : ", error);
+          if (error.response.data.error === "Access denied") {
+            dispatch(resetMandaState());
+            setSelectedTitle("비공개 만다라트입니다.");
+          } else {
+            console.error("manda 불러오기 에러 : ", error);
+          }
         }
       } else {
         // main.id가 존재하지 않는 경우 상태 초기화

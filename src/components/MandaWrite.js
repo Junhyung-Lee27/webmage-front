@@ -5,7 +5,7 @@ import componentTheme from "./theme";
 import { useDispatch, useSelector } from "react-redux";
 import { BASE_URL } from "./../config";
 import Manda from "../components/Manda";
-import { setContents, setMain, setSubs } from "../store/mandaSlice";
+import { setContents, setMain, setPrivacy, setSubs } from "../store/mandaSlice";
 
 function MandaWrite({ writeMode, setWriteMode, selectedSubIndex, setSelectedSubIndex }) {
   const dispatch = useDispatch();
@@ -90,7 +90,7 @@ function MandaWrite({ writeMode, setWriteMode, selectedSubIndex, setSelectedSubI
 
   return (
     <ThemeProvider theme={theme}>
-      <Row>
+      <MandaWriteLayout>
         <MyManda>
           <Row padding="0px 24px">
             {/* <MainTitle>{manda.main.main_title}</MainTitle> */}
@@ -123,7 +123,7 @@ function MandaWrite({ writeMode, setWriteMode, selectedSubIndex, setSelectedSubI
           setTextInputs={setTextInputs}
           isSubTitleSaveBtnActive={isSubTitleSaveBtnActive}
         />
-      </Row>
+      </MandaWriteLayout>
     </ThemeProvider>
   );
 }
@@ -236,6 +236,42 @@ function WriteBoxComponent({
     }
   };
 
+  // privacy 상태 관리
+  const [privacyInput, setPrivacyInput] = useState(manda.privacy);
+
+  // privacy 변경 핸들러
+  const handlePrivacyChange = (event) => {
+    setPrivacyInput(event.target.value);
+  };
+
+  // privacy 변경 여부 확인
+  const isPrivacyChanged = privacyInput !== manda.privacy;
+
+  // privacy 수정 요청 전송
+  const handleSubmitPrivacy = async (authToken) => {
+    // 요청 시도
+    try {
+      const response = await axios.patch(
+        `${BASE_URL}/manda/edit/main/`,
+        {
+          id: manda.main.id,
+          privacy: privacyInput,
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Token ${authToken}`,
+          },
+        }
+      );
+      if (response.status === 204) {
+        dispatch(setPrivacy(privacyInput));
+      }
+    } catch (error) {
+      console.error("Privacy update error:", error);
+    }
+  };
+
   return (
     <WriteBox>
       {writeMode === "SUB" ? (
@@ -262,15 +298,40 @@ function WriteBoxComponent({
           </ListItem>
         ))}
       </WriteList>
+      {/* privacy 옵션 선택 */}
+      <PrivacyOptions>
+        <WriteBoxTitle> 공개 범위 설정 </WriteBoxTitle>
+        <OptionWrapper>
+          <Option value="public" checked={privacyInput === "public"} onChange={handlePrivacyChange} />
+          <OptionText>전체 공개</OptionText>
+        </OptionWrapper>
+        <OptionWrapper>
+          <Option
+            value="followers"
+            checked={privacyInput === "followers"}
+            onChange={handlePrivacyChange}
+          />
+          <OptionText>팔로우 공개</OptionText>
+        </OptionWrapper>
+        <OptionWrapper>
+          <Option value="private" checked={privacyInput === "private"} onChange={handlePrivacyChange} />
+          <OptionText>나만 보기</OptionText>
+        </OptionWrapper>
+      </PrivacyOptions>
       <StyledButton
         height="42px"
-        isSaveBtnActive={isSubTitleSaveBtnActive}
+        isSaveBtnActive={isPrivacyChanged || isSubTitleSaveBtnActive}
         onClick={() => {
-          if (isSubTitleSaveBtnActive) {
-            if (writeMode === "SUB") {
-              handleSubmitSub();
-            } else if (writeMode === "CONTENT") {
-              handleSubmitContents();
+          if (isPrivacyChanged || isSubTitleSaveBtnActive) {
+            if (isPrivacyChanged) {
+              handleSubmitPrivacy(authToken);
+            }
+            if (isSubTitleSaveBtnActive) {
+              if (writeMode === "SUB") {
+                handleSubmitSub();
+              } else if (writeMode === "CONTENT") {
+                handleSubmitContents();
+              }
             }
           }
         }}
@@ -303,6 +364,14 @@ let MainTitle = styled.input`
   outline: none;
 `;
 
+let MandaWriteLayout = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  padding: ${({ padding }) => padding};
+  gap: 24px;
+`;
+
 let Row = styled.div`
   display: flex;
   flex-direction: row;
@@ -316,8 +385,10 @@ let WriteBox = styled.div`
   right: calc((100% - 1280px) / 2);
   
   width: 408px;
-  height: 760px;
-  padding: 0px 24px;
+  /* max-height: calc(100vh - 88px); */
+  max-height: 760px;
+  padding: 40px 24px;
+  gap: 16px;
   
   border: 1px solid ${({ theme }) => theme.color.border};
   border-radius: 8px;
@@ -327,6 +398,17 @@ let WriteBox = styled.div`
   flex-direction: column;
   align-items: center;
   justify-content: space-evenly;
+  
+  /* 스크롤 바 스타일 */
+  overflow-y: auto;
+    &::-webkit-scrollbar {
+    width: 10px;  // 스크롤바 너비
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: ${({ theme }) => theme.color.font2};  // 스크롤바 썸(핸들) 색상
+    border-radius: 5px;
+  }
 `;
 
 let WriteBoxTitle = styled.span`
@@ -334,6 +416,9 @@ let WriteBoxTitle = styled.span`
   font-size: 18px;
   font-weight: 700;
   line-height: 28px;
+  margin-bottom: 8px;
+
+  flex-shrink: 0;
 `;
 
 let Highlight = styled(WriteBoxTitle)`
@@ -343,8 +428,11 @@ let Highlight = styled(WriteBoxTitle)`
 let WriteList = styled.ol`
   display: flex;
   flex-direction: column;
-  gap: 32px;
+  gap: 24px;
+  margin-bottom: 16px;
   width: 100%;
+
+  flex-shrink: 0;
 `;
 
 let ListItem = styled.li`
@@ -376,6 +464,41 @@ let ItemInput = styled.input`
   }
 `;
 
+let PrivacyOptions = styled.div`
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+
+  flex-shrink: 0;
+
+  cursor: default;
+`
+
+let OptionWrapper = styled.div`
+  width: 100%;
+  padding: 12px 8px;
+
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  border-radius: 8px;
+  &:hover {
+    background: ${({ theme }) => theme.color.bg3};
+  }
+`
+
+let OptionText = styled.span`
+  color: ${({ theme }) => theme.color.font1};
+`
+
+
+let Option = styled.input.attrs({ type: 'radio', name: 'privacy'})`
+  width: 24px;
+  height: 24px;
+  cursor: pointer;
+`
+
 let StyledButton = styled.button`
   height: ${({ height }) => height};
   width: ${({ width = "100%" }) => width};
@@ -390,6 +513,9 @@ let StyledButton = styled.button`
     ${({ isSaveBtnActive, theme }) => (isSaveBtnActive ? theme.color.primary : theme.color.font2)};
   border-radius: 8px;
   outline: none;
+
+  flex-shrink: 0;
+
   cursor: pointer;
 `;
 

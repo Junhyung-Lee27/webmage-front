@@ -33,6 +33,9 @@ function MainPage() {
   // 만다라트 작성 상태
   const [currPage, setCurrPage] = useState("");
 
+  // 만다라트 제목 상태
+  const [selectedTitle, setSelectedTitle] = useState(null); // 선택된 제목 상태
+
   // 사용자 프로필 업데이트 (user.Id 변경되었을 경우)
   useEffect(() => {
     const fetchData = async (userId, authToken) => {
@@ -149,7 +152,6 @@ function MainPage() {
 
   // Intersection Observer 설정 (스크롤이 하단에 도달했을 때 감지)
   useEffect(() => {
-
     if (!isFeedLoaded || !hasMoreFeeds) return;
 
     const observer = new IntersectionObserver(
@@ -223,10 +225,14 @@ function MainPage() {
                 {/* <MandaLog>만다라트 실천 캘린더</MandaLog> */}
               </FixedLeftSide>
               <MyManda>
-                <MandaTitle />
-                <Manda currPage={currPage} setCurrPage={setCurrPage} />
+                <MandaTitle selectedTitle={selectedTitle} setSelectedTitle={setSelectedTitle} />
+                <Manda
+                  currPage={currPage}
+                  setCurrPage={setCurrPage}
+                  setSelectedTitle={setSelectedTitle}
+                />
               </MyManda>
-              <Advertise>광고</Advertise>
+              {/* <Advertise>광고</Advertise> */}
             </TopGroup>
             <Feeds>
               {feeds.map((feed, index) => (

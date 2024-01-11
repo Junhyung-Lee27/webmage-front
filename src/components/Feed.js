@@ -10,6 +10,7 @@ import FeedFooter from "./FeedFooter";
 import { setSelectedUser } from "../store/selectedUserSlice";
 import { useNavigate } from "react-router-dom";
 import { setFeeds } from "../store/feedSlice";
+import { current } from "@reduxjs/toolkit";
 
 function Feed({
   id, // 컴포넌트 고유 id
@@ -40,6 +41,59 @@ function Feed({
   const [isMenuOpen, setIsMenuOpen] = useState(false); // 옵션 메뉴
   const selectedUser = useSelector((state) => state.selectedUser);
   const feeds = useSelector((state) => state.feed.feeds);
+  const [isPrivateFeed, setIsPrivateFeed] = useState(null); // 피드 공개 범위 상태
+  const [isOpenPrivacyModal, setIsOpenPrivacyModal] = useState(false); // 피드 공개 설정 모달
+  const [postStateIcon, setPostStateIcon] = useState(null); // 피드 공개 상태 아이콘
+  const [showIconText, setShowIconText] = useState(false); // 피드 공개 상태 설명 텍스트
+
+  // 피드 공개상태 설명 텍스트 노출 함수
+   const handleMouseEnter = () => {
+    console.log('mouse-enter') 
+    setShowIconText(true);
+   };
+
+   const handleMouseLeave = () => {
+    console.log("mouse-leave"); 
+     setShowIconText(false);
+   };
+
+  // 피드 공개 상태 설정 초기화
+  useEffect(() => {
+    if (feedInfo.feed_privacy === "public") {
+      setIsPrivateFeed("전체 공개");
+    } else if (feedInfo.feed_privacy === "followers") {
+      setIsPrivateFeed("팔로우 공개");
+    } else if (feedInfo.feed_privacy === "private") {
+      setIsPrivateFeed("나만 보기");
+    }
+  }, []);
+
+  // 게시물 공개 상태에 따라 다른 아이콘 표시
+  useEffect(() => {
+    switch (isPrivateFeed) {
+      case "전체 공개":
+        setPostStateIcon(
+            <PostStateIcon src={process.env.PUBLIC_URL + "/icon/public.svg"} />
+        );
+        break;
+      case "팔로우 공개":
+        setPostStateIcon(
+            <PostStateIcon
+              src={process.env.PUBLIC_URL + "/icon/followers.svg"}
+            />
+        );
+        break;
+      case "나만 보기":
+        setPostStateIcon(
+            <PostStateIcon
+              src={process.env.PUBLIC_URL + "/icon/private.svg"}
+            />
+        );
+        break;
+      default:
+        setPostStateIcon(null);
+    }
+  }, [isPrivateFeed])
 
   // 특정 유저의 프로필 불러오기 함수
   const handleSelectedUser = async (userId, authToken) => {
@@ -182,6 +236,12 @@ function Feed({
                   onUnfollow={() => unfollowOnFeed(userInfo.id, user.authToken)}
                 />
               )}
+              {/* 게시자와 현재 유저가 동일할 경우 */}
+              {userInfo.id === user.userId && 
+                <IconWrapper onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}>
+                  {postStateIcon}
+                  {showIconText === true && <IconText>{isPrivateFeed}</IconText>}
+                </IconWrapper>}
               <OptionWrapper>
                 <FeedOptionIcon
                   src={process.env.PUBLIC_URL + "/icon/menu-horizontal.svg"}
@@ -202,6 +262,10 @@ function Feed({
                     fetchFeeds={fetchFeeds}
                     currentPage={currentPage}
                     theme={theme}
+                    isPrivateFeed={isPrivateFeed}
+                    setIsPrivateFeed={setIsPrivateFeed}
+                    isOpenPrivacyModal={isOpenPrivacyModal}
+                    setIsOpenPrivacyModal={setIsOpenPrivacyModal}
                   ></OptionMenu>
                 )}
               </OptionWrapper>
@@ -280,17 +344,16 @@ function OptionMenu({
   fetchFeeds,
   currentPage,
   theme,
+  isPrivateFeed,
+  setIsPrivateFeed,
+  isOpenPrivacyModal,
+  setIsOpenPrivacyModal
 }) {
   // 상태 관리
   const [isOpenReportFeedModal, setIsOpenReportFeedModal] = useState(false); // 피드 차단 모달
   const [isOpenDeleteFeedModal, setIsOpenDeleteFeedModal] = useState(false); // 피드 삭제 모달
   const [isOpenBlockUserModal, setIsOpenBlockUserModal] = useState(false); // 유저 차단 모달
   const [isReportFeedSuccess, setIsReportFeedSuccess] = useState(false); // 피드 신고 상태
-
-  // 사용자 차단 결정 후 피드 재로드
-  const onBlockUserCompleted = () => {
-    fetchFeeds(user, currentPage);
-  };
 
   return (
     <OptionLayout>
@@ -328,6 +391,15 @@ function OptionMenu({
                 currentPage={currentPage}
                 fetchFeeds={fetchFeeds}
               />
+            )}
+            <Option onClick={() => setIsOpenPrivacyModal(true)}>공개 범위 설정</Option>
+            {isOpenPrivacyModal === true && (
+              <PrivacyModal
+                setIsPrivateFeed={setIsPrivateFeed}
+                setIsOpenPrivacyModal={setIsOpenPrivacyModal}
+                feedInfo={feedInfo}
+                user={user}
+              ></PrivacyModal>
             )}
           </>
         ) : (
@@ -416,6 +488,54 @@ function DeleteFeedModal({
           </StyledButton>
         </Buttons>
       </ModalContent>
+    </ModalOverlay>
+  );
+}
+
+function PrivacyModal({ setIsOpenPrivacyModal, feedInfo, setIsPrivateFeed, user }) {
+  // 공개 범위 변경 처리 함수
+  const handlePrivacyChange = async (newPrivacy) => {
+    try {
+      const response = await axios.patch(
+        `${BASE_URL}/feed/edit/${feedInfo.id}/`,
+        {
+          feed_privacy: newPrivacy,
+        },
+        {
+          headers: {
+            Authorization: `Token ${user.authToken}`,
+          },
+        }
+      );
+      if (response.status === 200) {
+        // 요청 성공 처리
+        alert("공개 범위가 성공적으로 변경되었습니다.");
+        setIsOpenPrivacyModal(false);
+        if (newPrivacy === "public") {
+          setIsPrivateFeed("전체 공개");
+        } else if (newPrivacy === "followers") {
+          setIsPrivateFeed("팔로우 공개");
+        } else if (newPrivacy === "private") {
+          setIsPrivateFeed("나만 보기");
+        }
+      }
+    } catch (error) {
+      console.error("Failed to update privacy:", error);
+      alert("공개 범위 변경 중 오류가 발생했습니다.");
+    }
+  };
+
+  return (
+    <ModalOverlay>
+      <PrivacyContent>
+        <ModalTitle>공개 범위 설정</ModalTitle>
+        <PrivacyOptions>
+          <PrivacyButton onClick={() => handlePrivacyChange("public")}>전체 공개</PrivacyButton>
+          <PrivacyButton onClick={() => handlePrivacyChange("followers")}>팔로우 공개</PrivacyButton>
+          <PrivacyButton onClick={() => handlePrivacyChange("private")}>나만 보기</PrivacyButton>
+          <PrivacyButton onClick={() => setIsOpenPrivacyModal(false)}>취소</PrivacyButton>
+        </PrivacyOptions>
+      </PrivacyContent>
     </ModalOverlay>
   );
 }
@@ -618,6 +738,39 @@ let OptionWrapper = styled.div`
   border-radius: 50%;
 `;
 
+let IconText = styled.span`
+  position: absolute;
+  top: -20px; // 조정: 위치 조정
+  left: 50%;
+  transform: translateX(-50%);
+  display: none; // 초기 상태: 숨김
+  white-space: nowrap;
+
+  color: ${({ theme }) => theme.color.bg};
+  font-size: 14px;
+  padding: 4px 8px;
+  background-color: ${({ theme }) => theme.color.font2};
+  border-radius: 4px;
+`;
+
+let PostStateIcon = styled.img`
+  width: 24px;
+  height: 24px;
+  box-sizing: content-box;
+
+  border-radius: 100%;
+  padding: 2px; 
+`;
+
+let IconWrapper = styled.div`
+  position: relative;
+  display: inline-block;
+
+  &:hover ${IconText} {
+    display: block;
+  }
+`;
+
 let UserInfo = styled.div`
   ${({ theme }) => theme.component.flexBox.rowCenter};
   gap: 0.75rem;
@@ -670,7 +823,7 @@ let OptionLayout = styled.div`
   z-index: 5;
   top: 100%;
   right: calc(100% - 1.4rem);
-  width: 160px;
+  width: 240px;
   height: fit-content;
   background-color: ${({ theme }) => theme.color.bg};
   border-radius: 8px;
@@ -840,12 +993,14 @@ let ModalContent = styled.div`
 `;
 
 let ModalTitle = styled.span`
+  width: 100%;
+  padding-bottom: 24px;
+  border-bottom: 1px solid ${({ theme }) => theme.color.border};
+  
+  color: ${({ theme }) => theme.color.font1};
   font-size: 18px;
   font-weight: 700;
-  color: ${({ theme }) => theme.color.font1};
-  margin-bottom: 32px;
   text-align: center;
-  width: 100%;
 `;
 let Highlight = styled.span`
   color: ${({ theme }) => theme.color.primary};
@@ -892,5 +1047,35 @@ let StyledButton = styled.button`
   outline: none;
   cursor: pointer;
 `;
+
+let PrivacyOptions = styled.div`
+  width: 100%;
+`
+
+let PrivacyContent = styled.div`
+  width: 320px;
+  padding-top: 24px;
+  
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+
+  background-color: ${({ theme }) => theme.color.bg};
+  border-radius: 8px;
+`;
+
+let PrivacyButton = styled.button`
+  width: 100%;
+  padding: 16px 24px;
+
+  background: none;
+  border: none;
+
+  &:hover {
+    transition: 0.2s;
+    color: ${({ theme }) => theme.color.bg};
+    background-color: ${({ theme }) => theme.color.primary};
+  }
+`
 
 export default Feed;

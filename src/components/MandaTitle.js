@@ -7,7 +7,7 @@ import componentTheme from "./theme";
 import { useDispatch, useSelector } from "react-redux";
 import { setMain, setSubs, setContents } from "../store/mandaSlice";
 
-function MandaTitle() {
+function MandaTitle({selectedTitle, setSelectedTitle}) {
   const dispatch = useDispatch();
   let navigate = useNavigate();
 
@@ -26,7 +26,6 @@ function MandaTitle() {
   const [mandaMainList, setMandaMainList] = useState(null); // 드롭다운 리스트 상태
   const [titles, setTitles] = useState([]); // 만다라트 제목 상태
   const [selectedIndex, setSelectedIndex] = useState(null); // 선택된 입력 index 상태
-  const [selectedTitle, setSelectedTitle] = useState(null); // 선택된 제목 상태
   const [isOpenMandaMainModal, setIsOpenMandaMainModal] = useState(false); // 만다라트 작성 모달 상태
   const [isOpenDeleteMandaModal, setIsOpenDeleteMandaModal] = useState(false); // 만다라트 삭제 모달 상태
   const user = useSelector((state) => state.user); // 현재 사용자
