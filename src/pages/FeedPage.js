@@ -244,9 +244,9 @@ function FeedPage() {
                 <NavButton
                   active={activeTab === "전체"}
                   onClick={() => {
-                    setHasMoreFeeds(true);
-                    setCurrentPage(1);
                     setIsFeedLoaded(false);
+                    setCurrentPage(1);
+                    setHasMoreFeeds(true);
                     setActiveTab("전체");
                     dispatch(setSelectedFeedId(null));
                   }}
@@ -256,9 +256,9 @@ function FeedPage() {
                 <NavButton
                   active={activeTab === "마이"}
                   onClick={async () => {
-                    setHasMoreFeeds(true);
-                    setCurrentPage(1);
                     setIsFeedLoaded(false);
+                    setCurrentPage(1);
+                    setHasMoreFeeds(true);
                     setActiveTab("마이");
                     dispatch(setSelectedFeedId(null));
                   }}
@@ -279,7 +279,7 @@ function FeedPage() {
                   fetchFeeds={activeTab === "마이" ? fetchMyFeeds : fetchRecommendedFeeds}
                 ></FeedWriteModal>
               )}
-              <Advertise>광고</Advertise>
+              {/* <Advertise>광고</Advertise> */}
             </LeftSide>
             <Feeds>
               {feeds.map((feed, index) => (

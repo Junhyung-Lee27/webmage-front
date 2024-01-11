@@ -528,7 +528,7 @@ function SearchPage() {
                 </Feeds>
               </FeedsWrapper>
             </Article>
-            <Advertise>광고</Advertise>
+            {/* <Advertise>광고</Advertise> */}
           </Stadardized>
         </Body>
       </PageLayout>
