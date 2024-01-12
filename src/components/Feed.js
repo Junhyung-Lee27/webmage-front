@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import styled, { ThemeProvider } from "styled-components";
 import componentTheme from "./theme";
@@ -45,6 +45,27 @@ function Feed({
   const [isOpenPrivacyModal, setIsOpenPrivacyModal] = useState(false); // 피드 공개 설정 모달
   const [postStateIcon, setPostStateIcon] = useState(null); // 피드 공개 상태 아이콘
   const [showIconText, setShowIconText] = useState(false); // 피드 공개 상태 설명 텍스트
+
+  // 옵션 메뉴 ref
+  const menuIconRef = useRef(null);
+
+  // 옵션 메뉴 외부 클릭 감지 핸들러
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (menuIconRef.current && !menuIconRef.current.contains(event.target)) {
+        setIsMenuOpen(false);
+      }
+    }
+
+    // 이벤트 리스너 등록
+    document.addEventListener("mousedown", handleClickOutside);
+
+    // 클린업 함수
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [menuIconRef]);
+  
 
   // 피드 공개상태 설명 텍스트 노출 함수
    const handleMouseEnter = () => {
@@ -242,7 +263,7 @@ function Feed({
                   {postStateIcon}
                   {showIconText === true && <IconText>{isPrivateFeed}</IconText>}
                 </IconWrapper>}
-              <OptionWrapper>
+              <OptionWrapper ref={menuIconRef}>
                 <FeedOptionIcon
                   src={process.env.PUBLIC_URL + "/icon/menu-horizontal.svg"}
                   onClick={() => {
