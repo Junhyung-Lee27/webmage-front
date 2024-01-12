@@ -47,7 +47,7 @@ let WriteFeed = styled.button`
 
   transition: color 0.15s ease, background-color 0.15s ease;
   &:hover {
-    color: ${({ theme }) => theme.color.bg};
+    color: white;
     background-color: ${({ theme }) => theme.color.primary};
   }
 `;

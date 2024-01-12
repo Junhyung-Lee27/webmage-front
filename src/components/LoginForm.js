@@ -80,7 +80,7 @@ function LoginForm() {
           value={password}
           onChange={handlePasswordChange}
         ></StyledForm>
-        <StyledButton color="white" onClick={handleLoginClick}>
+        <StyledButton onClick={handleLoginClick}>
           로그인
         </StyledButton>
         <Row>
@@ -182,7 +182,7 @@ let StyledButton = styled.button`
   line-height: 20px;
   letter-spacing: 1px;
   margin: 16px 2px 16px 2px;
-  color: ${({ theme }) => theme.color.bg};
+  color: white;
   background-color: ${({ theme }) => theme.color.primary};
   border: 1px solid ${({ theme }) => theme.color.primary};
   border-radius: 8px;
@@ -200,7 +200,7 @@ let KakaoLogin = styled.button`
   outline: none;
   
   width: 100%;
-  height: 42px;
+  height: 44px;
 
   display: flex;
   justify-content: center;

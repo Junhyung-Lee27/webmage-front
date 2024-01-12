@@ -1225,7 +1225,6 @@ const EmojiText = styled.div`
   left: 50%;
   transform: translateX(-50%); // 가운데 정렬
   padding: 4px 8px;
-  background-color: #f5f5f5;
   border-radius: 4px;
   font-size: 14px;
   color: black;
@@ -1253,7 +1252,7 @@ let IconBox = styled.div`
       ? `1px solid ${theme.color.primary}`
       : `1px solid ${theme.color.border}`};
   border-radius: 8px;
-  background-color: #f5f5f5;
+  background-color: ${({ theme }) => theme.color.bg2};
   cursor: pointer;
 
   &:hover {
@@ -1269,7 +1268,7 @@ let CommentBox = styled.div`
   padding: 12px;
   border: 1px solid ${({ theme }) => theme.color.border};
   border-radius: 8px;
-  background-color: #f5f5f5;
+  background-color: ${({ theme }) => theme.color.bg2};
   cursor: pointer;
 
   &:hover {

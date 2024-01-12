@@ -305,7 +305,6 @@ const TableCell = styled.td`
     }
   }};
   color: ${({ theme }) => theme.color.font1};
-  font-weight: ${(props) => (props.isTitle ? "600" : props.isCenterCell ? "600" : "500")};
   font-size: 12px;
 
   // 자동 줄바꿈

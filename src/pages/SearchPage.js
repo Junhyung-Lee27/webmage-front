@@ -554,13 +554,12 @@ let Body = styled.div`
 `;
 
 let Stadardized = styled.div`
-  position: absolute;
-
   display: flex;
-  justify-content: space-between;
+  flex-direction: column;
   width: 1280px;
   gap: 24px;
   margin-top: 24px;
+  margin-bottom: 80px;
 `;
 
 const Nav = styled.nav`
