@@ -60,7 +60,7 @@ function LoginForm() {
   return (
     <ThemeProvider theme={theme}>
       <Column>
-        <StyledText color={theme.color.font1} size="14" weight="600" margin="24px 0px 0px 0px">
+        <StyledText color={theme.color.font1} size="14" weight="600">
           <label htmlFor="username">아이디</label>
         </StyledText>
         <StyledForm
@@ -70,7 +70,7 @@ function LoginForm() {
           value={username}
           onChange={handleUsernameChange}
         ></StyledForm>
-        <StyledText color={theme.color.font1} size="14" weight="600" margin="8px 0px 0px 0px">
+        <StyledText color={theme.color.font1} size="14" weight="600">
           <label htmlFor="password">비밀번호</label>
         </StyledText>
         <StyledForm
@@ -85,8 +85,7 @@ function LoginForm() {
         </StyledButton>
         <Row>
           <StyledText
-            size="12"
-            weight="700"
+            size="14"
             align="center"
             color={theme.color.font2}
             cursor="pointer"
@@ -97,8 +96,7 @@ function LoginForm() {
             회원가입
           </StyledText>
           <StyledText
-            size="12"
-            weight="700"
+            size="14"
             align="center"
             color={theme.color.font2}
             cursor="pointer"
@@ -118,9 +116,7 @@ function LoginForm() {
             ></SocialLogo>
           </LogoWrap> */}
           <KakaoLogin onClick={() => loginWithKakao()}>
-            <KakaoLogo
-              src={process.env.PUBLIC_URL + "/logo/KaKao_Logo.svg"}
-            ></KakaoLogo>
+            <KakaoLogo src={process.env.PUBLIC_URL + "/logo/KaKao_Logo.svg"}></KakaoLogo>
             카카오 로그인
           </KakaoLogin>
           {/* <LogoWrap backgroundcolor="#03C75A" border="none">
@@ -160,14 +156,15 @@ let StyledText = styled.span`
 
 let StyledForm = styled.input`
   box-sizing: content-box;
-  height: 24px;
+  height: 28px;
   padding: 8px 16px;
   font-size: 14px;
   color: ${({ theme }) => theme.color.font1};
-  border: none;
+  border: 1px solid ${({ theme }) => theme.color.border};
   border-radius: 8px;
   background-color: ${({ theme }) => theme.color.bg2};
-  margin-top: 4px;
+  margin-top: 8px;
+  margin-bottom: 16px;
   &::placeholder {
     color: ${({ theme }) => theme.color.font2};
     opacity: 0.5;
@@ -179,11 +176,13 @@ let StyledForm = styled.input`
 
 let StyledButton = styled.button`
   height: 42px;
+  box-sizing: content-box;
   font-size: 16px;
-  font-weight: 700;
+  font-weight: 500;
   line-height: 20px;
-  margin: 24px 2px 16px 2px;
-  color: ${({ color }) => color};
+  letter-spacing: 1px;
+  margin: 16px 2px 16px 2px;
+  color: ${({ theme }) => theme.color.bg};
   background-color: ${({ theme }) => theme.color.primary};
   border: 1px solid ${({ theme }) => theme.color.primary};
   border-radius: 8px;

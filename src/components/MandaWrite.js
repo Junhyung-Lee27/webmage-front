@@ -503,14 +503,15 @@ let StyledButton = styled.button`
   height: ${({ height }) => height};
   width: ${({ width = "100%" }) => width};
   font-size: 16px;
-  font-weight: 600;
+  /* font-weight: 600; */
   line-height: 20px;
   letter-spacing: 4px;
-  color: white;
+  color: ${({ isSaveBtnActive, theme }) =>
+    isSaveBtnActive ? theme.color.bg : theme.color.font1};
   background: ${({ isSaveBtnActive, theme }) =>
-    isSaveBtnActive ? theme.color.primary : theme.color.font2};
+    isSaveBtnActive ? theme.color.primary : theme.color.bg3};
   border: 1px solid
-    ${({ isSaveBtnActive, theme }) => (isSaveBtnActive ? theme.color.primary : theme.color.font2)};
+    ${({ isSaveBtnActive, theme }) => (isSaveBtnActive ? theme.color.primary : theme.color.border)};
   border-radius: 8px;
   outline: none;
 

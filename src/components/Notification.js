@@ -187,32 +187,21 @@ function Notification({ notifications, setNotifications }) {
 let NotiLayout = styled.div`
   // 아이콘 하단, 가운데 정렬
   position: absolute;
-  top: calc(100% + 24px);
+  top: 100%;
+  right: -16px;
+  z-index: 1;
 
   // 기타 스타일링
   width: fit-content;
   height: fit-content;
   background-color: ${({ theme }) => theme.color.bg};
+  border: 1px solid ${({ theme }) => theme.color.border};
   border-radius: 16px;
-  box-shadow: 0 8px 24px 0px rgba(0, 0, 0, 0.15);
 `;
 
 let NotiContainer = styled.div`
   position: relative;
   width: 420px;
-
-  &::before {
-    content: "";
-    position: absolute;
-    top: -10px;
-    left: 50%;
-    transform: translate(-50%);
-    width: 0;
-    height: 0;
-    border-left: 10px solid transparent;
-    border-right: 10px solid transparent;
-    border-bottom: 10px solid ${({ theme }) => theme.color.bg};
-  }
 `;
 
 let NotiTitleBox = styled.div`

@@ -15,8 +15,6 @@ import { setSelectedFeedId } from "../store/selectedFeedIdSlice";
 
 function FeedPage() {
   let dispatch = useDispatch();
-  const location = useLocation();
-  const feedEndRef = useRef(null);
 
   const colorTheme = useSelector((state) => state.theme.themes[state.theme.currentTheme]);
   const filterTheme = useSelector((state) => state.theme.filters[state.theme.currentTheme]);
@@ -391,7 +389,8 @@ let NavButton = styled.button`
   height: 56px;
   padding: 16px 24px;
   border: none;
-  background: ${({ active, theme }) => (active ? theme.color.bg3 : "none")};
+  color: ${({ active, theme }) => (active ? theme.color.bg : theme.color.font1)};
+  background: ${({ active, theme }) => (active ? theme.color.secondary : theme.color.bg)};
 
   font-size: 14px;
   font-weight: ${({ active }) => (active ? "bold" : "normal")};

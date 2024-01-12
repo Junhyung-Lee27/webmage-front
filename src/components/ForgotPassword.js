@@ -29,7 +29,7 @@ function ForgotPassword() {
   return (
     <ThemeProvider theme={theme}>
       <Column>
-        <StyledText color={theme.font1} size="14" weight="600" margin="24px 0px 0px 0px">
+        <StyledText color={theme.font1} size="14" weight="600">
           <label htmlFor="user-id">이메일</label>
         </StyledText>
         <StyledForm
@@ -43,8 +43,7 @@ function ForgotPassword() {
 
         <StyledText
           color={theme.font2}
-          size="12"
-          weight="700"
+          size="14"
           align="center"
           cursor="pointer"
           onClick={() => {
@@ -74,32 +73,35 @@ let StyledText = styled.span`
 
 let StyledForm = styled.input`
   box-sizing: content-box;
-  height: 24px;
+  height: 28px;
   padding: 8px 16px;
   font-size: 14px;
-  color: ${({ theme }) => theme.font1};
-  border: none;
+  color: ${({ theme }) => theme.color.font1};
+  border: 1px solid ${({ theme }) => theme.color.border};
   border-radius: 8px;
-  background-color: ${({ theme }) => theme.bg2};
-  margin: 4px 0px 0px 0px;
+  background-color: ${({ theme }) => theme.color.bg2};
+  margin-top: 8px;
+  margin-bottom: 16px;
   &::placeholder {
-    color: ${({ theme }) => theme.font2};
+    color: ${({ theme }) => theme.color.font2};
     opacity: 0.5;
   }
   &:focus {
-    outline: 2px solid ${({ theme }) => theme.primary};
+    outline: 2px solid ${({ theme }) => theme.color.primary};
   }
 `;
 
 let StyledButton = styled.button`
   height: 42px;
+  box-sizing: content-box;
   font-size: 16px;
-  font-weight: 700;
+  font-weight: 500;
   line-height: 20px;
-  margin: 16px 2px 8px 2px;
-  color: white;
-  background-color: ${({ theme }) => theme.primary};
-  border: 1px solid ${({ theme }) => theme.primary};
+  letter-spacing: 1px;
+  margin: 16px 2px 16px 2px;
+  color: ${({ theme }) => theme.color.bg};
+  background-color: ${({ theme }) => theme.color.primary};
+  border: 1px solid ${({ theme }) => theme.color.primary};
   border-radius: 8px;
   outline: none;
   cursor: pointer;

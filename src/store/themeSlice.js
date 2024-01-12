@@ -5,12 +5,12 @@ import { createSlice } from "@reduxjs/toolkit";
 const themes = {
   light: {
     bg: "#FFFFFF", // 가장 밝은 배경
-    bg2: "#FEFDFE", // 덜 밝은 배경
-    bg3: "#EBE9FA", // 더 덜 밝은 배경
+    bg2: "#FDFDFD", // 덜 밝은 배경
+    bg3: "#EDEDED", // 더 덜 밝은 배경
     primary: "#7269FF", // 브랜드 컬러
-    secondary: "#251F4B", // 브랜드 서브 컬러
-    font1: "#1A1A1A", // 중요한 텍스트
-    font2: "#5B5B5B", // 덜 중요한 텍스트
+    secondary: "#837EBF", // 브랜드 서브 컬러 (보색)
+    font1: "#242424", // 중요한 텍스트
+    font2: "#6D6D6D", // 덜 중요한 텍스트
     border: "#D8D6E2", // 경계선 컬러
   },
   dark: {

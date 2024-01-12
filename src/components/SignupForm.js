@@ -103,11 +103,11 @@ function SignupForm() {
 
           <StyledButton onClick={handleSignupClick}>회원가입</StyledButton>
 
-          <StyledText weight="500" align="center" color={theme.font2}>
+          <StyledText align="center" color={theme.font2}>
             이미 계정이 있으신가요?
           </StyledText>
           <StyledText
-            weight="700"
+            weight="600"
             align="center"
             color={theme.primary}
             margin="4px"
@@ -123,43 +123,45 @@ function SignupForm() {
 }
 
 let StyledText = styled.span`
-  font-size: 14px;
-  font-weight: ${({ weight = "600" }) => weight};
+  font-size: ${({ size = "14" }) => size + "px"};
+  font-weight: ${({ weight }) => weight};
   color: ${({ color }) => color};
   text-align: ${({ align }) => align};
-  margin-top: ${({ margin = "16px" }) => margin};
+  margin: ${({ margin }) => margin};
   cursor: ${({ cursor = "default" }) => cursor};
 `;
 
 let StyledForm = styled.input`
   box-sizing: content-box;
-  height: 24px;
+  height: 28px;
   padding: 8px 16px;
   font-size: 14px;
-  color: ${({ theme }) => theme.font1};
-  border: none;
+  color: ${({ theme }) => theme.color.font1};
+  border: 1px solid ${({ theme }) => theme.color.border};
   border-radius: 8px;
-  background-color: ${({ theme }) => theme.bg2};
-  margin-top: 4px;
-
+  background-color: ${({ theme }) => theme.color.bg2};
+  margin-top: 8px;
+  margin-bottom: 16px;
   &::placeholder {
-    color: ${({ theme }) => theme.font2};
+    color: ${({ theme }) => theme.color.font2};
     opacity: 0.5;
   }
   &:focus {
-    outline: 2px solid ${({ theme }) => theme.primary};
+    outline: 2px solid ${({ theme }) => theme.color.primary};
   }
 `;
 
 let StyledButton = styled.button`
   height: 42px;
+  box-sizing: content-box;
   font-size: 16px;
-  font-weight: 700;
+  font-weight: 500;
   line-height: 20px;
-  margin: 16px 2px 0px 2px;
-  color: white;
-  background-color: ${({ theme }) => theme.primary};
-  border: 1px solid ${({ theme }) => theme.primary};
+  letter-spacing: 1px;
+  margin: 16px 2px 16px 2px;
+  color: ${({ theme }) => theme.color.bg};
+  background-color: ${({ theme }) => theme.color.primary};
+  border: 1px solid ${({ theme }) => theme.color.primary};
   border-radius: 8px;
   outline: none;
   cursor: pointer;

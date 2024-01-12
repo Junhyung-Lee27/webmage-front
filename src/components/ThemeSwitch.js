@@ -23,8 +23,8 @@ function ThemeSwitch() {
 }
 
 let SwitchContainer = styled.img`
-  width: 88px;
-  height: 36px;
+  /* width: 88px; */
+  height: 32px;
   border-radius: 18px;
 `;
 

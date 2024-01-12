@@ -22,19 +22,27 @@ function AuthPage() {
       <PageLayout>
         <MandaIcon src={process.env.PUBLIC_URL + "/logo/Manda_logo1.svg"} />
         <Column>
-          <StyledText color={theme.color.font1} size="32" weight="700" margin="0px 0px 6px 0px">
-            웹법사와 함께 만드는
-          </StyledText>
           <StyledText
-            color={theme.color.primary}
+            color={theme.color.font1}
             size="32"
             weight="700"
-            align="right"
             margin="0px 0px 12px 0px"
+            align="left"
           >
-            만다라트
+            웹법사와 함께 만드는
           </StyledText>
-          <ThemeSwitch />
+          <Row>
+            <StyledText
+              color={theme.color.primary}
+              size="32"
+              weight="700"
+              align="left"
+              margin="0px 0px 0px 0px"
+            >
+              만다라트
+            </StyledText>
+            <ThemeSwitch />
+          </Row>
           {showingForm === "Login" && <LoginForm />}
           {showingForm === "Signup" && <SignupForm />}
           {showingForm === "ForgotPassword" && <ForgotPassword />}
@@ -64,11 +72,19 @@ let Column = styled.div`
   display: flex;
   flex-direction: column;
   width: 360px;
-  height: 500px;
+  /* height: 500px; */
 `;
 
+let Row = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 40px;
+`
+
 let StyledText = styled.span`
-  letter-spacing: 3px;
+  width: fit-content;
+  letter-spacing: 2px;
   font-size: ${({ size }) => size + "px"};
   font-weight: ${({ weight }) => weight};
   color: ${({ color }) => color};

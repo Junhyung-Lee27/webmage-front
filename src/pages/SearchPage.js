@@ -519,7 +519,6 @@ function SearchPage() {
                           fetchFeeds={fetchSearchedFeeds}
                         />
                       ))}
-                      {!hasMoreFeeds && <NoResult>더 이상 불러올 게시물이 없습니다.</NoResult>}
                     </>
                   ) : (
                     <NoResult>게시물 검색 결과가 없습니다.</NoResult>
@@ -527,6 +526,7 @@ function SearchPage() {
                   <div id="feedEnd" /> {/* 스크롤 감지를 위한 요소 */}
                 </Feeds>
               </FeedsWrapper>
+              {!hasMoreFeeds && <NoResult>더 이상 불러올 내용이 없습니다.</NoResult>}
             </Article>
             {/* <Advertise>광고</Advertise> */}
           </Stadardized>
@@ -583,8 +583,9 @@ let NavButton = styled.button`
   height: 56px;
   padding: 16px 24px;
   border: none;
-  background: ${({ active, theme }) => (active ? theme.color.bg3 : "none")};
-  
+  color: ${({ active, theme }) => (active ? theme.color.bg : theme.color.font1)};
+  background: ${({ active, theme }) => (active ? theme.color.secondary : theme.color.bg)};
+
   font-size: 14px;
   font-weight: ${({ active }) => (active ? "bold" : "normal")};
   text-align: left;

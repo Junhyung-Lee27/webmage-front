@@ -6,12 +6,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { BASE_URL } from "./../config";
 import { resetMandaState, setSubs, setContents, setPrivacy, setMain } from "../store/mandaSlice";
 
-function Manda({
-  currPage,
-  setWriteMode,
-  setSelectedSubIndex,
-  setSelectedTitle,
-}) {
+function Manda({ currPage, setWriteMode, setSelectedSubIndex, setSelectedTitle }) {
   const dispatch = useDispatch();
 
   // 테마
@@ -29,6 +24,8 @@ function Manda({
   const subs = manda.subs;
   const contents = manda.contents;
   const user = useSelector((state) => state.user);
+
+  console.log(manda);
 
   // 데이터 로드 상태 관리
   const [dataLoaded, setDataLoaded] = useState(false);
@@ -109,8 +106,8 @@ function Manda({
           mainTitle: "",
           subTitle: "",
           content: "",
-          subsColorPercentile: 0,
-          contsColorPercentile: 0,
+          subsSuccessStage: 0,
+          contsSuccessStage: 0,
         };
       }
     }
@@ -144,14 +141,14 @@ function Manda({
       const positionIndex = index * 2;
       const [firstX, firstY] = subsPositions[positionIndex];
       const [secondX, secondY] = subsPositions[positionIndex + 1];
-      const subsColorPercentile = sub.color_percentile;
+      const subsSuccessStage = sub.success_stage;
       table[firstX][firstY] = {
         subTitle: sub.sub_title || "",
-        subsColorPercentile: subsColorPercentile,
+        subsSuccessStage: subsSuccessStage,
       };
       table[secondX][secondY] = {
         subTitle: sub.sub_title || "",
-        subsColorPercentile: subsColorPercentile,
+        subsSuccessStage: subsSuccessStage,
       };
     });
 
@@ -164,8 +161,8 @@ function Manda({
             if (table[l][k] === null) {
               const contentData = contents[contentIndex++];
               const contentValue = contentData ? contentData.content : "";
-              const contsColorPercentile = contentData ? contentData.color_percentile : 0;
-              table[l][k] = { content: contentValue, contsColorPercentile: contsColorPercentile };
+              const contsSuccessStage = contentData ? contentData.success_stage : 0;
+              table[l][k] = { content: contentValue, contsSuccessStage: contsSuccessStage };
             }
           }
         }
@@ -213,11 +210,12 @@ function Manda({
                           <TableCell
                             key={`${cellIndex}-${rowIndex}`}
                             isCenterCell={isCenterCell}
+                            isCenterTable={isCenterTable}
                             isTitle={isTitle}
-                            colorPercentile={
-                              isCenterCell
-                                ? table[x][y].subsColorPercentile
-                                : table[x][y].contsColorPercentile
+                            successStage={
+                              isCenterCell || isCenterTable
+                                ? table[x][y].subsSuccessStage
+                                : table[x][y].contsSuccessStage
                             }
                           >
                             {table[x][y].mainTitle ||
@@ -252,7 +250,7 @@ const GridItem = styled.table`
   flex: 0 0 calc(33.3333% - 2px); /* 3개씩 가로로 배치, 2px는 border 두께 */
   box-sizing: content-box;
   table-layout: fixed;
-  background: ${(props) => (props.isCenterTable ? `${props.theme.color.primary}50` : ``)};
+  /* background: ${(props) => (props.isCenterTable ? `${props.theme.color.primary}0` : ``)}; */
   border-collapse: collapse; // 테이블 셀 간의 간격 제거
 
   /* 조건부 border 스타일 */
@@ -291,14 +289,18 @@ const TableCell = styled.td`
   border: 1px solid ${({ theme }) => theme.color.bg};
   background: ${(props) => {
     if (props.isTitle) {
-      return `${props.theme.color.primary}`;
-    } else if (props.isCenterCell) {
-      // mandaSubs color
-      const opacity = props.colorPercentile ? Math.round(props.colorPercentile * 0.9) : 90;
+      return `${props.theme.color.primary}99`;
+    } 
+    
+    // mandaSubs color
+    else if (props.isCenterCell || props.isCenterTable) {
+      const opacity = props.successStage ? Math.round(props.successStage * 19) : 10;
       return `${props.theme.color.primary}${opacity}`;
-    } else {
-      // mandaContents color
-      const opacity = props.colorPercentile ? Math.round(props.colorPercentile * 0.99) : 20;
+    } 
+    
+    // mandaContents color
+    else {
+      const opacity = props.successStage ? Math.round(props.successStage * 19) : 10;
       return `${props.theme.color.primary}${opacity}`;
     }
   }};

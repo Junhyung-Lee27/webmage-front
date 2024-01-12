@@ -111,7 +111,7 @@ let RecommendContainer = styled.div`
   position: relative;
   width: ${({ currentLocation }) =>
     currentLocation === "/feed" ? "100%" : "calc((100% - 16px) / 2)"};
-  padding: 16px 24px;
+  padding: 16px 12px;
   border: 1px solid ${({ theme }) => theme.color.border};
   border-radius: 8px;
   box-sizing: border-box;
@@ -133,10 +133,11 @@ let Row = styled.div`
 `;
 
 let Column = styled.div`
-  height: 100%;
+  height: 64px;
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: flex-start;
+  /* align-items: ; */
   gap: 4px;
   padding: 4px 0px;
 `;
@@ -160,8 +161,8 @@ let StyledText = styled.span`
 
 const FollowButtonWrapper = styled.div`
   position: absolute;
-  right: 24px;
-  top: 24px;
+  right: 12px;
+  top: 16px;
 `;
 
 export default UserRecommend;

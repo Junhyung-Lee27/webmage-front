@@ -473,12 +473,12 @@ let ModalTitle = styled.span`
 let Guideline = styled.ul`
   box-sizing: border-box;
   padding: 16px 24px;
-  border: none;
+  border: 1px solid ${({ theme }) => theme.color.border};
   border-radius: 8px;
   background-color: ${({ theme }) => theme.color.bg2};
   cursor: default;
   width: 100%;
-  margin-bottom: 24px;
+  margin-bottom: 40px;
 `;
 
 let GuidelineList = styled.li`
@@ -516,7 +516,7 @@ let Buttons = styled.div`
   align-items: center;
   width: 100%;
   gap: 8px;
-  margin-top: 32px;
+  margin-top: 24px;
   padding: 8px 0px;
 `;
 
@@ -549,16 +549,15 @@ let StyledForm = styled.input`
   padding: 16px;
   font-size: 14px;
   color: ${({ theme }) => theme.color.font1};
-  border: none;
+  border: 1px solid ${({ theme }) => theme.color.border};
   border-radius: 8px;
   background-color: ${({ theme }) => theme.color.bg2};
-  /* margin-bottom: 40px; */
   &::placeholder {
     color: ${({ theme }) => theme.color.font2};
     opacity: 0.5;
   }
   &:focus {
-    outline: 2px solid ${({ theme }) => theme.color.primary};
+    outline: 1px solid ${({ theme }) => theme.color.primary};
   }
 `;
 

@@ -1,5 +1,5 @@
 import styled, { ThemeProvider } from "styled-components";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { NavLink, useNavigate } from "react-router-dom";
 import componentTheme from "./theme";
@@ -16,7 +16,6 @@ import axios from "axios";
 import { resetMandaState } from "../store/mandaSlice";
 import { persistor } from "../store/store";
 import { setSelectedUser } from "../store/selectedUserSlice";
-import React from "react";
 
 const Header = React.forwardRef((props, ref) => {
   let navigate = useNavigate();
@@ -105,6 +104,26 @@ const Header = React.forwardRef((props, ref) => {
     };
   }, [user.userId, user.authToken]);
 
+  // NotiIconWrapper를 위한 ref
+  const notiIconRef = useRef(null);
+
+  // NotiIconWrapper 외부 클릭 감지 핸들러
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (notiIconRef.current && !notiIconRef.current.contains(event.target)) {
+        setIsNotiVisible(false);
+      }
+    }
+
+    // 이벤트 리스너 등록
+    document.addEventListener("mousedown", handleClickOutside);
+
+    // 클린업 함수
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [notiIconRef]);
+
   // 로그아웃 요청
   const handleLogoutClick = async () => {
     const response = await logout();
@@ -174,7 +193,7 @@ const Header = React.forwardRef((props, ref) => {
                   alt="Manda Logo"
                 />
               </NavLink>
-              <Row gap="16px">
+              <Row gap="8px">
                 <StyledLink
                   onClick={() => {
                     dispatch(setSelectedUser(user));
@@ -202,8 +221,6 @@ const Header = React.forwardRef((props, ref) => {
                   채팅
                 </StyledLink> */}
               </Row>
-            </Row>
-            <Row gap="20px" flex="1" justifycontent="flex-end">
               <SearchBox
                 type="text"
                 placeholder="만다라트, 사용자, 게시물 내용으로 검색하기"
@@ -212,8 +229,14 @@ const Header = React.forwardRef((props, ref) => {
                 onChange={handleInputChange}
                 onKeyDown={handleSearch}
               />
+            </Row>
+            <Row gap="20px" flex="1" justifycontent="flex-end">
               <Row gap="16px">
-                <NotiIconWrapper>
+                <IconLink to="/setting" activeclassname="active">
+                  <LargeIcon src={process.env.PUBLIC_URL + "/icon/header/AccountCircle.svg"} />
+                  <IconText>프로필·계정</IconText>
+                </IconLink>
+                <NotiIconWrapper ref={notiIconRef}>
                   <LargeIcon
                     $active={isNotiVisible}
                     onClick={() => {
@@ -223,15 +246,22 @@ const Header = React.forwardRef((props, ref) => {
                   />
                   {hasUnreadNotifications && <NewNotificationDot />}
                   {isNotiVisible && (
-                    <Notification notifications={notifications} setNotifications={setNotifications}>
-                      ...
-                    </Notification>
+                    <Notification
+                      notifications={notifications}
+                      setNotifications={setNotifications}
+                    ></Notification>
                   )}
+                  <IconText>알림</IconText>
                 </NotiIconWrapper>
-                <IconLink to="/setting" activeclassname="active">
-                  <LargeIcon src={process.env.PUBLIC_URL + "/icon/header/AccountCircle.svg"} />
-                </IconLink>
-                <LogoutBtn onClick={handleLogoutClick}>로그아웃</LogoutBtn>
+                {/* <LogoutBtn>로그아웃</LogoutBtn> */}
+                <IconWrapper>
+                  <LargeIcon
+                    padding="4px 4px 4px 6px"
+                    src={process.env.PUBLIC_URL + "/icon/header/Logout.svg"}
+                    onClick={handleLogoutClick}
+                  />
+                  <IconText>로그아웃</IconText>
+                </IconWrapper>
               </Row>
               <ThemeSwitch />
             </Row>
@@ -264,6 +294,8 @@ let HeaderLayout = styled.div`
 `;
 
 let Stadardized = styled.div`
+  position: relative;
+  
   display: flex;
   justify-content: space-between;
   width: 1280px;
@@ -297,7 +329,8 @@ let StyledLink = styled(NavLink)`
   line-height: 16px;
   font-weight: 600;
   text-align: center;
-  padding: 16px 0px;
+  padding: 8px;
+  border-radius: 8px;
   text-decoration: none;
   color: ${({ theme }) => theme.color.font2};
 
@@ -306,13 +339,17 @@ let StyledLink = styled(NavLink)`
   }
 
   &:hover {
-    color: ${({ theme }) => theme.color.secondary};
+    transition: 0.3s;
+    background-color: ${({ theme }) => theme.color.bg3};
   }
 `;
 
 let SearchBox = styled.input`
-  margin: 0px 40px 0px 60px;
-  flex: 1;
+  position: absolute;
+  left: 50%;
+  transform:translateX(-50%);
+  
+  width: 400px;
   height: 34px;
   padding: 11px 16px;
   box-sizing: border-box;
@@ -332,9 +369,24 @@ let SearchBox = styled.input`
 
 let LargeIcon = styled.img`
   ${({ theme }) => theme.component.iconSize.large};
-  padding: 2px;
+  padding: ${({ padding = "4px" }) => padding};
   filter: ${({ theme, $active }) => ($active ? theme.filter.primary : theme.filter.font2)};
   cursor: pointer;
+`;
+
+let IconText = styled.span`
+  position: absolute;
+  bottom: -28px; // 조정: 위치 조정
+  left: 50%;
+  transform: translateX(-50%);
+  display: none; // 초기 상태: 숨김
+  white-space: nowrap;
+
+  color: ${({ theme }) => theme.color.font1};
+  font-size: 14px;
+  padding: 4px 8px;
+  background-color: ${({ theme }) => theme.color.bg3};
+  border-radius: 4px;
 `;
 
 let IconLink = styled(NavLink)`
@@ -348,8 +400,31 @@ let IconLink = styled(NavLink)`
   }
 
   &:hover {
-    transition: 0.3s;
     background-color: ${({ theme }) => theme.color.bg3};
+  }
+
+  position: relative;
+  display: inline-block;
+  
+  &:hover ${IconText} {
+    display: block;
+  }
+`;
+
+let IconWrapper = styled.div`
+  ${({ theme }) => theme.component.iconSize.large};
+  border-radius: 50%;
+  border: none;
+
+  &:hover {
+    background-color: ${({ theme }) => theme.color.bg3};
+  }
+
+  position: relative;
+  display: inline-block;
+  
+  &:hover ${IconText} {
+    display: block;
   }
 `;
 
@@ -363,6 +438,13 @@ let NotiIconWrapper = styled.div`
   &:hover {
     transition: 0.3s;
     background-color: ${({ theme }) => theme.color.bg3};
+  }
+
+  position: relative;
+  display: inline-block;
+
+  &:hover ${IconText} {
+    display: block;
   }
 `;
 
@@ -389,8 +471,8 @@ let LogoutBtn = styled.button`
   cursor: pointer;
 
   &:hover {
-    color: ${({ theme }) => theme.color.secondary};
-    border: 1px solid ${({ theme }) => theme.color.secondary};
+    color: ${({ theme }) => theme.color.primary};
+    border: 1px solid ${({ theme }) => theme.color.primary};
   }
 `;
 
