@@ -828,7 +828,6 @@ let MediumIcon = styled.img`
 let FeedOptionIcon = styled(MediumIcon)`
   box-sizing: content-box;
   padding: 2px;
-  /* margin: -4px -4px 0px 0px; */
   border-radius: 50%;
   border: none;
   cursor: pointer;
