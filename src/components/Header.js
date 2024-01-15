@@ -263,7 +263,7 @@ const Header = React.forwardRef((props, ref) => {
                   <IconText>로그아웃</IconText>
                 </IconWrapper>
               </Row>
-              <ThemeSwitch />
+              {/* <ThemeSwitch /> */}
             </Row>
           </Stadardized>
         </HeaderLayout>
