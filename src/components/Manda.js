@@ -1,6 +1,6 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
-import styled, { ThemeProvider } from "styled-components";
+import styled, { css, ThemeProvider } from "styled-components";
 import componentTheme from "./theme";
 import { useDispatch, useSelector } from "react-redux";
 import { BASE_URL } from "./../config";
@@ -24,8 +24,6 @@ function Manda({ currPage, setWriteMode, setSelectedSubIndex, setSelectedTitle }
   const subs = manda.subs;
   const contents = manda.contents;
   const user = useSelector((state) => state.user);
-
-  console.log(manda);
 
   // 데이터 로드 상태 관리
   const [dataLoaded, setDataLoaded] = useState(false);
@@ -171,97 +169,121 @@ function Manda({ currPage, setWriteMode, setSelectedSubIndex, setSelectedTitle }
   }
 
   return (
-    <ThemeProvider theme={theme}>
-      <GridContainer>
-        {[...Array(3)].map((_, gridColumnIndex) =>
-          [...Array(3)].map((_, gridRowIndex) => {
-            const isCenterTable = gridRowIndex === 1 && gridColumnIndex === 1; // 중앙 테이블 여부 확인
-            const nowEditing =
-              editingIndex[0] === gridRowIndex && editingIndex[1] === gridColumnIndex;
+      <ThemeProvider theme={theme}>
+        <GridContainer isLoading={!dataLoaded}>
+          {[...Array(3)].map((_, gridColumnIndex) =>
+            [...Array(3)].map((_, gridRowIndex) => {
+              const isCenterTable = gridRowIndex === 1 && gridColumnIndex === 1; // 중앙 테이블 여부 확인
+              const nowEditing =
+                editingIndex[0] === gridRowIndex && editingIndex[1] === gridColumnIndex;
 
-            const gridItemProps = {
-              key: `${gridRowIndex}-${gridColumnIndex}`,
-              isCenterTable,
-              currPage,
-              dataLoaded,
-              onClick:
-                currPage === "MAIN"
-                  ? () => {}
-                  : () => handleGridItemClick(gridRowIndex, gridColumnIndex),
-            };
+              const gridItemProps = {
+                key: `${gridRowIndex}-${gridColumnIndex}`,
+                isCenterTable,
+                currPage,
+                dataLoaded,
+                onClick:
+                  currPage === "MAIN"
+                    ? () => {}
+                    : () => handleGridItemClick(gridRowIndex, gridColumnIndex),
+              };
 
-            if (currPage !== "MAIN") {
-              gridItemProps.nowEditing = nowEditing;
-            }
+              if (currPage !== "MAIN") {
+                gridItemProps.nowEditing = nowEditing;
+              }
 
-            return (
-              <GridItem {...gridItemProps}>
-                <tbody>
-                  {[...Array(3)].map((_, cellIndex) => (
-                    <tr key={cellIndex}>
-                      {[...Array(3)].map((_, rowIndex) => {
-                        const x = gridRowIndex * 3 + rowIndex;
-                        const y = gridColumnIndex * 3 + cellIndex;
-                        // 각 테이블의 중앙 셀 여부 확인
-                        const isCenterCell = rowIndex === 1 && cellIndex === 1;
-                        // 가운데 3x3 테이블이거나 각 테이블의 중앙 셀인 경우 isTitle을 true로 설정
-                        const isTitle = isCenterTable && isCenterCell;
-                        return (
-                          <TableCell
-                            key={`${cellIndex}-${rowIndex}`}
-                            isCenterCell={isCenterCell}
-                            isCenterTable={isCenterTable}
-                            isTitle={isTitle}
-                            successStage={
-                              isCenterCell || isCenterTable
-                                ? table[x][y].subsSuccessStage
-                                : table[x][y].contsSuccessStage
-                            }
-                          >
-                            {table[x][y].mainTitle ||
-                              table[x][y].subTitle ||
-                              table[x][y].content ||
-                              ""}
-                          </TableCell>
-                        );
-                      })}
-                    </tr>
-                  ))}
-                </tbody>
-              </GridItem>
-            );
-          })
-        )}
-      </GridContainer>
-    </ThemeProvider>
+              return (
+                <GridItem {...gridItemProps}>
+                  <tbody>
+                    {[...Array(3)].map((_, cellIndex) => (
+                      <tr key={cellIndex}>
+                        {[...Array(3)].map((_, rowIndex) => {
+                          const x = gridRowIndex * 3 + rowIndex;
+                          const y = gridColumnIndex * 3 + cellIndex;
+                          // 각 테이블의 중앙 셀 여부 확인
+                          const isCenterCell = rowIndex === 1 && cellIndex === 1;
+                          // 가운데 3x3 테이블이거나 각 테이블의 중앙 셀인 경우 isTitle을 true로 설정
+                          const isTitle = isCenterTable && isCenterCell;
+                          return (
+                            <TableCell
+                              key={`${cellIndex}-${rowIndex}`}
+                              isCenterCell={isCenterCell}
+                              isCenterTable={isCenterTable}
+                              isTitle={isTitle}
+                              successStage={
+                                isCenterCell || isCenterTable
+                                  ? table[x][y].subsSuccessStage
+                                  : table[x][y].contsSuccessStage
+                              }
+                            >
+                              {table[x][y].mainTitle ||
+                                table[x][y].subTitle ||
+                                table[x][y].content ||
+                                ""}
+                            </TableCell>
+                          );
+                        })}
+                      </tr>
+                    ))}
+                  </tbody>
+                </GridItem>
+              );
+            })
+          )}
+        </GridContainer>
+      </ThemeProvider>
   );
 }
+
+const loadingAnimation = css`
+  @keyframes loadingAnimation {
+    0% {
+      background-position: 0% 0%;
+    }
+    50% {
+      background-position: 100% 100%;
+    }
+    100% {
+      background-position: 0% 0%;
+    }
+  }
+`;
 
 const GridContainer = styled.div`
   display: inline-flex;
   flex-wrap: wrap;
   width: 100%;
   border-radius: 8px;
-  /* box-shadow: 0px 8px 24px 0px rgba(0, 0, 0, 0.15); */
+
+  /* 데이터 로딩 중 애니메이션 */
+  animation: ${(props) => (props.isLoading ? "loadingAnimation 1.5s ease infinite" : "none")};
+  ${(props) => props.isLoading && loadingAnimation};
+  background: ${(props) =>
+    props.isLoading
+      ? "linear-gradient(120deg, #EDEDED 30%, #FDFDFD 38%, #FDFDFD 42%, #EDEDED 50%)"
+      : "transparent"};
+
+  background-size: 300% 300%;
 `;
 
 const GridItem = styled.table`
   margin: 0;
-  flex: 0 0 calc(33.3333% - 2px); /* 3개씩 가로로 배치, 2px는 border 두께 */
-  box-sizing: content-box;
+  flex: 0 0 33.3333%; /* 3개씩 가로로 배치 */
+  box-sizing: border-box;
   table-layout: fixed;
-  /* background: ${(props) => (props.isCenterTable ? `${props.theme.color.primary}0` : ``)}; */
-  border-collapse: collapse; // 테이블 셀 간의 간격 제거
+  border-radius: 8px;
+  border-collapse: separate; // 테이블 셀 간의 간격 제거
+  border-spacing: 2px;
 
   /* 조건부 border 스타일 */
   border: ${(props) => {
     if (!props.dataLoaded) {
-      return `2px solid ${props.theme.color.bg2}`; // 데이터가 로드되지 않았을 때는 border 없음
+      return `2px solid ${props.theme.color.bg}`; // 데이터가 로드되지 않았을 때는 border 없음
     } else {
       // 데이터가 로드되었을 때는 nowEditing에 따라 다른 border 적용
       return props.nowEditing
         ? `2px solid ${props.theme.color.primary}`
-        : `2px solid ${props.theme.color.bg2}`;
+        : `2px solid ${props.theme.color.bg}`;
     }
   }};
 
@@ -269,7 +291,7 @@ const GridItem = styled.table`
   &:hover {
     border: ${(props) =>
       props.currPage === "MAIN"
-        ? `2px solid ${props.theme.color.bg2}`
+        ? `2px solid ${props.theme.color.bg}`
         : `2px solid ${props.theme.color.secondary}`};
   }
 
@@ -285,8 +307,8 @@ const TableCell = styled.td`
   height: 78px;
   max-width: 78px;
   max-height: 78px;
-  padding: 0.5px;
-  border: 1px solid ${({ theme }) => theme.color.bg};
+  padding: 2px;
+  border-radius: 4px;
   background: ${(props) => {
     if (props.isTitle) {
       return `${props.theme.color.primary}99`;
@@ -294,14 +316,14 @@ const TableCell = styled.td`
     
     // mandaSubs color
     else if (props.isCenterCell || props.isCenterTable) {
-      const opacity = props.successStage ? Math.round(props.successStage * 19) : 10;
+      const opacity = props.successStage ? Math.round(props.successStage * 24) : 10;
       return `${props.theme.color.primary}${opacity}`;
     } 
     
     // mandaContents color
     else {
-      const opacity = props.successStage ? Math.round(props.successStage * 19) : 10;
-      return `${props.theme.color.primary}${opacity}`;
+      const opacity = props.successStage ? Math.round(props.successStage * 24) : 10;
+      return `${props.theme.color.secondary}${opacity}`;
     }
   }};
   color: ${({ theme }) => theme.color.font1};
