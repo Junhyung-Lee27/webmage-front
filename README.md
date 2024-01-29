@@ -1,70 +1,163 @@
-# Getting Started with Create React App
+<h1>만다라트 기반 SNS 서비스</h1>
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+> 만다라트 작성과 실천을 간편하게 만들고, <br/>
+> 이용자들간 만다라트 및 관련 게시글을 공유함으로써 더욱 긍정적인 효과를 야기하는 서비스
 
-## Available Scripts
+<h2>📅 개발 기간</h2>
+2023.10.17(화) ~ 2023.11.02(목)
 
-In the project directory, you can run:
+<h2>🔨 기술 스택</h2>
 
-### `npm start`
+<h3>(FrontEnd) React</h3>
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+  - webpack
+  - redux
+  - axios
+  - styled-components
+  - (배포) Nginx, AWS - EC2, RDS, S3, Route53
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+<h3>(Backend) Django</h3>
 
-### `npm test`
+<a href="https://github.com/Junhyung-Lee27/webmage">Backend Github Repo</a>
+  - Django-restframework
+  - Docker
+  - AWS - EC2, RDS, S3
+  - Swagger
+  - Test code
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
 
-### `npm run build`
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+<h2>💻 서비스 화면</h2>
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+<h3>프론트 서버 배포 (Nginx)</h3>
+<h4>(현재 - 연결 중단)</h4>
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+- [Public IP] http://52.79.233.211/
+- [도메인] https://www.manda-web.link/
 
-### `npm run eject`
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+<h3>로그인, 회원가입</h3>
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+![login](https://github.com/Junhyung-Lee27/webmage-front/assets/120551363/b9ce2c1c-70e6-4337-85ce-2a4b91b57e71)
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+<h3>만다라트 작성</h3>
 
-## Learn More
+![write](https://github.com/Junhyung-Lee27/webmage-front/assets/120551363/803b55e9-3367-4eb9-b463-dc79573b4201)
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+<h3>설정 페이지</h3>
 
-### Code Splitting
+![setting](https://github.com/Junhyung-Lee27/webmage-front/assets/120551363/e38af706-93ec-4fa9-8108-169716d6ec49)
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+<h3>채팅</h3>
 
-### Analyzing the Bundle Size
+<img width="921" alt="chat" src="https://github.com/Junhyung-Lee27/webmage-front/assets/120551363/caa5a655-9da4-47d9-830b-5e82ec66ba9a">
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
 
-### Making a Progressive Web App
+<h2>🙌 협업</h2>
+<h3>Figma</h3>
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+<img width="1014" alt="figma" src="https://github.com/Junhyung-Lee27/webmage-front/assets/120551363/68044ff4-40e5-416d-b5db-137d42ee3cbe">
 
-### Advanced Configuration
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+<h3>ERD 설계</h3>
 
-### Deployment
+<img width="951" alt="erd" src="https://github.com/Junhyung-Lee27/webmage-front/assets/120551363/3d2d6593-afb4-4915-96f8-32e2dfc99bcb">
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
 
-### `npm run build` fails to minify
+<h3>기능 명세서</h3>
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+<img width="1230" alt="functional specification" src="https://github.com/Junhyung-Lee27/webmage-front/assets/120551363/b653d273-a7bd-4ebe-ab80-f2d67c4ebc61">
+
+<h3>Daily Scrum (Notion)</h3>
+
+<img width="1237" alt="daily_scrum" src="https://github.com/Junhyung-Lee27/webmage-front/assets/120551363/fe6b43a1-7498-49c5-9bfa-c38dc797e0d1">
+
+<h3>Commit Convention</h3>
+
+- 새로운 기능, 파일 추가
+    - `Add <작성자 : 추가한 부분>`
+- 기능 업데이트
+    - `Update  <작성자 : 수정한 부분>`
+- 코드 수정
+    - `Modify <작성자 : 수정한 부분>`
+- 파일 삭제
+    - `Remove <작성자 : 삭제한 파일명>`
+- 불필요한 코드 삭제
+    - `Delete <작성자 : 삭제한 부분>`
+- 파일명 수정
+    - `Rename <작성자 : 수정 전 -> 수정 후>`
+
+
+<h2>👨‍👨‍👧‍👧 Web-Mage (웹법사) 팀원 소개</h2>
+
+<h3>FrontEnd</h3>
+<div>
+  <table>
+    <tr>
+      <td align="center" width="150px">
+        <a href="https://github.com/Junhyung-Lee27" target="_blank">
+          <img src="https://avatars.githubusercontent.com/u/61534393?v=4" alt="이준형 프로필" />
+        </a>
+      </td>
+      <td align="center" width="150px">
+        <a href="https://github.com/Oneiric0102" target="_blank">
+          <img src="https://avatars.githubusercontent.com/u/113768350?v=4" alt="이민주 프로필" />
+        </a>
+      </td>
+      <td align="center" width="150px">
+        <a href="https://github.com/Yumi-Heo" target="_blank">
+          <img src="https://avatars.githubusercontent.com/u/120551363?v=4" alt="허유미 프로필" />
+        </a>
+      </td>
+    </tr>
+    <tr>
+      <td align="center">
+        <a href="https://github.com/Junhyung-Lee27" target="_blank">
+          이준형
+        </a>
+      </td>
+      <td align="center">
+        <a href="https://github.com/Oneiric0102" target="_blank">
+          이민주
+        </a>
+      </td>
+      <td align="center">
+        <a href="https://github.com/Yumi-Heo" target="_blank">
+          허유미
+        </a>
+      </td>
+    </tr>
+  </table>
+</div>
+
+<h3>BackEnd</h3>
+<div>
+  <table>
+    <tr>
+      <td align="center" width="150px">
+        <a href="https://github.com/tein408" target="_blank">
+          <img src="https://avatars.githubusercontent.com/u/75615404?v=4" alt="강은하 프로필" />
+        </a>
+      </td>
+      <td align="center" width="150px">
+        <a href="https://github.com/KimChaeHong" target="_blank">
+          <img src="https://avatars.githubusercontent.com/u/49267413?v=4" alt="김채홍 프로필" />
+        </a>
+      </td>
+    </tr>
+    <tr>
+      <td align="center">
+        <a href="https://github.com/tein408" target="_blank">
+          강은하
+        </a>
+      </td>
+      <td align="center">
+        <a href="https://github.com/KimChaeHong" target="_blank">
+          김채홍
+        </a>
+      </td>
+    </tr>
+  </table>
+</div>
