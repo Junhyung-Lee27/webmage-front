@@ -4,6 +4,8 @@ import { login } from "../services/authService";
 import styled, { ThemeProvider } from "styled-components";
 import componentTheme from "./theme";
 import { useNavigate } from "react-router-dom";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 import { useDispatch, useSelector } from "react-redux";
 import { showSignup, showForgotPassword } from "../store/authpageSlice";
@@ -32,7 +34,7 @@ function LoginForm() {
   // 일반 로그인
   const handleLoginClick = async () => {
     const loginResponse = await login(username, password, 'EMAIL');
-    console.log(loginResponse);
+
     if (loginResponse.success) {
       dispatch(setUser({ userId: loginResponse.userId }));
       dispatch(setAuthToken(loginResponse.token));
@@ -40,7 +42,14 @@ function LoginForm() {
       window.location.reload(); // 페이지 리로드
       navigate("/manda");
     } else if (loginResponse.error) {
-      alert(loginResponse.error);
+      // alert(loginResponse.error);
+      toast.warn(loginResponse.error, {
+        position: toast.POSITION.BOTTOM_RIGHT,
+        autoClose: 2000,
+        hideProgressBar: true,
+        newestOnTop: true,
+      });
+      return;
     }
   };
 
@@ -59,6 +68,7 @@ function LoginForm() {
 
   return (
     <ThemeProvider theme={theme}>
+      <ToastContainer />
       <Column>
         <StyledText color={theme.color.font1} size="14" weight="600">
           <label htmlFor="username">아이디</label>
@@ -80,9 +90,7 @@ function LoginForm() {
           value={password}
           onChange={handlePasswordChange}
         ></StyledForm>
-        <StyledButton onClick={handleLoginClick}>
-          로그인
-        </StyledButton>
+        <StyledButton onClick={handleLoginClick}>로그인</StyledButton>
         <Row>
           <StyledText
             size="14"
