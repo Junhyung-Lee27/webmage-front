@@ -5,6 +5,7 @@ import componentTheme from "./theme";
 import { useDispatch, useSelector } from "react-redux";
 import { BASE_URL } from "./../config";
 import { resetMandaState, setSubs, setContents, setPrivacy, setMain } from "../store/mandaSlice";
+import { loadingBackground } from "./animations";
 
 function Manda({ currPage, setWriteMode, setSelectedSubIndex, setSelectedTitle }) {
   const dispatch = useDispatch();
@@ -254,16 +255,7 @@ const GridContainer = styled.div`
   flex-wrap: wrap;
   width: 100%;
   border-radius: 8px;
-
-  /* 데이터 로딩 중 애니메이션 */
-  animation: ${(props) => (props.isLoading ? "loadingAnimation 1.5s ease infinite" : "none")};
-  ${(props) => props.isLoading && loadingAnimation};
-  background: ${(props) =>
-    props.isLoading
-      ? "linear-gradient(120deg, #EDEDED 30%, #FDFDFD 38%, #FDFDFD 42%, #EDEDED 50%)"
-      : "transparent"};
-
-  background-size: 300% 300%;
+  ${loadingBackground}; // 로딩 애니메이션
 `;
 
 const GridItem = styled.table`
